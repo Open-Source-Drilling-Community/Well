@@ -1,0 +1,302 @@
+﻿@page "/Well"
+@inject ILogger<WellMain> logger
+@inject ISnackbar Snackbar
+
+<MudUnitAndReferenceChoiceTag HttpHost=@APIUtils.HostNameUnitConversion
+                              HttpBasePath=@APIUtils.HostBasePathUnitConversion
+                              HttpController="UnitSystem/"
+                              UnitSystemName="@DataUtils.UnitAndReferenceParameters.UnitSystemName"
+                              UnitSystemNameChanged="@DataUtils.UpdateUnitSystemName">
+    @if (wellList == null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else
+    {
+        <div hidden="@isHiddenMainPanel">
+            <MudDataGrid T="Well" MultiSelection="true" Items="@wellList" SelectedItemsChanged="@SelectedItemsChanged"
+                         EditMode="DataGridEditMode.Cell"
+                         Hover="true" RowClick="@RowClicked"
+                         SortMode="SortMode.Multiple" QuickFilter="@_wellFilter" Filterable="false"
+                         ReadOnly="false" ColumnResizeMode="ResizeMode.Column" Elevation="0">
+                <ToolBarContent>
+                    <MudText Typo="Typo.h6">Well</MudText>
+                    <MudButton OnClick="@AddWell" Color="@Color.Success" Class="add-item-btn">Add</MudButton>
+                    <MudButton OnClick="@DeleteSelectedWell" Color="@Color.Error" Class="add-item-btn">Delete</MudButton>
+                    <MudSpacer />
+                    <MudTextField @bind-Value="_searchString" Placeholder="Search" Adornment="Adornment.Start" Immediate="true"
+                                  AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+                </ToolBarContent>
+                <Columns>
+                    <SelectColumn T="Well" />
+                    <PropertyColumn Property="x => x.Name" Title="@DataUtils.WellNameLabel" CellStyle="width: 30%;" Sortable="true" Editable="false" />
+                    <PropertyColumn Property="x => x.Description" Title="@DataUtils.WellDescrLabel" CellStyle="width: 60%;" Sortable="true" Editable="false" />
+                    <TemplateColumn CellStyle="width: 5%;">
+                        <EditTemplate>
+                            <MudIconButton Size="@Size.Small" Icon="@Icons.Material.Outlined.Delete" OnClick="(() => DeleteWell(context.Item.MetaInfo.ID))" />
+                        </EditTemplate>
+                    </TemplateColumn>
+                </Columns>
+                <PagerContent>
+                    <MudDataGridPager T="Well" />
+                </PagerContent>
+            </MudDataGrid>
+        </div>
+    }
+    @if (isHiddenMainPanel && currentWell != null)
+    {
+        <WellEdit CurrentWell="@currentWell" OnUpdate="@ShowMainPanel" Fields="@fieldList" Clusters="@clusterList" />
+    }
+</MudUnitAndReferenceChoiceTag>
+
+@code {
+    // Well related variables
+    private List<Well> wellList = new();
+    private List<Well> selectedWellList = new();
+    private Well? currentWell;
+    private List<Field> fieldList = new();
+    private List<Cluster> clusterList = new();
+
+    // UI related variables
+    public bool isHiddenMainPanel;
+    public bool isHiddenEditPanel;
+    private string? _searchString;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            // Show main panel
+            isHiddenMainPanel = false;
+            isHiddenEditPanel = true;
+            currentWell = null;
+
+            // Starting all loading tasks asynchronously
+            logger.LogInformation("Trying to load list of Well from client: " + APIUtils.HostNameWell);
+            var wellTask = APIUtils.ClientWell.GetAllWellAsync();
+            var clusterTask = APIUtils.ClientCluster.GetAllClusterAsync();
+            var fieldTask = APIUtils.ClientField.GetAllFieldAsync();
+
+            List<Task> loadingTaskList = new List<Task> { wellTask, clusterTask, fieldTask };
+
+            // Awaiting tasks and retrieve results as they become available
+            while (loadingTaskList.Count > 0)
+            {
+                Task finishedTask = await Task.WhenAny(loadingTaskList);
+                if (finishedTask == wellTask)
+                {
+                    try
+                    {
+                        wellList = (List<Well>)await wellTask; // awaiting the finished task allows to retrieve its result and throw exception if needed
+                        if (wellList != null)
+                        {
+                            wellList.Sort((t1, t2) => t1.Name.CompareTo(t2.Name));
+                        }
+                        else
+                        {
+                            logger.LogWarning("Returned list of Well were null on initialization");
+                            Snackbar.Add("Returned list of Well were null on initialization", Severity.Warning);
+                        }
+                    }
+                    catch (ApiException ex)
+                    {
+                        logger.LogError(ex, "Impossible to load Well from client");
+                    }
+                }
+                else if (finishedTask == clusterTask)
+                {
+                    try
+                    {
+                        var clusters = (List<Cluster>)await clusterTask; // awaiting the finished task allows to retrieve its result and throw exception if needed
+                        // remove the single wells
+                        clusterList ??= new List<Cluster>();
+                        clusterList.Clear();
+                        foreach (Cluster cluster in clusters)
+                        {
+                            clusterList.Add(cluster);
+                        }
+                        if (clusterList != null)
+                        {
+                            clusterList.Sort((t1, t2) => t1.Name.CompareTo(t2.Name));
+                        }
+                        else
+                        {
+                            logger.LogWarning("Returned list of Cluster were null on initialization");
+                            Snackbar.Add("Returned list of Cluster were null on initialization", Severity.Warning);
+                        }
+                    }
+                    catch (ApiException ex)
+                    {
+                        logger.LogError(ex, "Impossible to load Cluster from client");
+                    }
+                }
+                else if (finishedTask == fieldTask)
+                {
+                    try
+                    {
+                        fieldList = (List<Field>)await fieldTask; // awaiting the finished task allows to retrieve its result and throw exception if needed
+                        if (fieldList != null)
+                        {
+                            fieldList.Sort((t1, t2) => t1.Name.CompareTo(t2.Name));
+                        }
+                        else
+                        {
+                            logger.LogWarning("Returned list of fields were null on initialization");
+                            Snackbar.Add("Returned list of fields was null on initialization", Severity.Warning);
+                        }
+                    }
+                    catch (ApiException ex)
+                    {
+                        logger.LogError(ex, "Impossible to load fields from client");
+                    }
+                }
+                loadingTaskList.Remove(finishedTask);
+            }
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Problem Well initialization");
+        }
+        await InvokeAsync(() => { StateHasChanged(); });
+    }
+
+    private async Task AddWell()
+    {
+        try
+        {
+            MetaInfo metaInfo = new() { ID = Guid.NewGuid(), HttpHostName = APIUtils.HostNameWell, HttpHostBasePath = APIUtils.HostBasePathWell, HttpEndPoint = "Well/" };
+            DateTimeOffset creationDate = DateTimeOffset.UtcNow;
+            Well currentWell = new()
+                {
+                    MetaInfo = metaInfo,
+                    Name = DataUtils.DEFAULT_NAME_Well,
+                    Description = DataUtils.DEFAULT_DESCR_Well,
+                    CreationDate = creationDate,
+                    LastModificationDate = creationDate,
+                };
+            await APIUtils.ClientWell.PostWellAsync(currentWell);
+            logger.LogInformation("Well posted successfully");
+            Snackbar.Add("Well posted successfully", Severity.Success);
+            await OnInitializedAsync();
+            // Find the newly created datum in the refreshed list
+            var addedWell = wellList.FirstOrDefault(d => d.MetaInfo?.ID == currentWell.MetaInfo?.ID);
+            if (addedWell != null)
+            {
+                logger.LogInformation("Well posted successfully");
+                Snackbar.Add("Well posted successfully", Severity.Success);
+                await RowClicked(new DataGridRowClickEventArgs<Well>(new MouseEventArgs(), addedWell, -1));
+            }
+            else
+            {
+
+                logger.LogError("Could not retrieve the added Well");
+                Snackbar.Add("Could not retrieve the added Well", Severity.Warning);
+            }
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Impossible to add a new Well");
+            Snackbar.Add("Impossible to add a new Well", Severity.Warning);
+        }
+    }
+
+    private async Task RowClicked(DataGridRowClickEventArgs<Well> args)
+    {
+        await EditWell(args.Item.MetaInfo.ID);
+    }
+
+    private async Task EditWell(Guid id)
+    {
+        try
+        {
+            currentWell = await APIUtils.ClientWell.GetWellByIdAsync(id);
+            if (currentWell != null)
+            {
+                isHiddenMainPanel = true;
+                isHiddenEditPanel = false;
+                await InvokeAsync(() => { StateHasChanged(); });
+            }
+            else
+            {
+                logger.LogWarning("Impossible to load Well");
+                Snackbar.Add("Impossible to load Well", Severity.Warning);
+            }
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Impossible to load Well to be edited");
+        }
+    }
+
+    private async Task DeleteWell(Guid id)
+    {
+        try
+        {
+            await APIUtils.ClientWell.DeleteWellByIdAsync(id);
+            await OnInitializedAsync();
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Impossible to delete Well");
+        }
+    }
+
+    private async Task DeleteSelectedWell()
+    {
+        try
+        {
+            foreach (Well well in selectedWellList)
+            {
+                await APIUtils.ClientWell.DeleteWellByIdAsync(well.MetaInfo.ID);
+            }
+            await OnInitializedAsync();
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Impossible to delete all Well");
+        }
+
+    }
+
+    //Quick filter - filter gobally across multiple columns with the same input
+    private Func<Well, bool>
+    _wellFilter => x =>
+    {
+        if (string.IsNullOrWhiteSpace(_searchString))
+            return true;
+        if ($"{x.Name} {x.Description}".Contains(_searchString))
+            return true;
+
+        return false;
+    };
+
+    //Events
+    private void StartedEditingItem(Well item)
+    {
+        //Activating Edit event capture with parameter StartedEditingItem="@StartedEditingItem" in MudDataGrid; arguments are specified in OnClick="@context.Actions.StartedEditingItem(...)"
+    }
+
+    private void CancelledEditingItem(Well item)
+    {
+        //Activating Cancel event capture with parameter CancelledEditingItem = "@CancelledEditingItem" in MudDataGrid; arguments are specified in OnClick="@context.Actions.CancelledEditingItem(...)"
+    }
+
+    private void CommittedItemChanges(Well item)
+    {
+        //Activating Commit event capture with parameter CommittedItemChanges = "@CommittedItemChanges" in MudDataGrid; arguments are specified in OnClick="@context.Actions.CommittedEditingItem(...)"
+    }
+
+    void SelectedItemsChanged(HashSet<Well>
+        items)
+    {
+        selectedWellList.Clear();
+        selectedWellList.InsertRange(0, items);
+    }
+
+    private async void ShowMainPanel()
+    {
+        isHiddenMainPanel = false;
+        isHiddenEditPanel = true;
+        await OnInitializedAsync();
+    }
+}

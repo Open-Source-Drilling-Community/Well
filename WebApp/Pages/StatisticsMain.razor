@@ -1,0 +1,139 @@
+﻿@page "/Statistics"
+@inject ILogger<StatisticsMain> logger
+@inject ISnackbar Snackbar
+
+@if (statistics_ == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div hidden="@isHiddenMainPanel">
+        <MudText Class="mt-4 mb-4" Typo="Typo.h5"><strong>Usage Statistics</strong></MudText>
+        <div style="width: 90%; margin: auto">
+            <MudGrid>
+                <MudItem xs="6">
+                    <MudText Typo="Typo.h6">Total count:</MudText>
+                </MudItem>
+                <MudItem xs="6">
+                    <MudText Typo="Typo.body1">@totalCount_</MudText>
+                </MudItem>
+                <MudItem xs="6">
+                    <MudText Typo="Typo.h6">Well Count:</MudText>
+                </MudItem>
+                <MudItem xs="6">
+                    <MudText Typo="Typo.body1">@WellCount_</MudText>
+                </MudItem>
+            </MudGrid>
+        </div>
+    </div>
+}
+
+@code {
+    private UsageStatisticsWell statistics_ = null!;
+    private long totalCount_ = 0;
+    private long WellCount_ = 0;
+    private long WellConversionSetCount_ = 0;
+
+    private bool isHiddenMainPanel = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            statistics_ = await APIUtils.ClientWell.GetWellUsageStatisticsAsync();
+            if (statistics_ != null)
+            {
+                totalCount_ = 0;
+                WellCount_ = 0;
+                WellConversionSetCount_ = 0;
+
+                if (statistics_.GetAllWellIdPerDay != null && statistics_.GetAllWellIdPerDay.Data != null)
+                {
+                    foreach (CountPerDay count in statistics_.GetAllWellIdPerDay.Data)
+                    {
+                        if (count != null)
+                        {
+                            totalCount_ += count.Count;
+                            WellCount_ += count.Count;
+                        }
+                    }
+                }
+                if (statistics_.GetAllWellMetaInfoPerDay != null && statistics_.GetAllWellMetaInfoPerDay.Data != null)
+                {
+                    foreach (CountPerDay count in statistics_.GetAllWellMetaInfoPerDay.Data)
+                    {
+                        if (count != null)
+                        {
+                            totalCount_ += count.Count;
+                            WellCount_ += count.Count;
+                        }
+                    }
+                }
+                if (statistics_.GetWellByIdPerDay != null && statistics_.GetWellByIdPerDay.Data != null)
+                {
+                    foreach (CountPerDay count in statistics_.GetWellByIdPerDay.Data)
+                    {
+                        if (count != null)
+                        {
+                            totalCount_ += count.Count;
+                            WellCount_ += count.Count;
+                        }
+                    }
+                }
+                if (statistics_.GetAllWellPerDay != null && statistics_.GetAllWellPerDay.Data != null)
+                {
+                    foreach (CountPerDay count in statistics_.GetAllWellPerDay.Data)
+                    {
+                        if (count != null)
+                        {
+                            totalCount_ += count.Count;
+                            WellCount_ += count.Count;
+                        }
+                    }
+                }
+                if (statistics_.PostWellPerDay != null && statistics_.PostWellPerDay.Data != null)
+                {
+                    foreach (CountPerDay count in statistics_.PostWellPerDay.Data)
+                    {
+                        if (count != null)
+                        {
+                            totalCount_ += count.Count;
+                            WellCount_ += count.Count;
+                        }
+                    }
+                }
+                if (statistics_.PutWellByIdPerDay != null && statistics_.PutWellByIdPerDay.Data != null)
+                {
+                    foreach (CountPerDay count in statistics_.PutWellByIdPerDay.Data)
+                    {
+                        if (count != null)
+                        {
+                            totalCount_ += count.Count;
+                            WellCount_ += count.Count;
+                        }
+                    }
+                }
+                if (statistics_.DeleteWellByIdPerDay != null && statistics_.DeleteWellByIdPerDay.Data != null)
+                {
+                    foreach (CountPerDay count in statistics_.DeleteWellByIdPerDay.Data)
+                    {
+                        if (count != null)
+                        {
+                            totalCount_ += count.Count;
+                            WellCount_ += count.Count;
+                        }
+                    }
+                }
+            }
+            // Show main panel
+            isHiddenMainPanel = false;
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Problem UsageStatistics initialization");
+        }
+        await InvokeAsync(() => { StateHasChanged(); });
+    }
+
+}

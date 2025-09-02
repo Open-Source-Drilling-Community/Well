@@ -1,0 +1,385 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "Service, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null",
+    "version": "1.0"
+  },
+  "paths": {
+    "/Well": {
+      "get": {
+        "tags": [
+          "Well"
+        ],
+        "operationId": "GetAllWellId",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "format": "uuid"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Well"
+        ],
+        "operationId": "PostWell",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NORCE.Drilling.Well.Model.Well"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NORCE.Drilling.Well.Model.Well"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/NORCE.Drilling.Well.Model.Well"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/Well/MetaInfo": {
+      "get": {
+        "tags": [
+          "Well"
+        ],
+        "operationId": "GetAllWellMetaInfo",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/OSDC.DotnetLibraries.General.DataManagement.MetaInfo"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/Well/{id}": {
+      "get": {
+        "tags": [
+          "Well"
+        ],
+        "operationId": "GetWellById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NORCE.Drilling.Well.Model.Well"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Well"
+        ],
+        "operationId": "PutWellById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NORCE.Drilling.Well.Model.Well"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NORCE.Drilling.Well.Model.Well"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/NORCE.Drilling.Well.Model.Well"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Well"
+        ],
+        "operationId": "DeleteWellById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/Well/HeavyData": {
+      "get": {
+        "tags": [
+          "Well"
+        ],
+        "operationId": "GetAllWell",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/NORCE.Drilling.Well.Model.Well"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/Well/UsedSlot/{clusterId}": {
+      "get": {
+        "tags": [
+          "Well"
+        ],
+        "operationId": "GetAllUsedSlotMetaInfoByClusterId",
+        "parameters": [
+          {
+            "name": "clusterId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/OSDC.DotnetLibraries.General.DataManagement.MetaInfo"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/WellUsageStatistics": {
+      "get": {
+        "tags": [
+          "WellUsageStatistics"
+        ],
+        "operationId": "GetWellUsageStatistics",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NORCE.Drilling.Well.Model.UsageStatisticsWell"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "NORCE.Drilling.Well.Model.CountPerDay": {
+        "type": "object",
+        "properties": {
+          "Date": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "Count": {
+            "type": "integer",
+            "format": "int64"
+          }
+        },
+        "additionalProperties": false
+      },
+      "NORCE.Drilling.Well.Model.History": {
+        "type": "object",
+        "properties": {
+          "Data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/NORCE.Drilling.Well.Model.CountPerDay"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "NORCE.Drilling.Well.Model.UsageStatisticsWell": {
+        "type": "object",
+        "properties": {
+          "LastSaved": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "BackUpInterval": {
+            "type": "string",
+            "format": "date-span"
+          },
+          "GetAllWellIdPerDay": {
+            "$ref": "#/components/schemas/NORCE.Drilling.Well.Model.History"
+          },
+          "GetAllWellMetaInfoPerDay": {
+            "$ref": "#/components/schemas/NORCE.Drilling.Well.Model.History"
+          },
+          "GetWellByIdPerDay": {
+            "$ref": "#/components/schemas/NORCE.Drilling.Well.Model.History"
+          },
+          "GetAllWellPerDay": {
+            "$ref": "#/components/schemas/NORCE.Drilling.Well.Model.History"
+          },
+          "PostWellPerDay": {
+            "$ref": "#/components/schemas/NORCE.Drilling.Well.Model.History"
+          },
+          "PutWellByIdPerDay": {
+            "$ref": "#/components/schemas/NORCE.Drilling.Well.Model.History"
+          },
+          "DeleteWellByIdPerDay": {
+            "$ref": "#/components/schemas/NORCE.Drilling.Well.Model.History"
+          }
+        },
+        "additionalProperties": false
+      },
+      "NORCE.Drilling.Well.Model.Well": {
+        "type": "object",
+        "properties": {
+          "MetaInfo": {
+            "$ref": "#/components/schemas/OSDC.DotnetLibraries.General.DataManagement.MetaInfo"
+          },
+          "Name": {
+            "type": "string",
+            "nullable": true
+          },
+          "Description": {
+            "type": "string",
+            "nullable": true
+          },
+          "CreationDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "LastModificationDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "SlotID": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "ClusterID": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "IsSingleWell": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
+      "OSDC.DotnetLibraries.General.DataManagement.MetaInfo": {
+        "type": "object",
+        "properties": {
+          "ID": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "HttpHostName": {
+            "type": "string",
+            "nullable": true
+          },
+          "HttpHostBasePath": {
+            "type": "string",
+            "nullable": true
+          },
+          "HttpEndPoint": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  }
+}
