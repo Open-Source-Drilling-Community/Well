@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using OSDC.DotnetLibraries.General.DataManagement;
 using NORCE.Drilling.Well.Service.Managers;
+using NORCE.Drilling.Well.Model;
 
 namespace NORCE.Drilling.Well.Service.Controllers
 {
@@ -29,6 +30,7 @@ namespace NORCE.Drilling.Well.Service.Controllers
         [HttpGet(Name = "GetAllWellId")]
         public ActionResult<IEnumerable<Guid>> GetAllWellId()
         {
+            UsageStatisticsWell.Instance.IncrementGetAllWellIdPerDay();
             var ids = _wellManager.GetAllWellId();
             if (ids != null)
             {
@@ -47,6 +49,7 @@ namespace NORCE.Drilling.Well.Service.Controllers
         [HttpGet("MetaInfo", Name = "GetAllWellMetaInfo")]
         public ActionResult<IEnumerable<MetaInfo>> GetAllWellMetaInfo()
         {
+            UsageStatisticsWell.Instance.IncrementGetAllWellMetaInfoPerDay();
             var vals = _wellManager.GetAllWellMetaInfo();
             if (vals != null)
             {
@@ -66,6 +69,7 @@ namespace NORCE.Drilling.Well.Service.Controllers
         [HttpGet("{id}", Name = "GetWellById")]
         public ActionResult<Model.Well?> GetWellById(Guid id)
         {
+            UsageStatisticsWell.Instance.IncrementGetWellByIdPerDay();
             if (!id.Equals(Guid.Empty))
             {
                 var val = _wellManager.GetWellById(id);
@@ -91,6 +95,7 @@ namespace NORCE.Drilling.Well.Service.Controllers
         [HttpGet("HeavyData", Name = "GetAllWell")]
         public ActionResult<IEnumerable<Model.Well?>> GetAllWell()
         {
+            UsageStatisticsWell.Instance.IncrementGetAllWellPerDay();
             var vals = _wellManager.GetAllWell();
             if (vals != null)
             {
@@ -136,6 +141,7 @@ namespace NORCE.Drilling.Well.Service.Controllers
         [HttpPost(Name = "PostWell")]
         public ActionResult PostWell([FromBody] Model.Well? data)
         {
+            UsageStatisticsWell.Instance.IncrementPostWellPerDay();
             // Check if well exists in the database through ID
             if (data != null && data.MetaInfo != null && data.MetaInfo.ID != Guid.Empty)
             {
@@ -174,6 +180,7 @@ namespace NORCE.Drilling.Well.Service.Controllers
         [HttpPut("{id}", Name = "PutWellById")]
         public ActionResult PutWellById(Guid id, [FromBody] Model.Well? data)
         {
+            UsageStatisticsWell.Instance.IncrementPutWellByIdPerDay();
             // Check if Well is in the data base
             if (data != null && data.MetaInfo != null && data.MetaInfo.ID.Equals(id))
             {
@@ -210,6 +217,7 @@ namespace NORCE.Drilling.Well.Service.Controllers
         [HttpDelete("{id}", Name = "DeleteWellById")]
         public ActionResult DeleteWellById(Guid id)
         {
+            UsageStatisticsWell.Instance.IncrementDeleteWellByIdPerDay();
             if (_wellManager.GetWellById(id) != null)
             {
                 if (_wellManager.DeleteWellById(id))
