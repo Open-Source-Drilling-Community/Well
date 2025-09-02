@@ -18,7 +18,7 @@
                 <MudTextField @bind-Value="@_descr" Label="Description" Variant="Variant.Filled"></MudTextField>
             </MudItem>
 
-         @*    @if (Fields != null)
+            @if (Fields != null)
             {
                 <MudItem xs="12" sm="6" md="6" lg="6" xl="6" xxl="6">
                     <MudSelect Label="Field" @bind-Value="@_selectedField" Dense="true" ToStringFunc="@(s => s?.Name)">
@@ -37,7 +37,7 @@
             </MudItem>
             <MudItem xs="2" sm="4" md="8" lg="8" xl="8" xxl="8">
             </MudItem>
-            @if (_isSingleWell)
+ @*            @if (_isSingleWell)
             {
                 <MudItem xs="12" sm="2" md="2" lg="2">
                     <MudInputAngleWithUnitAdornment QuantityLabel="Ref. Latitude (WGS84)"
