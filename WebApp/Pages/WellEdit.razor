@@ -281,70 +281,70 @@
             Parent.Add(this);
             ManageUnits();
 
-            // if (CurrentWell != null && CurrentWell.MetaInfo != null)
-            // {
-            //     _name = CurrentWell.Name;
-            //     _descr = CurrentWell.Description;
-            //     _isSingleWell = CurrentWell.IsSingleWell;
-            //     _selectedCluster = null;
-            //     _selectedSlot = null;
-            //     _selectedField = null;
-            //     if (Clusters != null)
-            //     {
-            //         foreach (var cluster in Clusters)
-            //         {
-            //             if (cluster != null && cluster.MetaInfo != null && cluster.MetaInfo.ID == CurrentWell.ClusterID)
-            //             {
-            //                 _selectedCluster = cluster;
-            //                 if (cluster != null && cluster.Slots != null && CurrentWell.SlotID != null && CurrentWell.SlotID != Guid.Empty)
-            //                 {
-            //                     if (cluster.Slots.ContainsKey(CurrentWell.SlotID.ToString()))
-            //                     {
-            //                         _selectedSlot = cluster.Slots[CurrentWell.SlotID.ToString()];
-            //                     }
-            //                 }
-            //                 break;
-            //             }
-            //         }
-            //     }
-            //     if (Fields != null && _selectedCluster != null && _selectedCluster.MetaInfo != null)
-            //     {
-            //         foreach (var field in Fields)
-            //         {
-            //             if (field != null && field.MetaInfo != null && field.MetaInfo.ID == _selectedCluster.FieldID)
-            //             {
-            //                 _selectedField = field;
-            //                 break;
-            //             }
-            //         }
-            //     }
-            //     if (CurrentWell.IsSingleWell)
-            //     {
-            //         _singleWellCluster = _selectedCluster;
-            //         _singleWellSlot = _selectedSlot;
-            //         _selectedCluster = null;
-            //         _selectedSlot = null;
-            //         if (_singleWellCluster != null && _singleWellSlot != null && _selectedField != null && _selectedField.MetaInfo != null && _selectedField.MetaInfo.ID != Guid.Empty)
-            //         {
-            //             singleWellLatitudeWGS84 = _singleWellCluster.ReferenceLatitude?.GaussianValue?.Mean;
-            //             singleWellLongitudeWGS84 = _singleWellCluster.ReferenceLongitude?.GaussianValue?.Mean;
-            //             singleWellDepthWGS84 = _singleWellCluster.ReferenceDepth?.GaussianValue?.Mean;
-            //             singleWellDepthAccuracy = _singleWellCluster.ReferenceDepth?.GaussianValue?.StandardDeviation;
-            //             singleWellNorthingAccuracy = _singleWellCluster.ReferenceLatitude?.GaussianValue?.StandardDeviation * APIUtils.EarthRadiusWGS84;
-            //             singleWellEastingAccuracy = _singleWellCluster.ReferenceLongitude?.GaussianValue?.StandardDeviation * APIUtils.EarthRadiusWGS84;
-            //             singleWellGroundMudLineDepthWGS84 = _singleWellCluster.GroundMudLineDepth?.GaussianValue?.Mean;
-            //             singleWellGroundMudLineDepthAccuracy = _singleWellCluster.GroundMudLineDepth?.GaussianValue?.StandardDeviation;
-            //             singleWellTopWaterDepthWGS84 = _singleWellCluster.TopWaterDepth?.GaussianValue?.Mean;
-            //             singleWellTopWaterDepthAccuracy = _singleWellCluster.TopWaterDepth?.GaussianValue?.StandardDeviation;
-            //             CalculateWGS84();
-            //         }
-            //     }
-            // }
-            // else
-            // {
-            //     logger.LogError("Current Well is null or badly formed");
-            //     Snackbar.Add("Current Well is null or badly formed", Severity.Error);
-            // }
+            if (CurrentWell != null && CurrentWell.MetaInfo != null)
+            {
+                _name = CurrentWell.Name;
+                _descr = CurrentWell.Description;
+                _isSingleWell = CurrentWell.IsSingleWell;
+                _selectedCluster = null;
+                _selectedSlot = null;
+                _selectedField = null;
+                if (Clusters != null)
+                {
+                    foreach (var cluster in Clusters)
+                    {
+                        if (cluster != null && cluster.MetaInfo != null && cluster.MetaInfo.ID == CurrentWell.ClusterID)
+                        {
+                            _selectedCluster = cluster;
+                            if (cluster != null && cluster.Slots != null && CurrentWell.SlotID != null && CurrentWell.SlotID != Guid.Empty)
+                            {
+                                if (cluster.Slots.ContainsKey(CurrentWell.SlotID.ToString()))
+                                {
+                                    _selectedSlot = cluster.Slots[CurrentWell.SlotID.ToString()];
+                                }
+                            }
+                            break;
+                        }
+                    }
+                }
+                if (Fields != null && _selectedCluster != null && _selectedCluster.MetaInfo != null)
+                {
+                    foreach (var field in Fields)
+                    {
+                        if (field != null && field.MetaInfo != null && field.MetaInfo.ID == _selectedCluster.FieldID)
+                        {
+                            _selectedField = field;
+                            break;
+                        }
+                    }
+                }
+                if (CurrentWell.IsSingleWell)
+                {
+                    _singleWellCluster = _selectedCluster;
+                    _singleWellSlot = _selectedSlot;
+                    _selectedCluster = null;
+                    _selectedSlot = null;
+                    if (_singleWellCluster != null && _singleWellSlot != null && _selectedField != null && _selectedField.MetaInfo != null && _selectedField.MetaInfo.ID != Guid.Empty)
+                    {
+                        singleWellLatitudeWGS84 = _singleWellCluster.ReferenceLatitude?.GaussianValue?.Mean;
+                        singleWellLongitudeWGS84 = _singleWellCluster.ReferenceLongitude?.GaussianValue?.Mean;
+                        singleWellDepthWGS84 = _singleWellCluster.ReferenceDepth?.GaussianValue?.Mean;
+                        singleWellDepthAccuracy = _singleWellCluster.ReferenceDepth?.GaussianValue?.StandardDeviation;
+                        singleWellNorthingAccuracy = _singleWellCluster.ReferenceLatitude?.GaussianValue?.StandardDeviation * APIUtils.EarthRadiusWGS84;
+                        singleWellEastingAccuracy = _singleWellCluster.ReferenceLongitude?.GaussianValue?.StandardDeviation * APIUtils.EarthRadiusWGS84;
+                        singleWellGroundMudLineDepthWGS84 = _singleWellCluster.GroundMudLineDepth?.GaussianValue?.Mean;
+                        singleWellGroundMudLineDepthAccuracy = _singleWellCluster.GroundMudLineDepth?.GaussianValue?.StandardDeviation;
+                        singleWellTopWaterDepthWGS84 = _singleWellCluster.TopWaterDepth?.GaussianValue?.Mean;
+                        singleWellTopWaterDepthAccuracy = _singleWellCluster.TopWaterDepth?.GaussianValue?.StandardDeviation;
+                        CalculateWGS84();
+                    }
+                }
+            }
+            else
+            {
+                logger.LogError("Current Well is null or badly formed");
+                Snackbar.Add("Current Well is null or badly formed", Severity.Error);
+            }
         }
         catch (Exception ex)
         {
