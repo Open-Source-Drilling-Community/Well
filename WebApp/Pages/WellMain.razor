@@ -178,7 +178,7 @@
             logger.LogInformation("Well posted successfully");
             Snackbar.Add("Well posted successfully", Severity.Success);
             await OnInitializedAsync();
-            // Find the newly created datum in the refreshed list
+            // Find the newly created well in the refreshed list
             var addedWell = wellList.FirstOrDefault(d => d.MetaInfo?.ID == currentWell.MetaInfo?.ID);
             if (addedWell != null)
             {
