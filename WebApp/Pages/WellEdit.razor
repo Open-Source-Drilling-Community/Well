@@ -125,37 +125,29 @@
                                                SIValueNullable="singleWellDepthAccuracy"
                                                SIValueNullableChanged="@(val => singleWellDepthAccuracy = val)" />
                 </MudItem>
-                <MudItem xs="12" sm="4" md="4" lg="4">
+                <MudItem xs="12" sm="3" md="3" lg="3">
                     <MudInputWithUnitAdornment QuantityName="DepthDrilling"
-                                               QuantityLabel="Ground/Mud Line Depth (WGS84)"
-                                               SIValueNullable="singleWellGroundMudLineDepthWGS84"
-                                               SIValueNullableChanged="@ChangeSingleWellGroundMudLineDepthWGS84" />
+                                               @key="@($"ground-mud-depth-{_depthReferenceInputVersion}")"
+                                               QuantityLabel="Ground/Mud Line Depth"
+                                               DrillingSignalReference="@DrillingSignalReferenceType.Depth"
+                                               SIValueNullable="singleWellGroundMudLineDepth"
+                                               SIValueNullableChanged="@ChangeSingleWellGroundMudLineDepth" />
                 </MudItem>
-                <MudItem xs="12" sm="4" md="4" lg="4">
-                    <MudInputWithUnitAdornment QuantityName="DepthDrilling"
-                                               QuantityLabel="Ground/Mud Line Depth (Datum)"
-                                               SIValueNullable="singleWellGroundMudLineDepthDatum"
-                                               SIValueNullableChanged="@ChangeSingleWellGroundMudLineDepthDatum" />
-                </MudItem>
-                <MudItem xs="12" sm="4" md="4" lg="4">
+                <MudItem xs="12" sm="3" md="3" lg="3">
                     <MudInputWithUnitAdornment QuantityName="LengthSmall"
                                                QuantityLabel="Ground/Mud Line Accuracy"
                                                SIValueNullable="singleWellGroundMudLineDepthAccuracy"
                                                SIValueNullableChanged="@(val => singleWellGroundMudLineDepthAccuracy = val)" />
                 </MudItem>
-                <MudItem xs="12" sm="4" md="4" lg="4">
+                <MudItem xs="12" sm="3" md="3" lg="3">
                     <MudInputWithUnitAdornment QuantityName="DepthDrilling"
-                                               QuantityLabel="Top Water Depth (WGS84)"
-                                               SIValueNullable="singleWellTopWaterDepthWGS84"
-                                               SIValueNullableChanged="@ChangeSingleWellTopWaterDepthWGS84" />
+                                               @key="@($"top-water-depth-{_depthReferenceInputVersion}")"
+                                               QuantityLabel="Top Water Depth"
+                                               DrillingSignalReference="@DrillingSignalReferenceType.Depth"
+                                               SIValueNullable="singleWellTopWaterDepth"
+                                               SIValueNullableChanged="@ChangeSingleWellTopWaterDepth" />
                 </MudItem>
-                <MudItem xs="12" sm="4" md="4" lg="4">
-                    <MudInputWithUnitAdornment QuantityName="DepthDrilling"
-                                               QuantityLabel="Top Water Depth (Datum)"
-                                               SIValueNullable="singleWellTopWaterDepthDatum"
-                                               SIValueNullableChanged="@ChangeSingleWellTopWaterDepthDatum" />
-                </MudItem>
-                <MudItem xs="12" sm="4" md="4" lg="4">
+                <MudItem xs="12" sm="3" md="3" lg="3">
                     <MudInputWithUnitAdornment QuantityName="LengthSmall"
                                                QuantityLabel="Top Water Accuracy"
                                                SIValueNullable="singleWellTopWaterDepthAccuracy"
@@ -172,6 +164,7 @@
                                  YAxisReversed="@true" AspectRatio="-1" PlotHeight="500" PlotWidth="500"
                                  PlotTitle="Depth References" XAxisTitle="@DataUtils.DepthReferencesXValuesTitle" YAxisTitle="@DataUtils.DepthReferencesYValuesTitle"
                                  XUnit="@DataUtils.DepthReferencesXValuesQty" YUnit="@DataUtils.DepthReferencesYValuesQty"
+                                 YDrillingSignalReference="@DrillingSignalReferenceType.Depth"
                                  @ref="@depthPlot"
                                  ID="DepthPlot">
                     </ScatterPlot>
@@ -254,12 +247,11 @@
     private double? singleWellDepthWGS84 = null;
     private double? singleWellDepthDatum = null;
     private double? singleWellDepthAccuracy = null;
-    private double? singleWellGroundMudLineDepthWGS84 = null;
-    private double? singleWellGroundMudLineDepthDatum = null;
+    private double? singleWellGroundMudLineDepth = null;
     private double? singleWellGroundMudLineDepthAccuracy = null;
-    private double? singleWellTopWaterDepthWGS84 = null;
-    private double? singleWellTopWaterDepthDatum = null;
+    private double? singleWellTopWaterDepth = null;
     private double? singleWellTopWaterDepthAccuracy = null;
+    private int _depthReferenceInputVersion = 0;
 
     private string[] colorScale = { "black", "blue", "grey", "red", "orange", "green", "yellow", "pink", "brown", "purple" };
     private ScatterPlot depthPlot = new ScatterPlot();
@@ -332,9 +324,9 @@
                         singleWellDepthAccuracy = _singleWellCluster.ReferenceDepth?.GaussianValue?.StandardDeviation;
                         singleWellNorthingAccuracy = _singleWellCluster.ReferenceLatitude?.GaussianValue?.StandardDeviation * APIUtils.EarthRadiusWGS84;
                         singleWellEastingAccuracy = _singleWellCluster.ReferenceLongitude?.GaussianValue?.StandardDeviation * APIUtils.EarthRadiusWGS84;
-                        singleWellGroundMudLineDepthWGS84 = _singleWellCluster.GroundMudLineDepth?.GaussianValue?.Mean;
+                        singleWellGroundMudLineDepth = _singleWellCluster.GroundMudLineDepth?.GaussianValue?.Mean;
                         singleWellGroundMudLineDepthAccuracy = _singleWellCluster.GroundMudLineDepth?.GaussianValue?.StandardDeviation;
-                        singleWellTopWaterDepthWGS84 = _singleWellCluster.TopWaterDepth?.GaussianValue?.Mean;
+                        singleWellTopWaterDepth = _singleWellCluster.TopWaterDepth?.GaussianValue?.Mean;
                         singleWellTopWaterDepthAccuracy = _singleWellCluster.TopWaterDepth?.GaussianValue?.StandardDeviation;
                         CalculateWGS84();
                     }
@@ -356,7 +348,7 @@
 
     public void ManageUnits()
     {
-
+        depthPlot.Plot();
     }
 
     private async Task Update()
@@ -391,8 +383,8 @@
                             ReferenceDepth = (singleWellDepthWGS84 == null) ? null : new GaussianDrillingProperty() { GaussianValue = new GaussianDistribution() { Mean = singleWellDepthWGS84, StandardDeviation = (singleWellDepthAccuracy != null) ? singleWellDepthAccuracy : 0.01 } },
                             ReferenceLatitude = (singleWellLatitudeWGS84 == null) ? null : new GaussianDrillingProperty() { GaussianValue = new GaussianDistribution() { Mean = singleWellLatitudeWGS84, StandardDeviation = (singleWellNorthingAccuracy != null) ? singleWellNorthingAccuracy / APIUtils.EarthRadiusWGS84 : 0.01 } },
                             ReferenceLongitude = (singleWellLongitudeWGS84 == null) ? null : new GaussianDrillingProperty() { GaussianValue = new GaussianDistribution() { Mean = singleWellLongitudeWGS84, StandardDeviation = (singleWellEastingAccuracy != null) ? singleWellEastingAccuracy / APIUtils.EarthRadiusWGS84 : 0.01 } },
-                            GroundMudLineDepth = (singleWellGroundMudLineDepthWGS84 == null) ? null : new GaussianDrillingProperty() { GaussianValue = new GaussianDistribution() { Mean = singleWellGroundMudLineDepthWGS84, StandardDeviation = (singleWellGroundMudLineDepthAccuracy != null) ? singleWellGroundMudLineDepthAccuracy : 0.01 } },
-                            TopWaterDepth = (singleWellTopWaterDepthWGS84 == null) ? null : new GaussianDrillingProperty() { GaussianValue = new GaussianDistribution() { Mean = singleWellTopWaterDepthWGS84, StandardDeviation = (singleWellTopWaterDepthAccuracy != null) ? singleWellTopWaterDepthAccuracy : 0.01 } },
+                            GroundMudLineDepth = (singleWellGroundMudLineDepth == null) ? null : new GaussianDrillingProperty() { GaussianValue = new GaussianDistribution() { Mean = singleWellGroundMudLineDepth, StandardDeviation = (singleWellGroundMudLineDepthAccuracy != null) ? singleWellGroundMudLineDepthAccuracy : 0.01 } },
+                            TopWaterDepth = (singleWellTopWaterDepth == null) ? null : new GaussianDrillingProperty() { GaussianValue = new GaussianDistribution() { Mean = singleWellTopWaterDepth, StandardDeviation = (singleWellTopWaterDepthAccuracy != null) ? singleWellTopWaterDepthAccuracy : 0.01 } },
                         };
                         cluster.Slots = new Dictionary<string, Slot>();
                         cluster.Slots.Add(slot.ID.ToString(), new Slot()
@@ -425,8 +417,8 @@
                                     ReferenceDepth = (singleWellDepthWGS84 == null) ? null : new GaussianDrillingProperty() { GaussianValue = new GaussianDistribution() { Mean = singleWellDepthWGS84, StandardDeviation = (singleWellDepthAccuracy != null) ? singleWellDepthAccuracy : 0.01 } },
                                     ReferenceLatitude = (singleWellLatitudeWGS84 == null) ? null : new GaussianDrillingProperty() { GaussianValue = new GaussianDistribution() { Mean = singleWellLatitudeWGS84, StandardDeviation = (singleWellNorthingAccuracy != null) ? singleWellNorthingAccuracy / APIUtils.EarthRadiusWGS84 : 0.01 } },
                                     ReferenceLongitude = (singleWellLongitudeWGS84 == null) ? null : new GaussianDrillingProperty() { GaussianValue = new GaussianDistribution() { Mean = singleWellLongitudeWGS84, StandardDeviation = (singleWellEastingAccuracy != null) ? singleWellEastingAccuracy / APIUtils.EarthRadiusWGS84 : 0.01 } },
-                                    GroundMudLineDepth = (singleWellGroundMudLineDepthWGS84 == null) ? null : new GaussianDrillingProperty() { GaussianValue = new GaussianDistribution() { Mean = singleWellGroundMudLineDepthWGS84, StandardDeviation = (singleWellGroundMudLineDepthAccuracy != null) ? singleWellGroundMudLineDepthAccuracy : 0.01 } },
-                                    TopWaterDepth = (singleWellTopWaterDepthWGS84 == null) ? null : new GaussianDrillingProperty() { GaussianValue = new GaussianDistribution() { Mean = singleWellTopWaterDepthWGS84, StandardDeviation = (singleWellTopWaterDepthAccuracy != null) ? singleWellTopWaterDepthAccuracy : 0.01 } },
+                                    GroundMudLineDepth = (singleWellGroundMudLineDepth == null) ? null : new GaussianDrillingProperty() { GaussianValue = new GaussianDistribution() { Mean = singleWellGroundMudLineDepth, StandardDeviation = (singleWellGroundMudLineDepthAccuracy != null) ? singleWellGroundMudLineDepthAccuracy : 0.01 } },
+                                    TopWaterDepth = (singleWellTopWaterDepth == null) ? null : new GaussianDrillingProperty() { GaussianValue = new GaussianDistribution() { Mean = singleWellTopWaterDepth, StandardDeviation = (singleWellTopWaterDepthAccuracy != null) ? singleWellTopWaterDepthAccuracy : 0.01 } },
                                 };
                             cluster.Slots = new Dictionary<string, Slot>();
                             Guid slotID = Guid.NewGuid();
@@ -502,7 +494,7 @@
 
     private void UpdateDepthPlot()
     {
-        if (singleWellDepthWGS84 != null || singleWellGroundMudLineDepthWGS84 != null || singleWellTopWaterDepthWGS84 != null)
+        if (singleWellDepthWGS84 != null || singleWellGroundMudLineDepth != null || singleWellTopWaterDepth != null)
         {
             nameDepthList.Clear();
             modeFlagDepthList.Clear();
@@ -511,14 +503,14 @@
             yValuesDepthList.Clear();
 
             int count = 32;
-            double step = 100 / count;
+            double step = 100.0 / count;
             List<object> xValues = new List<object>();
             List<object> yValues = new List<object>();
 
             for (int i = 0; i < count; i++)
             {
-                xValues.Add(0 + i * step);
-                yValues.Add(0);
+                xValues.Add(0.0 + i * step);
+                yValues.Add(0.0);
             }
             xValuesDepthList.Add(xValues);
             yValuesDepthList.Add(yValues);
@@ -532,7 +524,7 @@
 
                 for (int i = 0; i < count; i++)
                 {
-                    xValues.Add(0 + i * step);
+                    xValues.Add(0.0 + i * step);
                     yValues.Add(singleWellDepthWGS84.Value);
                 }
                 xValuesDepthList.Add(xValues);
@@ -541,15 +533,15 @@
                 modeFlagDepthList.Add(1); //1 to 3
                 colorDepthList.Add(colorScale[0]);
             }
-            if (singleWellGroundMudLineDepthWGS84 != null)
+            if (singleWellGroundMudLineDepth != null)
             {
                 xValues = new List<object>();
                 yValues = new List<object>();
 
                 for (int i = 0; i < count; i++)
                 {
-                    xValues.Add(0 + i * step);
-                    yValues.Add(singleWellGroundMudLineDepthWGS84.Value);
+                    xValues.Add(0.0 + i * step);
+                    yValues.Add(singleWellGroundMudLineDepth.Value);
                 }
                 xValuesDepthList.Add(xValues);
                 yValuesDepthList.Add(yValues);
@@ -557,15 +549,15 @@
                 modeFlagDepthList.Add(1); //1 to 3
                 colorDepthList.Add(colorScale[1]);
             }
-            if (singleWellTopWaterDepthWGS84 != null)
+            if (singleWellTopWaterDepth != null)
             {
                 xValues = new List<object>();
                 yValues = new List<object>();
 
                 for (int i = 0; i < count; i++)
                 {
-                    xValues.Add(0 + i * step);
-                    yValues.Add(singleWellTopWaterDepthWGS84.Value);
+                    xValues.Add(0.0 + i * step);
+                    yValues.Add(singleWellTopWaterDepth.Value);
                 }
                 xValuesDepthList.Add(xValues);
                 yValuesDepthList.Add(yValues);
@@ -788,41 +780,27 @@
             }
         }
     }
-    private void ChangeSingleWellGroundMudLineDepthWGS84(double? val)
+    private void ChangeSingleWellGroundMudLineDepth(double? val)
     {
-        singleWellGroundMudLineDepthWGS84 = val;
-        if (singleWellLatitudeWGS84 != null && singleWellLongitudeWGS84 != null && singleWellGroundMudLineDepthWGS84 != null)
+        singleWellGroundMudLineDepth = val;
+        DataUtils.ApplyGroundMudLineDepthWGS84(singleWellGroundMudLineDepth);
+        _depthReferenceInputVersion++;
+        if (singleWellLatitudeWGS84 != null && singleWellLongitudeWGS84 != null && singleWellGroundMudLineDepth != null)
         {
-            CalculateDepthWGS84(singleWellGroundMudLineDepthWGS84, out singleWellGroundMudLineDepthDatum);
             UpdateDepthPlot();
         }
+        InvokeAsync(StateHasChanged);
     }
-    private void ChangeSingleWellGroundMudLineDepthDatum(double? val)
+    private void ChangeSingleWellTopWaterDepth(double? val)
     {
-        singleWellGroundMudLineDepthDatum = val;
-        if (singleWellLatitudeDatum != null && singleWellLongitudeDatum != null && singleWellGroundMudLineDepthDatum != null)
+        singleWellTopWaterDepth = val;
+        DataUtils.ApplyTopWaterDepthWGS84(singleWellTopWaterDepth);
+        _depthReferenceInputVersion++;
+        if (singleWellLatitudeWGS84 != null && singleWellLongitudeWGS84 != null && singleWellTopWaterDepth != null)
         {
-            CalculateDepthDatum(singleWellGroundMudLineDepthDatum, out singleWellGroundMudLineDepthWGS84);
             UpdateDepthPlot();
         }
-    }
-    private void ChangeSingleWellTopWaterDepthWGS84(double? val)
-    {
-        singleWellTopWaterDepthWGS84 = val;
-        if (singleWellLatitudeWGS84 != null && singleWellLongitudeWGS84 != null && singleWellTopWaterDepthWGS84 != null)
-        {
-            CalculateDepthWGS84(singleWellTopWaterDepthWGS84, out singleWellTopWaterDepthDatum);
-            UpdateDepthPlot();
-        }
-    }
-    private void ChangeSingleWellTopWaterDepthDatum(double? val)
-    {
-        singleWellTopWaterDepthDatum = val;
-        if (singleWellLatitudeDatum != null && singleWellLongitudeDatum != null && singleWellTopWaterDepthDatum != null)
-        {
-            CalculateDepthDatum(singleWellTopWaterDepthDatum, out singleWellTopWaterDepthWGS84);
-            UpdateDepthPlot();
-        }
+        InvokeAsync(StateHasChanged);
     }
     private void CalculateDepthWGS84(double? depthInput, out double? depthOutput)
     {
@@ -968,7 +946,7 @@
                     toBeProcessed.Add(false);
                 }
                 conversionSet.CartographicCoordinateList.Add(coordinate);
-                if (singleWellLatitudeWGS84 != null && singleWellLongitudeWGS84 != null && singleWellGroundMudLineDepthWGS84 != null)
+                if (singleWellLatitudeWGS84 != null && singleWellLongitudeWGS84 != null && singleWellGroundMudLineDepth != null)
                 {
                     coordinate = new CartographicCoordinate()
                     {
@@ -976,7 +954,7 @@
                         {
                             LatitudeWGS84 = singleWellLatitudeWGS84,
                             LongitudeWGS84 = singleWellLongitudeWGS84,
-                            VerticalDepthWGS84 = singleWellGroundMudLineDepthWGS84
+                            VerticalDepthWGS84 = singleWellGroundMudLineDepth
                         }
                     };
                     toBeProcessed.Add(true);
@@ -995,7 +973,7 @@
                     toBeProcessed.Add(false);
                 }
                 conversionSet.CartographicCoordinateList.Add(coordinate);
-                if (singleWellLatitudeWGS84 != null && singleWellLongitudeWGS84 != null && singleWellTopWaterDepthWGS84 != null)
+                if (singleWellLatitudeWGS84 != null && singleWellLongitudeWGS84 != null && singleWellTopWaterDepth != null)
                 {
                     coordinate = new CartographicCoordinate()
                     {
@@ -1003,7 +981,7 @@
                         {
                             LatitudeWGS84 = singleWellLatitudeWGS84,
                             LongitudeWGS84 = singleWellLongitudeWGS84,
-                            VerticalDepthWGS84 = singleWellTopWaterDepthWGS84
+                            VerticalDepthWGS84 = singleWellTopWaterDepth
                         }
                     };
                     toBeProcessed.Add(true);
@@ -1044,12 +1022,12 @@
                     calculatedCoordinate = calculatedConversionSet.CartographicCoordinateList.ElementAt<CartographicCoordinate>(1);
                     if (calculatedCoordinate != null && toBeProcessed[1])
                     {
-                        singleWellGroundMudLineDepthDatum = calculatedCoordinate.GeodeticCoordinate.VerticalDepthDatum;
+                        //singleWellGroundMudLineDepthDatum = calculatedCoordinate.GeodeticCoordinate.VerticalDepthDatum;
                     }
                     calculatedCoordinate = calculatedConversionSet.CartographicCoordinateList.ElementAt<CartographicCoordinate>(2);
                     if (calculatedCoordinate != null && toBeProcessed[2] && calculatedCoordinate.GeodeticCoordinate != null)
                     {
-                        singleWellTopWaterDepthDatum = calculatedCoordinate.GeodeticCoordinate.VerticalDepthDatum;
+                        //singleWellTopWaterDepthDatum = calculatedCoordinate.GeodeticCoordinate.VerticalDepthDatum;
                     }
                 }
                 APIUtils.ClientField.DeleteFieldCartographicConversionSetByIdAsync(conversionSet.MetaInfo.ID).Wait();

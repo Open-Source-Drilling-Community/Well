@@ -6,7 +6,11 @@
                               HttpBasePath=@APIUtils.HostBasePathUnitConversion
                               HttpController="UnitSystem/"
                               UnitSystemName="@DataUtils.UnitAndReferenceParameters.UnitSystemName"
-                              UnitSystemNameChanged="@DataUtils.UpdateUnitSystemName">
+                              UnitSystemNameChanged="@DataUtils.UpdateUnitSystemName"
+                              DepthReferenceName="@DataUtils.UnitAndReferenceParameters.DepthReferenceName"
+                              DepthReferenceNameChanged="@DataUtils.UpdateDepthReferenceName"
+                              GroundMudLineDepthReferenceSource="@DataUtils.UnitAndReferenceParameters.GroundMudLineDepthReferenceSource"
+                              SeaWaterLevelDepthReferenceSource="@DataUtils.UnitAndReferenceParameters.SeaWaterLevelDepthReferenceSource">
     @if (wellList == null)
     {
         <p><em>Loading...</em></p>
@@ -174,6 +178,7 @@
                     CreationDate = creationDate,
                     LastModificationDate = creationDate,
                 };
+            UpdateSelectedClusterDepthReferenceSource();
             await APIUtils.ClientWell.PostWellAsync(currentWell);
             logger.LogInformation("Well posted successfully");
             Snackbar.Add("Well posted successfully", Severity.Success);
@@ -210,6 +215,7 @@
         try
         {
             currentWell = await APIUtils.ClientWell.GetWellByIdAsync(id);
+            UpdateSelectedClusterDepthReferenceSource();
             if (currentWell != null)
             {
                 isHiddenMainPanel = true;
@@ -233,6 +239,7 @@
         try
         {
             await APIUtils.ClientWell.DeleteWellByIdAsync(id);
+            UpdateSelectedClusterDepthReferenceSource();
             await OnInitializedAsync();
         }
         catch (Exception ex)
@@ -249,6 +256,7 @@
             {
                 await APIUtils.ClientWell.DeleteWellByIdAsync(well.MetaInfo.ID);
             }
+            UpdateSelectedClusterDepthReferenceSource();
             await OnInitializedAsync();
         }
         catch (Exception ex)
@@ -299,4 +307,6 @@
         isHiddenEditPanel = true;
         await OnInitializedAsync();
     }
+
+    private void UpdateSelectedClusterDepthReferenceSource() => DataUtils.ApplyWellReferenceValues(currentWell, clusterList);
 }
