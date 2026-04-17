@@ -1,6 +1,7 @@
-﻿@implements IUnitAwareComponent
+@implements IUnitAwareComponent
 @inject ILogger<WellEdit> logger
 @inject ISnackbar Snackbar
+@inject IWellAPIUtils Api
 
 <MudText Class="mt-4 mb-4" Typo="Typo.h6">Edit Well</MudText>
 <MudContainer Class="d-flex flex-row mt-4 mb-4">
@@ -322,8 +323,8 @@
                         singleWellLongitudeWGS84 = _singleWellCluster.ReferenceLongitude?.GaussianValue?.Mean;
                         singleWellDepthWGS84 = _singleWellCluster.ReferenceDepth?.GaussianValue?.Mean;
                         singleWellDepthAccuracy = _singleWellCluster.ReferenceDepth?.GaussianValue?.StandardDeviation;
-                        singleWellNorthingAccuracy = _singleWellCluster.ReferenceLatitude?.GaussianValue?.StandardDeviation * APIUtils.EarthRadiusWGS84;
-                        singleWellEastingAccuracy = _singleWellCluster.ReferenceLongitude?.GaussianValue?.StandardDeviation * APIUtils.EarthRadiusWGS84;
+                        singleWellNorthingAccuracy = _singleWellCluster.ReferenceLatitude?.GaussianValue?.StandardDeviation * Api.EarthRadiusWGS84;
+                        singleWellEastingAccuracy = _singleWellCluster.ReferenceLongitude?.GaussianValue?.StandardDeviation * Api.EarthRadiusWGS84;
                         singleWellGroundMudLineDepth = _singleWellCluster.GroundMudLineDepth?.GaussianValue?.Mean;
                         singleWellGroundMudLineDepthAccuracy = _singleWellCluster.GroundMudLineDepth?.GaussianValue?.StandardDeviation;
                         singleWellTopWaterDepth = _singleWellCluster.TopWaterDepth?.GaussianValue?.Mean;
@@ -381,8 +382,8 @@
                             FieldID = _selectedField.MetaInfo.ID,
                             IsSingleWell = true,
                             ReferenceDepth = (singleWellDepthWGS84 == null) ? null : new GaussianDrillingProperty() { GaussianValue = new GaussianDistribution() { Mean = singleWellDepthWGS84, StandardDeviation = (singleWellDepthAccuracy != null) ? singleWellDepthAccuracy : 0.01 } },
-                            ReferenceLatitude = (singleWellLatitudeWGS84 == null) ? null : new GaussianDrillingProperty() { GaussianValue = new GaussianDistribution() { Mean = singleWellLatitudeWGS84, StandardDeviation = (singleWellNorthingAccuracy != null) ? singleWellNorthingAccuracy / APIUtils.EarthRadiusWGS84 : 0.01 } },
-                            ReferenceLongitude = (singleWellLongitudeWGS84 == null) ? null : new GaussianDrillingProperty() { GaussianValue = new GaussianDistribution() { Mean = singleWellLongitudeWGS84, StandardDeviation = (singleWellEastingAccuracy != null) ? singleWellEastingAccuracy / APIUtils.EarthRadiusWGS84 : 0.01 } },
+                            ReferenceLatitude = (singleWellLatitudeWGS84 == null) ? null : new GaussianDrillingProperty() { GaussianValue = new GaussianDistribution() { Mean = singleWellLatitudeWGS84, StandardDeviation = (singleWellNorthingAccuracy != null) ? singleWellNorthingAccuracy / Api.EarthRadiusWGS84 : 0.01 } },
+                            ReferenceLongitude = (singleWellLongitudeWGS84 == null) ? null : new GaussianDrillingProperty() { GaussianValue = new GaussianDistribution() { Mean = singleWellLongitudeWGS84, StandardDeviation = (singleWellEastingAccuracy != null) ? singleWellEastingAccuracy / Api.EarthRadiusWGS84 : 0.01 } },
                             GroundMudLineDepth = (singleWellGroundMudLineDepth == null) ? null : new GaussianDrillingProperty() { GaussianValue = new GaussianDistribution() { Mean = singleWellGroundMudLineDepth, StandardDeviation = (singleWellGroundMudLineDepthAccuracy != null) ? singleWellGroundMudLineDepthAccuracy : 0.01 } },
                             TopWaterDepth = (singleWellTopWaterDepth == null) ? null : new GaussianDrillingProperty() { GaussianValue = new GaussianDistribution() { Mean = singleWellTopWaterDepth, StandardDeviation = (singleWellTopWaterDepthAccuracy != null) ? singleWellTopWaterDepthAccuracy : 0.01 } },
                         };
@@ -397,7 +398,7 @@
                             Latitude = cluster.ReferenceLatitude,
                             Longitude = cluster.ReferenceLongitude
                         });
-                        await APIUtils.ClientCluster.PutClusterByIdAsync(_singleWellCluster.MetaInfo.ID, cluster);
+                        await Api.ClientCluster.PutClusterByIdAsync(_singleWellCluster.MetaInfo.ID, cluster);
                     }
                     else
                     {
@@ -407,7 +408,7 @@
                             Guid clusterID = Guid.NewGuid();
                             cluster = new Cluster()
                                 {
-                                    MetaInfo = new MetaInfo() { ID = clusterID, HttpEndPoint = "Cluster/", HttpHostBasePath = APIUtils.HostBasePathCluster, HttpHostName = APIUtils.HostNameCluster },
+                                    MetaInfo = new MetaInfo() { ID = clusterID, HttpEndPoint = "Cluster/", HttpHostBasePath = Api.HostBasePathCluster, HttpHostName = Api.HostNameCluster },
                                     Name = "dummy cluster for well" + ((_name == null) ? _name : string.Empty),
                                     Description = "dummy cluster for well" + ((_name == null) ? _name : string.Empty),
                                     CreationDate = DateTimeOffset.UtcNow,
@@ -415,8 +416,8 @@
                                     FieldID = _selectedField.MetaInfo.ID,
                                     IsSingleWell = true,
                                     ReferenceDepth = (singleWellDepthWGS84 == null) ? null : new GaussianDrillingProperty() { GaussianValue = new GaussianDistribution() { Mean = singleWellDepthWGS84, StandardDeviation = (singleWellDepthAccuracy != null) ? singleWellDepthAccuracy : 0.01 } },
-                                    ReferenceLatitude = (singleWellLatitudeWGS84 == null) ? null : new GaussianDrillingProperty() { GaussianValue = new GaussianDistribution() { Mean = singleWellLatitudeWGS84, StandardDeviation = (singleWellNorthingAccuracy != null) ? singleWellNorthingAccuracy / APIUtils.EarthRadiusWGS84 : 0.01 } },
-                                    ReferenceLongitude = (singleWellLongitudeWGS84 == null) ? null : new GaussianDrillingProperty() { GaussianValue = new GaussianDistribution() { Mean = singleWellLongitudeWGS84, StandardDeviation = (singleWellEastingAccuracy != null) ? singleWellEastingAccuracy / APIUtils.EarthRadiusWGS84 : 0.01 } },
+                                    ReferenceLatitude = (singleWellLatitudeWGS84 == null) ? null : new GaussianDrillingProperty() { GaussianValue = new GaussianDistribution() { Mean = singleWellLatitudeWGS84, StandardDeviation = (singleWellNorthingAccuracy != null) ? singleWellNorthingAccuracy / Api.EarthRadiusWGS84 : 0.01 } },
+                                    ReferenceLongitude = (singleWellLongitudeWGS84 == null) ? null : new GaussianDrillingProperty() { GaussianValue = new GaussianDistribution() { Mean = singleWellLongitudeWGS84, StandardDeviation = (singleWellEastingAccuracy != null) ? singleWellEastingAccuracy / Api.EarthRadiusWGS84 : 0.01 } },
                                     GroundMudLineDepth = (singleWellGroundMudLineDepth == null) ? null : new GaussianDrillingProperty() { GaussianValue = new GaussianDistribution() { Mean = singleWellGroundMudLineDepth, StandardDeviation = (singleWellGroundMudLineDepthAccuracy != null) ? singleWellGroundMudLineDepthAccuracy : 0.01 } },
                                     TopWaterDepth = (singleWellTopWaterDepth == null) ? null : new GaussianDrillingProperty() { GaussianValue = new GaussianDistribution() { Mean = singleWellTopWaterDepth, StandardDeviation = (singleWellTopWaterDepthAccuracy != null) ? singleWellTopWaterDepthAccuracy : 0.01 } },
                                 };
@@ -432,7 +433,7 @@
                                     Latitude = cluster.ReferenceLatitude,
                                     Longitude = cluster.ReferenceLongitude
                                 });
-                            await APIUtils.ClientCluster.PostClusterAsync(cluster);
+                            await Api.ClientCluster.PostClusterAsync(cluster);
                         }
                     }
                     if (cluster != null && cluster.MetaInfo != null && cluster.MetaInfo.ID != Guid.Empty && cluster.Slots != null && cluster.Slots.Count > 0 && cluster.Slots.Values.ToList()[0].ID != Guid.Empty)
@@ -448,7 +449,7 @@
                             ClusterID = cluster.MetaInfo.ID,
                             SlotID = cluster.Slots.Values.ToList()[0].ID,
                         };
-                        await APIUtils.ClientWell.PutWellByIdAsync(CurrentWell.MetaInfo.ID, well);
+                        await Api.ClientWell.PutWellByIdAsync(CurrentWell.MetaInfo.ID, well);
                     }
                 }
                 else
@@ -456,7 +457,7 @@
                     if (CurrentWell.IsSingleWell && CurrentWell.ClusterID != null && CurrentWell.ClusterID != Guid.Empty)
                     {
                         // delete the single well cluster as it will not be connected anymore
-                        await APIUtils.ClientCluster.DeleteClusterByIdAsync(CurrentWell.ClusterID.Value);
+                        await Api.ClientCluster.DeleteClusterByIdAsync(CurrentWell.ClusterID.Value);
                     }
                     Well well = new()
                     {
@@ -469,7 +470,7 @@
                         ClusterID = (_selectedCluster != null && _selectedCluster.MetaInfo != null) ? _selectedCluster.MetaInfo.ID : null,
                         SlotID = (_selectedSlot != null) ? _selectedSlot.ID : null,
                     };
-                    await APIUtils.ClientWell.PutWellByIdAsync(CurrentWell.MetaInfo.ID, well);
+                    await Api.ClientWell.PutWellByIdAsync(CurrentWell.MetaInfo.ID, well);
                     logger.LogInformation("Updated the Well successfully");
                     Snackbar.Add("Updated the Well successfully", Severity.Success);
                 }
@@ -648,7 +649,7 @@
         {
             try
             {
-                if (APIUtils.ClientField != null)
+                if (Api.ClientField != null)
                 {
                     FieldCartographicConversionSet conversionSet = new FieldCartographicConversionSet()
                     {
@@ -666,8 +667,8 @@
                             }
                         }
                     };
-                    APIUtils.ClientField.PostFieldCartographicConversionSetAsync(conversionSet).Wait();
-                    FieldCartographicConversionSet calculatedConversionSet = APIUtils.ClientField.GetFieldCartographicConversionSetByIdAsync(conversionSet.MetaInfo.ID).GetAwaiter().GetResult();
+                    Api.ClientField.PostFieldCartographicConversionSetAsync(conversionSet).Wait();
+                    FieldCartographicConversionSet calculatedConversionSet = Api.ClientField.GetFieldCartographicConversionSetByIdAsync(conversionSet.MetaInfo.ID).GetAwaiter().GetResult();
                     if (calculatedConversionSet?.MetaInfo?.ID == conversionSet.MetaInfo.ID &&
                         calculatedConversionSet.CartographicCoordinateList != null &&
                         calculatedConversionSet.CartographicCoordinateList.Count > 0 &&
@@ -679,7 +680,7 @@
                         singleWellNorthing = calculatedConversionSet.CartographicCoordinateList.ElementAt(0).Northing;
                         singleWellEasting = calculatedConversionSet.CartographicCoordinateList.ElementAt(0).Easting;
                     }
-                    APIUtils.ClientField.DeleteFieldCartographicConversionSetByIdAsync(conversionSet.MetaInfo.ID).Wait();
+                    Api.ClientField.DeleteFieldCartographicConversionSetByIdAsync(conversionSet.MetaInfo.ID).Wait();
                 }
             }
             catch (Exception e)
@@ -694,7 +695,7 @@
         {
             try
             {
-                if (APIUtils.ClientField != null)
+                if (Api.ClientField != null)
                 {
                     FieldCartographicConversionSet conversionSet = new FieldCartographicConversionSet()
                     {
@@ -712,8 +713,8 @@
                             }
                         }
                     };
-                    APIUtils.ClientField.PostFieldCartographicConversionSetAsync(conversionSet).Wait();
-                    FieldCartographicConversionSet calculatedConversionSet = APIUtils.ClientField.GetFieldCartographicConversionSetByIdAsync(conversionSet.MetaInfo.ID).GetAwaiter().GetResult();
+                    Api.ClientField.PostFieldCartographicConversionSetAsync(conversionSet).Wait();
+                    FieldCartographicConversionSet calculatedConversionSet = Api.ClientField.GetFieldCartographicConversionSetByIdAsync(conversionSet.MetaInfo.ID).GetAwaiter().GetResult();
                     if (calculatedConversionSet?.MetaInfo?.ID == conversionSet.MetaInfo.ID &&
                         calculatedConversionSet.CartographicCoordinateList != null &&
                         calculatedConversionSet.CartographicCoordinateList.Count > 0 &&
@@ -725,7 +726,7 @@
                         singleWellNorthing = calculatedConversionSet.CartographicCoordinateList.ElementAt(0).Northing;
                         singleWellEasting = calculatedConversionSet.CartographicCoordinateList.ElementAt(0).Easting;
                     }
-                    APIUtils.ClientField.DeleteFieldCartographicConversionSetByIdAsync(conversionSet.MetaInfo.ID).Wait();
+                    Api.ClientField.DeleteFieldCartographicConversionSetByIdAsync(conversionSet.MetaInfo.ID).Wait();
 
                 }
             }
@@ -741,7 +742,7 @@
         {
             try
             {
-                if (APIUtils.ClientField != null)
+                if (Api.ClientField != null)
                 {
                     FieldCartographicConversionSet conversionSet = new FieldCartographicConversionSet()
                     {
@@ -757,8 +758,8 @@
                             }
                         }
                     };
-                    APIUtils.ClientField.PostFieldCartographicConversionSetAsync(conversionSet).Wait();
-                    FieldCartographicConversionSet calculatedConversionSet = APIUtils.ClientField.GetFieldCartographicConversionSetByIdAsync(conversionSet.MetaInfo.ID).GetAwaiter().GetResult();
+                    Api.ClientField.PostFieldCartographicConversionSetAsync(conversionSet).Wait();
+                    FieldCartographicConversionSet calculatedConversionSet = Api.ClientField.GetFieldCartographicConversionSetByIdAsync(conversionSet.MetaInfo.ID).GetAwaiter().GetResult();
                     if (calculatedConversionSet?.MetaInfo?.ID == conversionSet.MetaInfo.ID &&
                         calculatedConversionSet.CartographicCoordinateList != null &&
                         calculatedConversionSet.CartographicCoordinateList.Count > 0 &&
@@ -770,7 +771,7 @@
                         singleWellLatitudeDatum = calculatedConversionSet.CartographicCoordinateList.ElementAt(0).GeodeticCoordinate.LatitudeDatum;
                         singleWellLongitudeDatum = calculatedConversionSet.CartographicCoordinateList.ElementAt(0).GeodeticCoordinate.LongitudeDatum;
                     }
-                    APIUtils.ClientField.DeleteFieldCartographicConversionSetByIdAsync(conversionSet.MetaInfo.ID).Wait();
+                    Api.ClientField.DeleteFieldCartographicConversionSetByIdAsync(conversionSet.MetaInfo.ID).Wait();
 
                 }
             }
@@ -809,7 +810,7 @@
         {
             try
             {
-                if (APIUtils.ClientField != null)
+                if (Api.ClientField != null)
                 {
                     FieldCartographicConversionSet conversionSet = new FieldCartographicConversionSet()
                     {
@@ -827,8 +828,8 @@
                             }
                         }
                     };
-                    APIUtils.ClientField.PostFieldCartographicConversionSetAsync(conversionSet).Wait();
-                    FieldCartographicConversionSet calculatedConversionSet = APIUtils.ClientField.GetFieldCartographicConversionSetByIdAsync(conversionSet.MetaInfo.ID).GetAwaiter().GetResult();
+                    Api.ClientField.PostFieldCartographicConversionSetAsync(conversionSet).Wait();
+                    FieldCartographicConversionSet calculatedConversionSet = Api.ClientField.GetFieldCartographicConversionSetByIdAsync(conversionSet.MetaInfo.ID).GetAwaiter().GetResult();
                     if (calculatedConversionSet?.MetaInfo?.ID == conversionSet.MetaInfo.ID &&
                         calculatedConversionSet.CartographicCoordinateList != null &&
                         calculatedConversionSet.CartographicCoordinateList.Count > 0 &&
@@ -836,7 +837,7 @@
                     {
                         depthOutput = calculatedConversionSet.CartographicCoordinateList.ElementAt(0).GeodeticCoordinate.VerticalDepthDatum;
                     }
-                    APIUtils.ClientField.DeleteFieldCartographicConversionSetByIdAsync(conversionSet.MetaInfo.ID).Wait();
+                    Api.ClientField.DeleteFieldCartographicConversionSetByIdAsync(conversionSet.MetaInfo.ID).Wait();
                 }
             }
             catch (Exception e)
@@ -851,7 +852,7 @@
         {
             try
             {
-                if (APIUtils.ClientField != null)
+                if (Api.ClientField != null)
                 {
                     FieldCartographicConversionSet conversionSet = new FieldCartographicConversionSet()
                     {
@@ -869,8 +870,8 @@
                             }
                         }
                     };
-                    APIUtils.ClientField.PostFieldCartographicConversionSetAsync(conversionSet).Wait();
-                    FieldCartographicConversionSet calculatedConversionSet = APIUtils.ClientField.GetFieldCartographicConversionSetByIdAsync(conversionSet.MetaInfo.ID).GetAwaiter().GetResult();
+                    Api.ClientField.PostFieldCartographicConversionSetAsync(conversionSet).Wait();
+                    FieldCartographicConversionSet calculatedConversionSet = Api.ClientField.GetFieldCartographicConversionSetByIdAsync(conversionSet.MetaInfo.ID).GetAwaiter().GetResult();
                     if (calculatedConversionSet?.MetaInfo?.ID == conversionSet.MetaInfo.ID &&
                         calculatedConversionSet.CartographicCoordinateList != null &&
                         calculatedConversionSet.CartographicCoordinateList.Count > 0 &&
@@ -878,7 +879,7 @@
                     {
                         depthOutput = calculatedConversionSet.CartographicCoordinateList.ElementAt(0).GeodeticCoordinate.VerticalDepthWGS84;
                     }
-                    APIUtils.ClientField.DeleteFieldCartographicConversionSetByIdAsync(conversionSet.MetaInfo.ID).Wait();
+                    Api.ClientField.DeleteFieldCartographicConversionSetByIdAsync(conversionSet.MetaInfo.ID).Wait();
                 }
             }
             catch (Exception e)
@@ -896,7 +897,7 @@
     {
         try
         {
-            if (APIUtils.ClientField != null && _selectedField != null && _selectedField.MetaInfo != null && _selectedField.MetaInfo.ID != Guid.Empty)
+            if (Api.ClientField != null && _selectedField != null && _selectedField.MetaInfo != null && _selectedField.MetaInfo.ID != Guid.Empty)
             {
                 FieldCartographicConversionSet conversionSet = new FieldCartographicConversionSet()
                 {
@@ -1000,8 +1001,8 @@
                     toBeProcessed.Add(false);
                 }
                 conversionSet.CartographicCoordinateList.Add(coordinate);
-                APIUtils.ClientField.PostFieldCartographicConversionSetAsync(conversionSet).Wait();
-                FieldCartographicConversionSet calculatedConversionSet = APIUtils.ClientField.GetFieldCartographicConversionSetByIdAsync(conversionSet.MetaInfo.ID).GetAwaiter().GetResult();
+                Api.ClientField.PostFieldCartographicConversionSetAsync(conversionSet).Wait();
+                FieldCartographicConversionSet calculatedConversionSet = Api.ClientField.GetFieldCartographicConversionSetByIdAsync(conversionSet.MetaInfo.ID).GetAwaiter().GetResult();
                 if (calculatedConversionSet?.MetaInfo?.ID == conversionSet.MetaInfo.ID &&
                     calculatedConversionSet.CartographicCoordinateList != null &&
                     calculatedConversionSet.CartographicCoordinateList.Count == toBeProcessed.Count &&
@@ -1030,7 +1031,7 @@
                         //singleWellTopWaterDepthDatum = calculatedCoordinate.GeodeticCoordinate.VerticalDepthDatum;
                     }
                 }
-                APIUtils.ClientField.DeleteFieldCartographicConversionSetByIdAsync(conversionSet.MetaInfo.ID).Wait();
+                Api.ClientField.DeleteFieldCartographicConversionSetByIdAsync(conversionSet.MetaInfo.ID).Wait();
             }
         }
         catch (Exception e)
@@ -1038,3 +1039,4 @@
         }
     }
 }
+

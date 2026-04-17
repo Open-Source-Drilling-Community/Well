@@ -1,9 +1,10 @@
-﻿@page "/Well"
+@page "/Well"
 @inject ILogger<WellMain> logger
 @inject ISnackbar Snackbar
+@inject IWellAPIUtils Api
 
-<MudUnitAndReferenceChoiceTag HttpHost=@APIUtils.HostNameUnitConversion
-                              HttpBasePath=@APIUtils.HostBasePathUnitConversion
+<MudUnitAndReferenceChoiceTag HttpHost=@Api.HostNameUnitConversion
+                              HttpBasePath=@Api.HostBasePathUnitConversion
                               HttpController="UnitSystem/"
                               UnitSystemName="@DataUtils.UnitAndReferenceParameters.UnitSystemName"
                               UnitSystemNameChanged="@DataUtils.UpdateUnitSystemName"
@@ -76,10 +77,10 @@
             currentWell = null;
 
             // Starting all loading tasks asynchronously
-            logger.LogInformation("Trying to load list of Well from client: " + APIUtils.HostNameWell);
-            var wellTask = APIUtils.ClientWell.GetAllWellAsync();
-            var clusterTask = APIUtils.ClientCluster.GetAllClusterAsync();
-            var fieldTask = APIUtils.ClientField.GetAllFieldAsync();
+            logger.LogInformation("Trying to load list of Well from client: " + Api.HostNameWell);
+            var wellTask = Api.ClientWell.GetAllWellAsync();
+            var clusterTask = Api.ClientCluster.GetAllClusterAsync();
+            var fieldTask = Api.ClientField.GetAllFieldAsync();
 
             List<Task> loadingTaskList = new List<Task> { wellTask, clusterTask, fieldTask };
 
@@ -168,7 +169,7 @@
     {
         try
         {
-            MetaInfo metaInfo = new() { ID = Guid.NewGuid(), HttpHostName = APIUtils.HostNameWell, HttpHostBasePath = APIUtils.HostBasePathWell, HttpEndPoint = "Well/" };
+            MetaInfo metaInfo = new() { ID = Guid.NewGuid(), HttpHostName = Api.HostNameWell, HttpHostBasePath = Api.HostBasePathWell, HttpEndPoint = "Well/" };
             DateTimeOffset creationDate = DateTimeOffset.UtcNow;
             Well currentWell = new()
                 {
@@ -179,7 +180,7 @@
                     LastModificationDate = creationDate,
                 };
             UpdateSelectedClusterDepthReferenceSource();
-            await APIUtils.ClientWell.PostWellAsync(currentWell);
+            await Api.ClientWell.PostWellAsync(currentWell);
             logger.LogInformation("Well posted successfully");
             Snackbar.Add("Well posted successfully", Severity.Success);
             await OnInitializedAsync();
@@ -214,7 +215,7 @@
     {
         try
         {
-            currentWell = await APIUtils.ClientWell.GetWellByIdAsync(id);
+            currentWell = await Api.ClientWell.GetWellByIdAsync(id);
             UpdateSelectedClusterDepthReferenceSource();
             if (currentWell != null)
             {
@@ -238,7 +239,7 @@
     {
         try
         {
-            await APIUtils.ClientWell.DeleteWellByIdAsync(id);
+            await Api.ClientWell.DeleteWellByIdAsync(id);
             UpdateSelectedClusterDepthReferenceSource();
             await OnInitializedAsync();
         }
@@ -254,7 +255,7 @@
         {
             foreach (Well well in selectedWellList)
             {
-                await APIUtils.ClientWell.DeleteWellByIdAsync(well.MetaInfo.ID);
+                await Api.ClientWell.DeleteWellByIdAsync(well.MetaInfo.ID);
             }
             UpdateSelectedClusterDepthReferenceSource();
             await OnInitializedAsync();
@@ -310,3 +311,4 @@
 
     private void UpdateSelectedClusterDepthReferenceSource() => DataUtils.ApplyWellReferenceValues(currentWell, clusterList);
 }
+
