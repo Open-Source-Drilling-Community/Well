@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Razor">
+﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
@@ -8,16 +8,16 @@
     <RootNamespace>NORCE.Drilling.Well.WebPages</RootNamespace>
     <PackageId>NORCE.Drilling.Well.WebPages</PackageId>
     <Title>NORCE.Drilling.Well.WebPages</Title>
-    <Authors>NORCE</Authors>
+    <Authors>Eric Cayeux</Authors>
     <Company>NORCE</Company>
     <Description>Reusable Razor class library containing the Well and statistics web pages. See the package README for setup, dependencies, and usage.</Description>
     <PackageTags>well;drilling;blazor;razor;mudblazor</PackageTags>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <RepositoryUrl>https://github.com/NORCE-DrillingAndWells/Well</RepositoryUrl>
+    <RepositoryUrl>https://github.com/Open-Source-Drilling-Community/Well</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
-    <PackageProjectUrl>https://github.com/NORCE-DrillingAndWells/Well</PackageProjectUrl>
+    <PackageProjectUrl>https://github.com/Open-Source-Drilling-Community/Well</PackageProjectUrl>
     <PackageReadmeFile>README.md</PackageReadmeFile>
-    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
   </PropertyGroup>
 
   <ItemGroup>
