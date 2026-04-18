@@ -28,12 +28,14 @@
     <PackageReference Include="Plotly.Blazor" Version="6.0.2" />
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\ModelSharedOut\ModelSharedOut.csproj" />
-  </ItemGroup>
+	<ItemGroup>
+		<None Include="README.md" Pack="true" PackagePath="\" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <None Include="README.md" Pack="true" PackagePath="\" />
-  </ItemGroup>
+	<!-- Include generated DTO source files directly from ModelSharedOut -->
+	<ItemGroup>
+		<Compile Include="..\ModelSharedOut\WellMergedModel.cs"
+				 Link="GeneratedDtos\%(RecursiveDir)%(Filename)%(Extension)" />
+	</ItemGroup>
 
 </Project>
