@@ -19,6 +19,10 @@ public class WellAPIUtils : APIUtils, IWellAPIUtils
         HttpClientCluster = SetHttpClient(HostNameCluster, HostBasePathCluster);
         ClientCluster = new Client(HttpClientCluster.BaseAddress!.ToString(), HttpClientCluster);
 
+        HostNameTrajectory = Require(configuration.TrajectoryHostURL, nameof(configuration.TrajectoryHostURL));
+        HttpClientTrajectory = SetHttpClient(HostNameTrajectory, HostBasePathTrajectory);
+        ClientTrajectory = new Client(HttpClientTrajectory.BaseAddress!.ToString(), HttpClientTrajectory);
+
         HostNameUnitConversion = Require(configuration.UnitConversionHostURL, nameof(configuration.UnitConversionHostURL));
     }
 
@@ -46,6 +50,11 @@ public class WellAPIUtils : APIUtils, IWellAPIUtils
     public string HostBasePathCluster { get; } = "Cluster/api/";
     public HttpClient HttpClientCluster { get; }
     public Client ClientCluster { get; }
+
+    public string HostNameTrajectory { get; }
+    public string HostBasePathTrajectory { get; } = "Trajectory/api/";
+    public HttpClient HttpClientTrajectory { get; }
+    public Client ClientTrajectory { get; }
 
     public string HostNameUnitConversion { get; }
     public string HostBasePathUnitConversion { get; } = "UnitConversion/api/";

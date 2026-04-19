@@ -6,6 +6,7 @@ public interface IWellWebPagesConfiguration :
     IWellHostURL,
     IClusterHostURL,
     IFieldHostURL,
+    ITrajectoryHostURL,
     IUnitConversionHostURL
 {
 }

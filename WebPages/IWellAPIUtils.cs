@@ -19,6 +19,11 @@ public interface IWellAPIUtils
     HttpClient HttpClientCluster { get; }
     Client ClientCluster { get; }
 
+    string HostNameTrajectory { get; }
+    string HostBasePathTrajectory { get; }
+    HttpClient HttpClientTrajectory { get; }
+    Client ClientTrajectory { get; }
+
     string HostNameUnitConversion { get; }
     string HostBasePathUnitConversion { get; }
 
