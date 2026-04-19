@@ -10,7 +10,10 @@ WebPagesHostConfiguration webPagesConfiguration = new()
     WellHostURL = builder.Configuration["WellHostURL"] ?? string.Empty,
     ClusterHostURL = builder.Configuration["ClusterHostURL"] ?? string.Empty,
     FieldHostURL = builder.Configuration["FieldHostURL"] ?? string.Empty,
+    RigHostURL = builder.Configuration["RigHostURL"] ?? string.Empty,
     TrajectoryHostURL = builder.Configuration["TrajectoryHostURL"] ?? string.Empty,
+    CartographicProjectionHostURL = builder.Configuration["CartographicProjectionHostURL"] ?? string.Empty,
+    GeodeticDatumHostURL = builder.Configuration["GeodeticDatumHostURL"] ?? string.Empty,
     UnitConversionHostURL = builder.Configuration["UnitConversionHostURL"] ?? string.Empty,
 };
 
@@ -29,6 +32,7 @@ builder.Services.AddMudServices(config =>
 });
 builder.Services.AddSingleton<IWellWebPagesConfiguration>(webPagesConfiguration);
 builder.Services.AddSingleton<IWellAPIUtils, WellAPIUtils>();
+builder.Services.AddExternalWebPages(webPagesConfiguration);
 
 var app = builder.Build();
 

@@ -253,6 +253,7 @@
     private double? singleWellTopWaterDepth = null;
     private double? singleWellTopWaterDepthAccuracy = null;
     private int _depthReferenceInputVersion = 0;
+    private bool _depthPlotReady = false;
 
     private string[] colorScale = { "black", "blue", "grey", "red", "orange", "green", "yellow", "pink", "brown", "purple" };
     private ScatterPlot depthPlot = new ScatterPlot();
@@ -349,7 +350,21 @@
 
     public void ManageUnits()
     {
-        depthPlot.Plot();
+        if (_depthPlotReady)
+        {
+            depthPlot.Plot();
+        }
+    }
+
+    protected override Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            _depthPlotReady = true;
+            UpdateDepthPlot();
+        }
+
+        return Task.CompletedTask;
     }
 
     private async Task Update()
@@ -567,8 +582,10 @@
                 colorDepthList.Add(colorScale[2]);
             }
 
-            //plot curves
-            depthPlot.Plot();
+            if (_depthPlotReady)
+            {
+                depthPlot.Plot();
+            }
         }
     }
     private void ChangeSingleWellReferenceLatitudeWGS84(double? val)
