@@ -69,6 +69,8 @@ namespace NORCE.Drilling.Well.Model
         public History GetAllWellMetaInfoPerDay { get; set; } = new History();
         public History GetWellByIdPerDay { get; set; } = new History();
         public History GetAllWellPerDay { get; set; } = new History();
+        public History GetAllWellBySlotIdPerDay { get; set; } = new History();
+        public History GetAllWellByClusterIdPerDay { get; set; } = new History();
         public History PostWellPerDay { get; set; } = new History();
         public History PutWellByIdPerDay { get; set; } = new History();
         public History DeleteWellByIdPerDay { get; set; } = new History();
@@ -174,6 +176,34 @@ namespace NORCE.Drilling.Well.Model
                 ManageBackup();
             }
         }
+
+        public void IncrementGetAllWellByClusterIdPerDay()
+        {
+            lock (lock_)
+            {
+                if (GetAllWellByClusterIdPerDay == null)
+                {
+                    GetAllWellByClusterIdPerDay = new History();
+                }
+                GetAllWellByClusterIdPerDay.Increment();
+                ManageBackup();
+            }
+        }
+
+        public void IncrementGetAllWellBySlotIdPerDay()
+        {
+            lock (lock_)
+            {
+                if (GetAllWellBySlotIdPerDay == null)
+                {
+                    GetAllWellBySlotIdPerDay = new History();
+                }
+                GetAllWellBySlotIdPerDay.Increment();
+                ManageBackup();
+            }
+        }
+
+
         public void IncrementPutWellByIdPerDay()
         {
             lock (lock_)

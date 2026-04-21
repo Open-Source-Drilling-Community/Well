@@ -107,6 +107,44 @@ namespace NORCE.Drilling.Well.Service.Controllers
             }
         }
 
+
+        /// <summary>
+        /// Returns the list of all Well present in the microservice database with given SlotId, at endpoint Well/api/Well/HeavyData
+        /// </summary>
+        /// <returns>the list of all Well present in the microservice database with given SlotId, at endpoint Well/api/Well/HeavyData</returns>
+        [HttpGet("SlotId", Name = "GetAllWellBySlotId")]
+        public ActionResult<IEnumerable<Model.Well?>> GetAllWellBySlotId(Guid slotId)
+        {
+            UsageStatisticsWell.Instance.IncrementGetAllWellPerDay();
+            var vals = _wellManager.GetAllWellBySlotId(slotId);
+            if (vals != null)
+            {
+                return Ok(vals);
+            }
+            else
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
+        }
+        /// <summary>
+        /// Returns the list of all Well present in the microservice database with given ClusterId, at endpoint Well/api/Well/HeavyData
+        /// </summary>
+        /// <returns>the list of all Well present in the microservice database with given ClusterId, at endpoint Well/api/Well/HeavyData</returns>
+        [HttpGet("ClusterId", Name = "GetAllWellByClusterId")]
+        public ActionResult<IEnumerable<Model.Well?>> GetAllWellByClusterId(Guid clusterId)
+        {
+            UsageStatisticsWell.Instance.IncrementGetAllWellPerDay();
+            var vals = _wellManager.GetAllWellByClusterId(clusterId);
+            if (vals != null)
+            {
+                return Ok(vals);
+            }
+            else
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
+        }
+
         /// <summary>
         /// Returns the MetaInfo of all the slots used in the cluster of given ID, at endpoint Well/api/Well/UsedSlot/clusterId
         /// </summary>

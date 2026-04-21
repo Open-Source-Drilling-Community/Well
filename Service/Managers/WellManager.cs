@@ -154,6 +154,79 @@ namespace NORCE.Drilling.Well.Service.Managers
             }
             return null;
         }
+        /// <summary>
+        /// Returns the list of Wells with the specified ClusterID present in the microservice database 
+        /// </summary>
+        /// <returns>the list of Wells with the specified ClusterID </returns>
+        public List<Model.Well>? GetAllWellByClusterId(Guid clusterId)
+        {
+            
+            List<Model.Well?> vals = [];
+            var connection = _connectionManager.GetConnection();
+            if (connection != null)
+            {
+                var command = connection.CreateCommand();
+                command.CommandText = $"SELECT Well FROM WellTable WHERE ClusterID = '{clusterId}'";                 
+                try
+                {
+                    using var reader = command.ExecuteReader();
+                    while (reader.Read() && !reader.IsDBNull(0))
+                    {
+                        string data = reader.GetString(0);
+                        Model.Well? well = JsonSerializer.Deserialize<Model.Well>(data, JsonSettings.Options);
+                        vals.Add(well);
+                    }
+                    _logger.LogInformation("Returning the list of existing Well from WellTable");
+                    return vals;
+                }
+                catch (SqliteException ex)
+                {
+                    _logger.LogError(ex, "Impossible to get Well from WellTable");
+                }
+            }
+            else
+            {
+                _logger.LogWarning("Impossible to access the SQLite database");
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// Returns the list of Wells with the specified SlotID present in the microservice database 
+        /// </summary>
+        /// <returns>the list of Wells with the specified SlotID </returns>
+        public List<Model.Well>? GetAllWellBySlotId(Guid slotId)
+        {
+            
+            List<Model.Well?> vals = [];
+            var connection = _connectionManager.GetConnection();
+            if (connection != null)
+            {
+                var command = connection.CreateCommand();
+                command.CommandText = $"SELECT Well FROM WellTable WHERE SlotID = '{slotId}'";                 
+                try
+                {
+                    using var reader = command.ExecuteReader();
+                    while (reader.Read() && !reader.IsDBNull(0))
+                    {
+                        string data = reader.GetString(0);
+                        Model.Well? well = JsonSerializer.Deserialize<Model.Well>(data, JsonSettings.Options);
+                        vals.Add(well);
+                    }
+                    _logger.LogInformation("Returning the list of existing Well from WellTable");
+                    return vals;
+                }
+                catch (SqliteException ex)
+                {
+                    _logger.LogError(ex, "Impossible to get Well from WellTable");
+                }
+            }
+            else
+            {
+                _logger.LogWarning("Impossible to access the SQLite database");
+            }
+            return null;
+        }
 
         /// <summary>
         /// Returns the list of MetaInfo of all Well present in the microservice database 
