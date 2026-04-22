@@ -199,6 +199,72 @@
         }
       }
     },
+    "/Well/SlotId": {
+      "get": {
+        "tags": [
+          "Well"
+        ],
+        "operationId": "GetAllWellBySlotId",
+        "parameters": [
+          {
+            "name": "slotId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/NORCE.Drilling.Well.Model.Well"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/Well/ClusterId": {
+      "get": {
+        "tags": [
+          "Well"
+        ],
+        "operationId": "GetAllWellByClusterId",
+        "parameters": [
+          {
+            "name": "clusterId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/NORCE.Drilling.Well.Model.Well"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/Well/UsedSlot/{clusterId}": {
       "get": {
         "tags": [
@@ -304,6 +370,12 @@
             "$ref": "#/components/schemas/NORCE.Drilling.Well.Model.History"
           },
           "GetAllWellPerDay": {
+            "$ref": "#/components/schemas/NORCE.Drilling.Well.Model.History"
+          },
+          "GetAllWellBySlotIdPerDay": {
+            "$ref": "#/components/schemas/NORCE.Drilling.Well.Model.History"
+          },
+          "GetAllWellByClusterIdPerDay": {
             "$ref": "#/components/schemas/NORCE.Drilling.Well.Model.History"
           },
           "PostWellPerDay": {

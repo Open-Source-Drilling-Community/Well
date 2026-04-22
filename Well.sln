@@ -27,7 +27,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModelTest", "ModelTest\Mode
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebApp", "WebApp\WebApp.csproj", "{CA557B90-68A1-4B16-8DF0-787C4FAEC877}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebPages", "WebPages\WebPages.csproj", "{01624631-3B10-47F2-B96D-8628D374FD30}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DBVersioningManager", "DBVersioningManager\DBVersioningManager.csproj", "{E63FA716-1588-4FFA-995B-65DE35C88794}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -107,22 +107,6 @@ Global
 		{CA557B90-68A1-4B16-8DF0-787C4FAEC877}.Debug|x86.Build.0 = Debug|Any CPU
 		{CA557B90-68A1-4B16-8DF0-787C4FAEC877}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CA557B90-68A1-4B16-8DF0-787C4FAEC877}.Release|Any CPU.Build.0 = Release|Any CPU
-		{CA557B90-68A1-4B16-8DF0-787C4FAEC877}.Release|x64.ActiveCfg = Release|Any CPU
-		{CA557B90-68A1-4B16-8DF0-787C4FAEC877}.Release|x64.Build.0 = Release|Any CPU
-		{CA557B90-68A1-4B16-8DF0-787C4FAEC877}.Release|x86.ActiveCfg = Release|Any CPU
-		{CA557B90-68A1-4B16-8DF0-787C4FAEC877}.Release|x86.Build.0 = Release|Any CPU
-		{01624631-3B10-47F2-B96D-8628D374FD30}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{01624631-3B10-47F2-B96D-8628D374FD30}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{01624631-3B10-47F2-B96D-8628D374FD30}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{01624631-3B10-47F2-B96D-8628D374FD30}.Debug|x64.Build.0 = Debug|Any CPU
-		{01624631-3B10-47F2-B96D-8628D374FD30}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{01624631-3B10-47F2-B96D-8628D374FD30}.Debug|x86.Build.0 = Debug|Any CPU
-		{01624631-3B10-47F2-B96D-8628D374FD30}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{01624631-3B10-47F2-B96D-8628D374FD30}.Release|Any CPU.Build.0 = Release|Any CPU
-		{01624631-3B10-47F2-B96D-8628D374FD30}.Release|x64.ActiveCfg = Release|Any CPU
-		{01624631-3B10-47F2-B96D-8628D374FD30}.Release|x64.Build.0 = Release|Any CPU
-		{01624631-3B10-47F2-B96D-8628D374FD30}.Release|x86.ActiveCfg = Release|Any CPU
-		{01624631-3B10-47F2-B96D-8628D374FD30}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
