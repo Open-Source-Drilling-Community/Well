@@ -6,6 +6,220 @@
     "version": "1.0"
   },
   "paths": {
+    "/Cluster": {
+      "get": {
+        "tags": [
+          "Cluster"
+        ],
+        "operationId": "GetAllClusterId",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "format": "uuid"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Cluster"
+        ],
+        "operationId": "PostCluster",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Cluster"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Cluster"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/Cluster"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/Cluster/MetaInfo": {
+      "get": {
+        "tags": [
+          "Cluster"
+        ],
+        "operationId": "GetAllClusterMetaInfo",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/MetaInfo"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/Cluster/{id}": {
+      "get": {
+        "tags": [
+          "Cluster"
+        ],
+        "operationId": "GetClusterById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Cluster"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Cluster"
+        ],
+        "operationId": "PutClusterById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Cluster"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Cluster"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/Cluster"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Cluster"
+        ],
+        "operationId": "DeleteClusterById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/Cluster/HeavyData": {
+      "get": {
+        "tags": [
+          "Cluster"
+        ],
+        "operationId": "GetAllCluster",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Cluster"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/ClusterUsageStatistics": {
+      "get": {
+        "tags": [
+          "ClusterUsageStatistics"
+        ],
+        "operationId": "GetClusterUsageStatistics",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UsageStatisticsCluster"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/CartographicConversionSet": {
       "get": {
         "tags": [
@@ -2837,72 +3051,6 @@
         }
       }
     },
-    "/Well/SlotId": {
-      "get": {
-        "tags": [
-          "Well"
-        ],
-        "operationId": "GetAllWellBySlotId",
-        "parameters": [
-          {
-            "name": "slotId",
-            "in": "query",
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Well"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/Well/ClusterId": {
-      "get": {
-        "tags": [
-          "Well"
-        ],
-        "operationId": "GetAllWellByClusterId",
-        "parameters": [
-          {
-            "name": "clusterId",
-            "in": "query",
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Well"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/Well/UsedSlot/{clusterId}": {
       "get": {
         "tags": [
@@ -3387,6 +3535,72 @@
           }
         }
       }
+    },
+    "/Well/SlotId": {
+      "get": {
+        "tags": [
+          "Well"
+        ],
+        "operationId": "GetAllWellBySlotId",
+        "parameters": [
+          {
+            "name": "slotId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Well"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/Well/ClusterId": {
+      "get": {
+        "tags": [
+          "Well"
+        ],
+        "operationId": "GetAllWellByClusterId",
+        "parameters": [
+          {
+            "name": "clusterId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Well"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -3454,171 +3668,7 @@
             "nullable": true
           }
         }
-      }
-    },
-    "/Cluster/MetaInfo": {
-      "get": {
-        "tags": [
-          "Cluster"
-        ],
-        "operationId": "GetAllClusterMetaInfo",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/MetaInfo"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/Cluster/{id}": {
-      "get": {
-        "tags": [
-          "Cluster"
-        ],
-        "operationId": "GetClusterById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Cluster"
-                }
-              }
-            }
-          }
-        }
       },
-      "put": {
-        "tags": [
-          "Cluster"
-        ],
-        "operationId": "PutClusterById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/Cluster"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/Cluster"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/Cluster"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      },
-      "delete": {
-        "tags": [
-          "Cluster"
-        ],
-        "operationId": "DeleteClusterById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/Cluster/HeavyData": {
-      "get": {
-        "tags": [
-          "Cluster"
-        ],
-        "operationId": "GetAllCluster",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Cluster"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/ClusterUsageStatistics": {
-      "get": {
-        "tags": [
-          "ClusterUsageStatistics"
-        ],
-        "operationId": "GetClusterUsageStatistics",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UsageStatisticsCluster"
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-  },
-  "components": {
-    "schemas": {
       "CountPerDay": {
         "type": "object",
         "properties": {
@@ -3640,6 +3690,125 @@
             "items": {
               "$ref": "#/components/schemas/CountPerDay"
             },
+            "nullable": true
+          }
+        }
+      },
+      "Slot": {
+        "type": "object",
+        "properties": {
+          "ID": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "Name": {
+            "type": "string",
+            "nullable": true
+          },
+          "Description": {
+            "type": "string",
+            "nullable": true
+          },
+          "CreationDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "LastModificationDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "Latitude": {
+            "$ref": "#/components/schemas/GaussianDrillingProperty"
+          },
+          "Longitude": {
+            "$ref": "#/components/schemas/GaussianDrillingProperty"
+          }
+        }
+      },
+      "UsageStatisticsCluster": {
+        "type": "object",
+        "properties": {
+          "LastSaved": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "BackUpInterval": {
+            "type": "string",
+            "format": "date-span"
+          },
+          "GetAllClusterIdPerDay": {
+            "$ref": "#/components/schemas/History"
+          },
+          "GetAllClusterMetaInfoPerDay": {
+            "$ref": "#/components/schemas/History"
+          },
+          "GetClusterByIdPerDay": {
+            "$ref": "#/components/schemas/History"
+          },
+          "GetAllClusterPerDay": {
+            "$ref": "#/components/schemas/History"
+          },
+          "PostClusterPerDay": {
+            "$ref": "#/components/schemas/History"
+          },
+          "PutClusterByIdPerDay": {
+            "$ref": "#/components/schemas/History"
+          },
+          "DeleteClusterByIdPerDay": {
+            "$ref": "#/components/schemas/History"
+          }
+        }
+      },
+      "GaussianDrillingProperty": {
+        "type": "object",
+        "properties": {
+          "GaussianValue": {
+            "$ref": "#/components/schemas/GaussianDistribution"
+          }
+        }
+      },
+      "MetaInfo": {
+        "type": "object",
+        "properties": {
+          "ID": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "HttpHostName": {
+            "type": "string",
+            "nullable": true
+          },
+          "HttpHostBasePath": {
+            "type": "string",
+            "nullable": true
+          },
+          "HttpEndPoint": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "GaussianDistribution": {
+        "type": "object",
+        "properties": {
+          "MinValue": {
+            "type": "number",
+            "format": "double"
+          },
+          "MaxValue": {
+            "type": "number",
+            "format": "double"
+          },
+          "Mean": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "StandardDeviation": {
+            "type": "number",
+            "format": "double",
             "nullable": true
           }
         }
@@ -4276,27 +4445,6 @@
           }
         },
         "additionalProperties": { }
-      },
-      "MetaInfo": {
-        "type": "object",
-        "properties": {
-          "ID": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "HttpHostName": {
-            "type": "string",
-            "nullable": true
-          },
-          "HttpHostBasePath": {
-            "type": "string",
-            "nullable": true
-          },
-          "HttpEndPoint": {
-            "type": "string",
-            "nullable": true
-          }
-        }
       },
       "UsageStatisticsGeodeticDatum": {
         "type": "object",
