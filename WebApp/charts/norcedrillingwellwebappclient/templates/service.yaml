@@ -3,7 +3,10 @@ kind: Service
 metadata:
   name: {{ include "norcedrillingwellwebappclient.fullname" . }}
   labels:
-    {{- include "norcedrillingwellwebappclient.labels" . | nindent 4 }}
+    {{- include "norcedrillingwellwebappclient.labels" . | nindent 4 }}  {{- with .Values.service.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
 spec:
   type: {{ .Values.service.type }}
   ports:
@@ -13,3 +16,4 @@ spec:
       name: http
   selector:
     {{- include "norcedrillingwellwebappclient.selectorLabels" . | nindent 4 }}
+
