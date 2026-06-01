@@ -1,5 +1,5 @@
-@page "/WellTrajectories"
-@inject ILogger<WellTrajectories> logger
+@page "/WellSurveyRuns"
+@inject ILogger<WellSurveyRuns> logger
 @inject ISnackbar Snackbar
 @inject IWellAPIUtils Api
 @using System.Net.Http.Json
@@ -25,8 +25,8 @@
             <MudPaper Class="pa-4" Elevation="2">
                 <MudGrid>
                     <MudItem xs="12" md="4">
-                        <MudText Typo="Typo.h5">Well Trajectories</MudText>
-                        <MudText Typo="Typo.body2">All trajectories for the selected well, shown in 3D and as a horizontal projection.</MudText>
+                        <MudText Typo="Typo.h5">Well Survey Runs</MudText>
+                        <MudText Typo="Typo.body2">All survey runs for the selected well, shown in 3D and as a horizontal projection.</MudText>
                     </MudItem>
                     <MudItem xs="12" sm="4" md="2">
                         <MudSelect Label="Field" T="Guid?" Value="@selectedFieldId" ValueChanged="OnFieldChanged" ShrinkLabel Clearable="true">
@@ -56,14 +56,11 @@
                         <MudButton Variant="Variant.Filled" Color="Color.Primary" FullWidth="true" OnClick="ReloadSelectedWellAsync" Disabled="@(selectedWellId == null)">Reload</MudButton>
                     </MudItem>
                     <MudItem xs="12" sm="4" md="2">
-                        <MudSelect Label="Type" T="string" Value="@selectedTrajectoryTypeFilter" ValueChanged="OnTrajectoryFilterChanged" ShrinkLabel>
-                            <MudSelectItem T="string" Value="@TrajectoryTypeFilterAll">All</MudSelectItem>
-                            <MudSelectItem T="string" Value="@TrajectoryTypeFilterPlanned">Planned</MudSelectItem>
-                            <MudSelectItem T="string" Value="@TrajectoryTypeFilterActual">Actual</MudSelectItem>
+                        <MudSelect Label="Type" T="string" Value="@selectedSurveyRunTypeFilter" ValueChanged="OnSurveyRunFilterChanged" ShrinkLabel>
+                            <MudSelectItem T="string" Value="@SurveyRunTypeFilterAll">All</MudSelectItem>
+                            <MudSelectItem T="string" Value="@SurveyRunTypeFilterPlanned">Planned</MudSelectItem>
+                            <MudSelectItem T="string" Value="@SurveyRunTypeFilterActual">Actual</MudSelectItem>
                         </MudSelect>
-                    </MudItem>
-                    <MudItem xs="12" sm="4" md="2">
-                        <MudCheckBox T="bool" Value="@definitiveTrajectoryOnly" ValueChanged="OnDefinitiveTrajectoryFilterChanged" Label="Definitive only" />
                     </MudItem>
                 </MudGrid>
                 <MudDivider Class="my-3" />
@@ -72,10 +69,10 @@
                         <MudNumericField @bind-Value="ellipseConfidenceFactor" Label="Confidence factor" Min="0.0" Max="1.0" Step="0.01" ShrinkLabel />
                     </MudItem>
                     <MudItem xs="12" sm="4" md="3">
-                        <MudButton Variant="Variant.Outlined" Color="Color.Primary" FullWidth="true" OnClick="CalculateUncertaintyEllipsesAsync" Disabled="@(trajectoryList.Count == 0 || isLoadingTrajectories || isCalculatingEllipses)">Calculate Ellipses</MudButton>
+                        <MudButton Variant="Variant.Outlined" Color="Color.Primary" FullWidth="true" OnClick="CalculateUncertaintyEllipsesAsync" Disabled="@(surveyRunList.Count == 0 || isLoadingSurveyRuns || isCalculatingEllipses)">Calculate Ellipses</MudButton>
                     </MudItem>
                     <MudItem xs="12" sm="4" md="3">
-                        <MudButton Variant="Variant.Text" Color="Color.Secondary" FullWidth="true" OnClick="ClearUncertaintyEllipses" Disabled="@(ellipseResultsByTrajectory.Count == 0 || isCalculatingEllipses)">Clear Ellipses</MudButton>
+                        <MudButton Variant="Variant.Text" Color="Color.Secondary" FullWidth="true" OnClick="ClearUncertaintyEllipses" Disabled="@(ellipseResultsBySurveyRun.Count == 0 || isCalculatingEllipses)">Clear Ellipses</MudButton>
                     </MudItem>
                     @if (isCalculatingEllipses)
                     {
@@ -83,15 +80,16 @@
                             <MudProgressLinear Indeterminate="true" Color="Color.Info" Class="mt-4" />
                         </MudItem>
                     }
-                </MudGrid>            </MudPaper>
+                </MudGrid>
+            </MudPaper>
 
             @if (!string.IsNullOrWhiteSpace(errorMessage))
             {
                 <MudAlert Severity="Severity.Error" Dense="true">@errorMessage</MudAlert>
             }
-            else if (isLoadingTrajectories)
+            else if (isLoadingSurveyRuns)
             {
-                <MudAlert Severity="Severity.Info" Dense="true">Loading trajectories for the selected well.</MudAlert>
+                <MudAlert Severity="Severity.Info" Dense="true">Loading survey runs for the selected well.</MudAlert>
             }
             else if (selectedFieldId == null)
             {
@@ -103,11 +101,11 @@
             }
             else if (selectedWellId == null)
             {
-                <MudAlert Severity="Severity.Info" Dense="true">Select a well to display its trajectories.</MudAlert>
+                <MudAlert Severity="Severity.Info" Dense="true">Select a well to display its survey runs.</MudAlert>
             }
-            else if (trajectoryList.Count == 0)
+            else if (surveyRunList.Count == 0)
             {
-                <MudAlert Severity="Severity.Info" Dense="true">No trajectories were found for the selected well.</MudAlert>
+                <MudAlert Severity="Severity.Info" Dense="true">No survey runs were found for the selected well.</MudAlert>
             }
             else
             {
@@ -127,7 +125,7 @@
                                            XAxisTitle="Easting"
                                            YAxisTitle="Northing"
                                            ZAxisTitle="TVD"
-                                           PlotTitle="Well trajectories"
+                                           PlotTitle="Well survey runs"
                                            PlotHeight="600"
                                            ZAxisReversed="true"
                                            XDrillingSignalReference="@DrillingSignalReferenceType.Position"
@@ -185,22 +183,21 @@
     private List<WellModelShared.Field>? fieldList;
     private List<WellModelShared.Cluster>? clusterList;
     private List<WellModelShared.Well>? wellList;
-    private List<WellModelShared.TrajectoryLight> trajectoryLightList = [];
-    private List<WellModelShared.Trajectory> trajectoryList = [];
+    private List<WellModelShared.SurveyRunLight> surveyRunLightList = [];
+    private List<WellModelShared.SurveyRun> surveyRunList = [];
     private Guid? selectedFieldId;
     private Guid? selectedClusterId;
     private Guid? selectedWellId;
     private string? errorMessage;
-    private bool isLoadingTrajectories;
-    private const string TrajectoryTypeFilterAll = "All";
-    private const string TrajectoryTypeFilterPlanned = "Planned";
-    private const string TrajectoryTypeFilterActual = "Actual";
-    private string selectedTrajectoryTypeFilter = TrajectoryTypeFilterAll;
-    private bool definitiveTrajectoryOnly;
+    private bool isLoadingSurveyRuns;
+    private const string SurveyRunTypeFilterAll = "All";
+    private const string SurveyRunTypeFilterPlanned = "Planned";
+    private const string SurveyRunTypeFilterActual = "Actual";
+    private string selectedSurveyRunTypeFilter = SurveyRunTypeFilterAll;
     private bool isCalculatingEllipses;
     private double ellipseConfidenceFactor = 0.95;
     private List<PlotTrace> plotTraces = [];
-    private Dictionary<Guid, List<WellModelShared.SurveyStationEllipseResult>> ellipseResultsByTrajectory = [];
+    private Dictionary<Guid, List<WellModelShared.SurveyStationEllipseResult>> ellipseResultsBySurveyRun = [];
 
     private List<string> PlotNames => plotTraces.Select(trace => trace.Name).ToList();
     private List<int> PlotModeFlags => plotTraces.Select(trace => trace.ModeFlag).ToList();
@@ -282,8 +279,8 @@
         selectedFieldId = fieldId;
         selectedClusterId = null;
         selectedWellId = null;
-        trajectoryLightList.Clear();
-        trajectoryList.Clear();
+        surveyRunLightList.Clear();
+        surveyRunList.Clear();
         ClearPlots();
         errorMessage = null;
         DataUtils.ApplyWellReferenceValues(null, clusterList ?? []);
@@ -294,8 +291,8 @@
     {
         selectedClusterId = clusterId;
         selectedWellId = null;
-        trajectoryLightList.Clear();
-        trajectoryList.Clear();
+        surveyRunLightList.Clear();
+        surveyRunList.Clear();
         ClearPlots();
         errorMessage = null;
         DataUtils.ApplyWellReferenceValues(null, clusterList ?? []);
@@ -308,12 +305,12 @@
         if (selectedWellId is Guid selected && selectedFieldId is Guid fieldId)
         {
             ApplySelectedWellReferenceValues(selected);
-            await LoadTrajectoriesAsync(fieldId, selectedClusterId, selected);
+            await LoadSurveyRunsAsync(fieldId, selectedClusterId, selected);
         }
         else
         {
-            trajectoryLightList.Clear();
-            trajectoryList.Clear();
+            surveyRunLightList.Clear();
+            surveyRunList.Clear();
             ClearPlots();
             errorMessage = null;
             DataUtils.ApplyWellReferenceValues(null, clusterList ?? []);
@@ -326,7 +323,7 @@
         if (selectedFieldId is Guid fieldId && selectedWellId is Guid wellId)
         {
             ApplySelectedWellReferenceValues(wellId);
-            await LoadTrajectoriesAsync(fieldId, selectedClusterId, wellId);
+            await LoadSurveyRunsAsync(fieldId, selectedClusterId, wellId);
         }
     }
 
@@ -337,108 +334,101 @@
     }
 
 
-    private async Task OnTrajectoryFilterChanged(string value)
+    private async Task OnSurveyRunFilterChanged(string value)
     {
-        selectedTrajectoryTypeFilter = string.IsNullOrWhiteSpace(value) ? TrajectoryTypeFilterAll : value;
+        selectedSurveyRunTypeFilter = string.IsNullOrWhiteSpace(value) ? SurveyRunTypeFilterAll : value;
         await ReloadCurrentSelectionAsync();
     }
 
-    private async Task OnDefinitiveTrajectoryFilterChanged(bool value)
+    private bool MatchesSurveyRunFilters(WellModelShared.SurveyRunLight surveyRun)
     {
-        definitiveTrajectoryOnly = value;
-        await ReloadCurrentSelectionAsync();
-    }
-
-    private bool MatchesTrajectoryFilters(WellModelShared.TrajectoryLight trajectory)
-    {
-        bool typeMatches = selectedTrajectoryTypeFilter == TrajectoryTypeFilterAll ||
-            string.Equals(trajectory.TrajectoryType.ToString(), selectedTrajectoryTypeFilter, StringComparison.OrdinalIgnoreCase);
-        bool definitiveMatches = !definitiveTrajectoryOnly || trajectory.IsDefinitive;
-        return typeMatches && definitiveMatches;
+        bool typeMatches = selectedSurveyRunTypeFilter == SurveyRunTypeFilterAll ||
+            string.Equals(surveyRun.SurveyRunType.ToString(), selectedSurveyRunTypeFilter, StringComparison.OrdinalIgnoreCase);
+        return typeMatches;
     }
 
     private async Task ReloadCurrentSelectionAsync()
     {
-        if (selectedFieldId is Guid fieldId && selectedWellId is Guid wellId) { ApplySelectedWellReferenceValues(wellId); await LoadTrajectoriesAsync(fieldId, selectedClusterId, wellId); }
+        if (selectedFieldId is Guid fieldId && selectedWellId is Guid wellId) { ApplySelectedWellReferenceValues(wellId); await LoadSurveyRunsAsync(fieldId, selectedClusterId, wellId); }
     }
 
-    private async Task LoadTrajectoriesAsync(Guid fieldId, Guid? clusterId, Guid wellId)
+    private async Task LoadSurveyRunsAsync(Guid fieldId, Guid? clusterId, Guid wellId)
     {
         try
         {
             errorMessage = null;
-            isLoadingTrajectories = true;
-            trajectoryLightList.Clear();
-            trajectoryList.Clear();
+            isLoadingSurveyRuns = true;
+            surveyRunLightList.Clear();
+            surveyRunList.Clear();
             ClearPlots();
             await InvokeAsync(StateHasChanged);
 
-            logger.LogInformation("Loading trajectory light data for field {FieldId}, cluster {ClusterId} and well {WellId}", fieldId, clusterId, wellId);
-            trajectoryLightList = (await Api.ClientTrajectory.GetAllTrajectoryLightAsync(fieldId: fieldId, clusterId: clusterId, wellId: wellId))
-                .Where(trajectory => trajectory?.MetaInfo != null && trajectory.MetaInfo.ID != Guid.Empty)
-                .Where(MatchesTrajectoryFilters)
-                .OrderBy(trajectory => trajectory.Name)
+            logger.LogInformation("Loading survey run light data for field {FieldId}, cluster {ClusterId} and well {WellId}", fieldId, clusterId, wellId);
+            surveyRunLightList = (await Api.ClientTrajectory.GetAllSurveyRunLightAsync(fieldId: fieldId, clusterId: clusterId, wellId: wellId))
+                .Where(surveyRun => surveyRun?.MetaInfo != null && surveyRun.MetaInfo.ID != Guid.Empty)
+                .Where(MatchesSurveyRunFilters)
+                .OrderBy(surveyRun => surveyRun.Name)
                 .ToList();
 
-            List<Task<WellModelShared.Trajectory>> detailTasks = trajectoryLightList
-                .Select(light => LoadTrajectoryWithSurveyStationsAsync(light.MetaInfo.ID))
+            List<Task<WellModelShared.SurveyRun>> detailTasks = surveyRunLightList
+                .Select(light => LoadSurveyRunWithSurveyStationsAsync(light.MetaInfo.ID))
                 .ToList();
 
-            trajectoryList = (await Task.WhenAll(detailTasks))
-                .Where(trajectory => trajectory != null)
-                .OrderBy(trajectory => trajectory.Name)
+            surveyRunList = (await Task.WhenAll(detailTasks))
+                .Where(surveyRun => surveyRun != null)
+                .OrderBy(surveyRun => surveyRun.Name)
                 .ToList();
 
             UpdatePlots();
         }
         catch (ApiException ex)
         {
-            logger.LogError(ex, "Problem while loading trajectories for well {WellId}", wellId);
-            errorMessage = "Unable to load trajectories for the selected well.";
+            logger.LogError(ex, "Problem while loading survey runs for well {WellId}", wellId);
+            errorMessage = "Unable to load survey runs for the selected well.";
             Snackbar.Add(errorMessage, Severity.Error);
-            trajectoryLightList.Clear();
-            trajectoryList.Clear();
+            surveyRunLightList.Clear();
+            surveyRunList.Clear();
             ClearPlots();
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Unexpected problem while loading trajectories for well {WellId}", wellId);
-            errorMessage = "Unable to load trajectories for the selected well.";
+            logger.LogError(ex, "Unexpected problem while loading survey runs for well {WellId}", wellId);
+            errorMessage = "Unable to load survey runs for the selected well.";
             Snackbar.Add(errorMessage, Severity.Error);
-            trajectoryLightList.Clear();
-            trajectoryList.Clear();
+            surveyRunLightList.Clear();
+            surveyRunList.Clear();
             ClearPlots();
         }
         finally
         {
-            isLoadingTrajectories = false;
+            isLoadingSurveyRuns = false;
         }
 
         await InvokeAsync(StateHasChanged);
     }
 
-    private async Task<WellModelShared.Trajectory> LoadTrajectoryWithSurveyStationsAsync(Guid trajectoryId)
+    private async Task<WellModelShared.SurveyRun> LoadSurveyRunWithSurveyStationsAsync(Guid surveyRunId)
     {
-        WellModelShared.Trajectory trajectory = await Api.ClientTrajectory.GetTrajectoryByIdAsync(trajectoryId);
-        int chunkCount = await Api.HttpClientTrajectory.GetFromJsonAsync<int>($"Trajectory/{trajectoryId}/SurveyStations/ChunkCount");
+        WellModelShared.SurveyRun surveyRun = await Api.ClientTrajectory.GetSurveyRunByIdAsync(surveyRunId);
+        int chunkCount = await Api.HttpClientTrajectory.GetFromJsonAsync<int>($"SurveyRun/{surveyRunId}/SurveyStations/ChunkCount");
         if (chunkCount <= 0)
         {
-            trajectory.SurveyStationList ??= [];
-            return trajectory;
+            surveyRun.SurveyStationList ??= [];
+            return surveyRun;
         }
 
         List<WellModelShared.SurveyStation> stations = [];
         for (int chunkIndex = 0; chunkIndex < chunkCount; chunkIndex++)
         {
-            WellModelShared.SurveyStationChunk? chunk = await Api.HttpClientTrajectory.GetFromJsonAsync<WellModelShared.SurveyStationChunk>($"Trajectory/{trajectoryId}/SurveyStations/Chunks/{chunkIndex}");
+            WellModelShared.SurveyStationChunk? chunk = await Api.HttpClientTrajectory.GetFromJsonAsync<SurveyStationChunk>($"SurveyRun/{surveyRunId}/SurveyStations/Chunks/{chunkIndex}");
             if (chunk?.SurveyStationList is { Count: > 0 } chunkStations)
             {
                 stations.AddRange(chunkStations);
             }
         }
 
-        trajectory.SurveyStationList = stations;
-        return trajectory;
+        surveyRun.SurveyStationList = stations;
+        return surveyRun;
     }
 
     private void UpdatePlots()
@@ -446,9 +436,9 @@
         int colorIndex = 0;
         List<PlotTrace> nextPlotTraces = [];
 
-        foreach (WellModelShared.Trajectory trajectory in trajectoryList)
+        foreach (WellModelShared.SurveyRun surveyRun in surveyRunList)
         {
-            if (trajectory?.SurveyStationList == null || trajectory.SurveyStationList.Count == 0)
+            if (surveyRun?.SurveyStationList == null || surveyRun.SurveyStationList.Count == 0)
             {
                 continue;
             }
@@ -457,7 +447,7 @@
             List<object> eastValues = [];
             List<object> tvdValues = [];
 
-            foreach (WellModelShared.SurveyStation station in trajectory.SurveyStationList)
+            foreach (WellModelShared.SurveyStation station in surveyRun.SurveyStationList)
             {
                 AppendPoint(station, northValues, eastValues, tvdValues);
             }
@@ -468,7 +458,7 @@
             }
 
             nextPlotTraces.Add(new PlotTrace(
-                string.IsNullOrWhiteSpace(trajectory.Name) ? "trajectory" : trajectory.Name,
+                string.IsNullOrWhiteSpace(surveyRun.Name) ? "survey run" : surveyRun.Name,
                 1,
                 Colors[colorIndex % Colors.Length],
                 true,
@@ -478,14 +468,14 @@
             colorIndex++;
         }
 
-        AddEllipseTracesForLoadedTrajectories(nextPlotTraces);
+        AddEllipseTracesForLoadedSurveyRuns(nextPlotTraces);
         plotTraces = nextPlotTraces;
     }
 
 
     private async Task CalculateUncertaintyEllipsesAsync()
     {
-        if (trajectoryList.Count == 0)
+        if (surveyRunList.Count == 0)
         {
             return;
         }
@@ -493,13 +483,13 @@
         try
         {
             isCalculatingEllipses = true;
-            ellipseResultsByTrajectory.Clear();
+            ellipseResultsBySurveyRun.Clear();
             await InvokeAsync(StateHasChanged);
 
-            foreach (WellModelShared.Trajectory trajectory in trajectoryList)
+            foreach (WellModelShared.SurveyRun surveyRun in surveyRunList)
             {
-                if (trajectory.MetaInfo?.ID is not Guid trajectoryId ||
-                    trajectory.SurveyStationList is not { Count: > 0 } surveyStations)
+                if (surveyRun.MetaInfo?.ID is not Guid surveyRunId ||
+                    surveyRun.SurveyStationList is not { Count: > 0 } surveyStations)
                 {
                     continue;
                 }
@@ -507,7 +497,7 @@
                 WellModelShared.SurveyStationEllipseCalculation order = new()
                 {
                     MetaInfo = new WellModelShared.MetaInfo { ID = Guid.NewGuid() },
-                    Name = $"{trajectory.Name} uncertainty ellipses",
+                    Name = $"{surveyRun.Name} uncertainty ellipses",
                     Description = string.Empty,
                     CreationDate = DateTimeOffset.UtcNow,
                     LastModificationDate = DateTimeOffset.UtcNow,
@@ -520,12 +510,12 @@
                 WellModelShared.SurveyStationEllipseCalculation? result = await response.Content.ReadFromJsonAsync<WellModelShared.SurveyStationEllipseCalculation>();
                 if (result?.SurveyStationEllipseResultList is { Count: > 0 } ellipseResults)
                 {
-                    ellipseResultsByTrajectory[trajectoryId] = ellipseResults.ToList();
+                    ellipseResultsBySurveyRun[surveyRunId] = ellipseResults.ToList();
                 }
             }
 
             UpdatePlots();
-            if (ellipseResultsByTrajectory.Count == 0)
+            if (ellipseResultsBySurveyRun.Count == 0)
             {
                 Snackbar.Add("No uncertainty ellipses could be calculated.", Severity.Warning);
             }
@@ -545,16 +535,16 @@
 
     private void ClearUncertaintyEllipses()
     {
-        ellipseResultsByTrajectory.Clear();
+        ellipseResultsBySurveyRun.Clear();
         UpdatePlots();
     }
 
-    private void AddEllipseTracesForLoadedTrajectories(List<PlotTrace> traces)
+    private void AddEllipseTracesForLoadedSurveyRuns(List<PlotTrace> traces)
     {
         int colorIndex = 0;
-        foreach (WellModelShared.Trajectory trajectory in trajectoryList)
+        foreach (WellModelShared.SurveyRun surveyRun in surveyRunList)
         {
-            if (trajectory?.SurveyStationList == null || trajectory.SurveyStationList.Count == 0)
+            if (surveyRun?.SurveyStationList == null || surveyRun.SurveyStationList.Count == 0)
             {
                 continue;
             }
@@ -562,17 +552,17 @@
             List<object> northValues = [];
             List<object> eastValues = [];
             List<object> tvdValues = [];
-            foreach (WellModelShared.SurveyStation station in trajectory.SurveyStationList)
+            foreach (WellModelShared.SurveyStation station in surveyRun.SurveyStationList)
             {
                 AppendPoint(station, northValues, eastValues, tvdValues);
             }
 
             if (northValues.Count >= 2 && northValues.Count == eastValues.Count && northValues.Count == tvdValues.Count)
             {
-                if (trajectory.MetaInfo?.ID is Guid trajectoryId &&
-                    ellipseResultsByTrajectory.TryGetValue(trajectoryId, out var ellipseResults))
+                if (surveyRun.MetaInfo?.ID is Guid surveyRunId &&
+                    ellipseResultsBySurveyRun.TryGetValue(surveyRunId, out var ellipseResults))
                 {
-                    AddEllipseTraces(traces, trajectory.SurveyStationList, ellipseResults, Colors[colorIndex % Colors.Length], trajectory.Name);
+                    AddEllipseTraces(traces, surveyRun.SurveyStationList, ellipseResults, Colors[colorIndex % Colors.Length], surveyRun.Name);
                 }
                 colorIndex++;
             }
@@ -584,18 +574,18 @@
         ICollection<WellModelShared.SurveyStation> surveyStations,
         IReadOnlyList<WellModelShared.SurveyStationEllipseResult> ellipseResults,
         string color,
-        string? trajectoryName)
+        string? surveyRunName)
     {
         bool horizontalLegendShown = false;
         bool perpendicularLegendShown = false;
         foreach ((WellModelShared.SurveyStation station, WellModelShared.SurveyStationEllipseResult result) in SelectEvenlySpacedEllipses(surveyStations, ellipseResults))
         {
-            if (BuildHorizontalEllipseTrace(station, result.HorizontalEllipse, color, !horizontalLegendShown, trajectoryName) is { } horizontalTrace)
+            if (BuildHorizontalEllipseTrace(station, result.HorizontalEllipse, color, !horizontalLegendShown, surveyRunName) is { } horizontalTrace)
             {
                 traces.Add(horizontalTrace);
                 horizontalLegendShown = true;
             }
-            if (BuildPerpendicularEllipseTrace(station, result.PerpendicularEllipse, color, !perpendicularLegendShown, trajectoryName) is { } perpendicularTrace)
+            if (BuildPerpendicularEllipseTrace(station, result.PerpendicularEllipse, color, !perpendicularLegendShown, surveyRunName) is { } perpendicularTrace)
             {
                 traces.Add(perpendicularTrace);
                 perpendicularLegendShown = true;
@@ -648,7 +638,7 @@
             .FirstOrDefault();
     }
 
-    private static PlotTrace? BuildHorizontalEllipseTrace(WellModelShared.SurveyStation station, WellModelShared.SurveyStationEllipse? ellipse, string color, bool showLegend, string? trajectoryName)
+    private static PlotTrace? BuildHorizontalEllipseTrace(WellModelShared.SurveyStation station, WellModelShared.SurveyStationEllipse? ellipse, string color, bool showLegend, string? surveyRunName)
     {
         if (ellipse?.SemiMajorAxis is not double semiMajor ||
             ellipse.SemiMinorAxis is not double semiMinor ||
@@ -675,10 +665,10 @@
             tvdValues.Add(centerTvd);
         }
 
-        return new PlotTrace($"{trajectoryName ?? "trajectory"} horizontal ellipses", 1, color, showLegend, northValues, eastValues, tvdValues);
+        return new PlotTrace($"{surveyRunName ?? "survey run"} horizontal ellipses", 1, color, showLegend, northValues, eastValues, tvdValues);
     }
 
-    private static PlotTrace? BuildPerpendicularEllipseTrace(WellModelShared.SurveyStation station, WellModelShared.SurveyStationEllipse? ellipse, string color, bool showLegend, string? trajectoryName)
+    private static PlotTrace? BuildPerpendicularEllipseTrace(WellModelShared.SurveyStation station, WellModelShared.SurveyStationEllipse? ellipse, string color, bool showLegend, string? surveyRunName)
     {
         if (ellipse?.SemiMajorAxis is not double semiMajor ||
             ellipse.SemiMinorAxis is not double semiMinor ||
@@ -713,7 +703,7 @@
             tvdValues.Add(centerTvd - sinI * localX);
         }
 
-        return new PlotTrace($"{trajectoryName ?? "trajectory"} perpendicular ellipses", 1, color, showLegend, northValues, eastValues, tvdValues);
+        return new PlotTrace($"{surveyRunName ?? "survey run"} perpendicular ellipses", 1, color, showLegend, northValues, eastValues, tvdValues);
     }
 
     private static void AppendPoint(WellModelShared.SurveyStation? point, List<object> northValues, List<object> eastValues, List<object> tvdValues)
@@ -805,6 +795,7 @@
     private const int EllipsePointCount = 72;
 
 }
+
 
 
 
