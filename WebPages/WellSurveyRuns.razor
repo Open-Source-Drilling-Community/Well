@@ -14,7 +14,9 @@
                               DepthReferenceName="@DataUtils.UnitAndReferenceParameters.DepthReferenceName"
                               DepthReferenceNameChanged="@DataUtils.UpdateDepthReferenceName"
                               GroundMudLineDepthReferenceSource="@DataUtils.UnitAndReferenceParameters.GroundMudLineDepthReferenceSource"
-                              SeaWaterLevelDepthReferenceSource="@DataUtils.UnitAndReferenceParameters.SeaWaterLevelDepthReferenceSource">
+                              SeaWaterLevelDepthReferenceSource="@DataUtils.UnitAndReferenceParameters.SeaWaterLevelDepthReferenceSource"
+                              MeanSeaLevelDepthReferenceSource="@DataUtils.UnitAndReferenceParameters.MeanSeaLevelDepthReferenceSource"
+                              RotaryTableDepthReferenceSource="@DataUtils.UnitAndReferenceParameters.RotaryTableDepthReferenceSource">
     @if (fieldList == null || clusterList == null || wellList == null)
     {
         <p><em>Loading...</em></p>
@@ -182,6 +184,7 @@
 @code {
     private List<WellModelShared.Field>? fieldList;
     private List<WellModelShared.Cluster>? clusterList;
+    private List<WellModelShared.Rig>? rigList;
     private List<WellModelShared.Well>? wellList;
     private List<WellModelShared.SurveyRunLight> surveyRunLightList = [];
     private List<WellModelShared.SurveyRun> surveyRunList = [];
@@ -227,12 +230,14 @@
             logger.LogInformation("Trying to load list of Fields, Clusters and Wells");
             Task<ICollection<WellModelShared.Field>> fieldTask = Api.ClientField.GetAllFieldAsync();
             Task<ICollection<WellModelShared.Cluster>> clusterTask = Api.ClientCluster.GetAllClusterAsync();
+            Task<ICollection<WellModelShared.Rig>> rigTask = Api.ClientRig.GetAllRigAsync();
             Task<ICollection<WellModelShared.Well>> wellTask = Api.ClientWell.GetAllWellAsync();
 
-            await Task.WhenAll(fieldTask, clusterTask, wellTask);
+            await Task.WhenAll(fieldTask, clusterTask, rigTask, wellTask);
 
             fieldList = fieldTask.Result.Where(field => field?.MetaInfo != null).OrderBy(field => field.Name).ToList();
             clusterList = clusterTask.Result.Where(cluster => cluster?.MetaInfo != null).OrderBy(cluster => cluster.Name).ToList();
+            rigList = rigTask.Result.Where(rig => rig?.MetaInfo != null).OrderBy(rig => rig.Name).ToList();
             wellList = wellTask.Result.Where(well => well?.MetaInfo != null).OrderBy(well => well.Name).ToList();
         }
         catch (ApiException ex)
@@ -296,7 +301,7 @@
         surveyRunList.Clear();
         ClearPlots();
         errorMessage = null;
-        DataUtils.ApplyWellReferenceValues(null, clusterList ?? []);
+        await ApplySelectedWellReferenceValuesAsync(null);
         await InvokeAsync(StateHasChanged);
     }
 
@@ -308,7 +313,7 @@
         surveyRunList.Clear();
         ClearPlots();
         errorMessage = null;
-        DataUtils.ApplyWellReferenceValues(null, clusterList ?? []);
+        await ApplySelectedWellReferenceValuesAsync(null);
         await InvokeAsync(StateHasChanged);
     }
 
@@ -317,7 +322,7 @@
         selectedWellId = wellId;
         if (selectedWellId is Guid selected && selectedFieldId is Guid fieldId)
         {
-            ApplySelectedWellReferenceValues(selected);
+            await ApplySelectedWellReferenceValuesAsync(selected);
             await LoadSurveyRunsAsync(fieldId, selectedClusterId, selected);
         }
         else
@@ -326,7 +331,7 @@
             surveyRunList.Clear();
             ClearPlots();
             errorMessage = null;
-            DataUtils.ApplyWellReferenceValues(null, clusterList ?? []);
+            await ApplySelectedWellReferenceValuesAsync(null);
             await InvokeAsync(StateHasChanged);
         }
     }
@@ -335,15 +340,17 @@
     {
         if (selectedFieldId is Guid fieldId && selectedWellId is Guid wellId)
         {
-            ApplySelectedWellReferenceValues(wellId);
+            await ApplySelectedWellReferenceValuesAsync(wellId);
             await LoadSurveyRunsAsync(fieldId, selectedClusterId, wellId);
         }
     }
 
-    private void ApplySelectedWellReferenceValues(Guid wellId)
+    private async Task ApplySelectedWellReferenceValuesAsync(Guid? wellId)
     {
         WellModelShared.Well? selectedWell = wellList?.FirstOrDefault(well => well.MetaInfo?.ID == wellId);
-        DataUtils.ApplyWellReferenceValues(selectedWell, clusterList ?? []);
+        DataUtils.ApplyWellReferenceValues(selectedWell, clusterList ?? [], rigList);
+        DataUtils.UnitAndReferenceParameters.MeanSeaLevelDepthReferenceSource.MeanSeaLevelDepthReference =
+            await MslDepthReferenceUtils.ResolveMeanSeaLevelDepthReferenceAsync(Api, selectedWell, clusterList);
     }
 
 
@@ -362,7 +369,7 @@
 
     private async Task ReloadCurrentSelectionAsync()
     {
-        if (selectedFieldId is Guid fieldId && selectedWellId is Guid wellId) { ApplySelectedWellReferenceValues(wellId); await LoadSurveyRunsAsync(fieldId, selectedClusterId, wellId); }
+        if (selectedFieldId is Guid fieldId && selectedWellId is Guid wellId) { await ApplySelectedWellReferenceValuesAsync(wellId); await LoadSurveyRunsAsync(fieldId, selectedClusterId, wellId); }
     }
 
     private async Task LoadSurveyRunsAsync(Guid fieldId, Guid? clusterId, Guid wellId)

@@ -6,7 +6,9 @@ public interface IWellWebPagesConfiguration :
     IWellHostURL,
     IClusterHostURL,
     IFieldHostURL,
+    IRigHostURL,
     ITrajectoryHostURL,
     IUnitConversionHostURL
 {
+    string? VerticalDatumHostURL { get; set; }
 }

@@ -19,6 +19,11 @@ public interface IWellAPIUtils
     HttpClient HttpClientCluster { get; }
     Client ClientCluster { get; }
 
+    string HostNameRig { get; }
+    string HostBasePathRig { get; }
+    HttpClient HttpClientRig { get; }
+    Client ClientRig { get; }
+
     string HostNameTrajectory { get; }
     string HostBasePathTrajectory { get; }
     HttpClient HttpClientTrajectory { get; }
@@ -26,6 +31,10 @@ public interface IWellAPIUtils
 
     string HostNameUnitConversion { get; }
     string HostBasePathUnitConversion { get; }
+
+    string HostNameVerticalDatum { get; }
+    string HostBasePathVerticalDatum { get; }
+    HttpClient HttpClientVerticalDatum { get; }
 
     double EarthRadiusWGS84 { get; }
 }

@@ -21,12 +21,16 @@ public static class DataUtils
         public static string? DateReferenceName { get; set; }
         public static GroundMudLineDepthReferenceSource GroundMudLineDepthReferenceSource { get; set; } = new();
         public static SeaWaterLevelDepthReferenceSource SeaWaterLevelDepthReferenceSource { get; set; } = new();
+        public static RotaryTableDepthReferenceSource RotaryTableDepthReferenceSource { get; set; } = new();
+        public static MeanSeaLevelDepthReferenceSource MeanSeaLevelDepthReferenceSource { get; set; } = new();
     }
 
-    public static void ApplyWellReferenceValues(NORCE.Drilling.Well.ModelShared.Well? well, List<Cluster> clusters)
+    public static void ApplyWellReferenceValues(NORCE.Drilling.Well.ModelShared.Well? well, List<Cluster> clusters, List<Rig>? rigs = null)
     {
         UnitAndReferenceParameters.GroundMudLineDepthReferenceSource.GroundMudLineDepthReference = 0;
         UnitAndReferenceParameters.SeaWaterLevelDepthReferenceSource.SeaWaterLevelDepthReference = 0;
+        UnitAndReferenceParameters.RotaryTableDepthReferenceSource.RotaryTableDepthReference = 0;
+        UnitAndReferenceParameters.MeanSeaLevelDepthReferenceSource.MeanSeaLevelDepthReference = null;
         if (well != null && well.ClusterID != null)
         {
             Cluster? cluster = null;
@@ -47,6 +51,11 @@ public static class DataUtils
             {
                 ApplyTopWaterDepthWGS84(cluster.TopWaterDepth.GaussianValue.Mean);
             }
+            if (cluster?.RigID is Guid rigId && rigId != Guid.Empty && rigs != null)
+            {
+                Rig? rig = rigs.FirstOrDefault(item => item?.MetaInfo?.ID == rigId);
+                ApplyRotaryTableDepthWGS84(rig?.DrillFloorElevation);
+            }
         }
     }
 
@@ -63,6 +72,14 @@ public static class DataUtils
         if (val != null)
         {
             UnitAndReferenceParameters.SeaWaterLevelDepthReferenceSource.SeaWaterLevelDepthReference = -val;
+        }
+    }
+
+    public static void ApplyRotaryTableDepthWGS84(double? val)
+    {
+        if (val != null)
+        {
+            UnitAndReferenceParameters.RotaryTableDepthReferenceSource.RotaryTableDepthReference = -val;
         }
     }
 
@@ -85,5 +102,15 @@ public static class DataUtils
     public class SeaWaterLevelDepthReferenceSource : ISeaWaterLevelDepthReferenceSource
     {
         public double? SeaWaterLevelDepthReference { get; set; }
+    }
+
+    public class RotaryTableDepthReferenceSource : IRotaryTableDepthReferenceSource
+    {
+        public double? RotaryTableDepthReference { get; set; }
+    }
+
+    public class MeanSeaLevelDepthReferenceSource : IMeanSeaLevelDepthReferenceSource
+    {
+        public double? MeanSeaLevelDepthReference { get; set; }
     }
 }

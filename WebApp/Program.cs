@@ -14,6 +14,7 @@ WebPagesHostConfiguration webPagesConfiguration = new()
     TrajectoryHostURL = builder.Configuration["TrajectoryHostURL"] ?? string.Empty,
     CartographicProjectionHostURL = builder.Configuration["CartographicProjectionHostURL"] ?? string.Empty,
     GeodeticDatumHostURL = builder.Configuration["GeodeticDatumHostURL"] ?? string.Empty,
+    VerticalDatumHostURL = builder.Configuration["VerticalDatumHostURL"] ?? string.Empty,
     UnitConversionHostURL = builder.Configuration["UnitConversionHostURL"] ?? string.Empty,
 };
 

@@ -87,3 +87,10 @@ See each project’s `.csproj` for exact versions.
 ## More
 - Per‑project guides: `Model/README.md`, `Service/README.md`, `WebApp/README.md`
 - Templates and docs: https://github.com/NORCE-DrillingAndWells/Templates and https://github.com/NORCE-DrillingAndWells/DrillingAndWells/wiki
+
+## Current implementation
+
+- The Well service exposes its ten non-statistics REST operations as MCP tools, plus `ping`; usage-statistics endpoints are intentionally excluded.
+- MCP is available at `/well/api/mcp` over streamable HTTP and `/well/api/mcp/ws` over WebSocket. Optional MCP-hub registration is disabled by default.
+- The Well UI now uses Rig and Vertical Datum information to present mean-sea-level depth references in well, survey-run, and trajectory workflows.
+- The WebApp's embedded service pages use the current Field (1.0.19), Cluster (1.0.12), Cartographic Projection (1.0.8), and Geodetic Datum (1.0.7) packages.

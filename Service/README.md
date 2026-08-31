@@ -125,3 +125,12 @@ See `Service.csproj` for exact versions and build targets. A `CreateSwaggerJson`
 ---
 
 This solution was generated from the NORCE Drilling and Wells .NET template. See https://github.com/NORCE-DrillingAndWells/Templates and the related documentation at https://github.com/NORCE-DrillingAndWells/DrillingAndWells/wiki/.NET-Templates
+
+## MCP server
+
+The service publishes all ten non-statistics Well REST operations as MCP tools. Tool names use the underscore convention directly, and access-statistics operations are not registered. Each tool includes an explicit JSON input schema; create and update describe the complete Well payload, including `MetaInfo.ID`, timestamps, slot/cluster associations, nullability, and UUID formats.
+
+- Streamable HTTP: `/well/api/mcp`
+- WebSocket: `/well/api/mcp/ws`
+- Utility tool: `ping`
+- Optional external MCP-hub registration: configured in `appsettings.json`, disabled by default

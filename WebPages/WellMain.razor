@@ -11,7 +11,9 @@
                               DepthReferenceName="@DataUtils.UnitAndReferenceParameters.DepthReferenceName"
                               DepthReferenceNameChanged="@DataUtils.UpdateDepthReferenceName"
                               GroundMudLineDepthReferenceSource="@DataUtils.UnitAndReferenceParameters.GroundMudLineDepthReferenceSource"
-                              SeaWaterLevelDepthReferenceSource="@DataUtils.UnitAndReferenceParameters.SeaWaterLevelDepthReferenceSource">
+                              SeaWaterLevelDepthReferenceSource="@DataUtils.UnitAndReferenceParameters.SeaWaterLevelDepthReferenceSource"
+                              MeanSeaLevelDepthReferenceSource="@DataUtils.UnitAndReferenceParameters.MeanSeaLevelDepthReferenceSource"
+                              RotaryTableDepthReferenceSource="@DataUtils.UnitAndReferenceParameters.RotaryTableDepthReferenceSource">
     @if (wellList == null)
     {
         <p><em>Loading...</em></p>
@@ -61,6 +63,7 @@
     private Well? currentWell;
     private List<Field> fieldList = new();
     private List<Cluster> clusterList = new();
+    private List<Rig> rigList = new();
 
     // UI related variables
     public bool isHiddenMainPanel;
@@ -81,8 +84,9 @@
             var wellTask = Api.ClientWell.GetAllWellAsync();
             var clusterTask = Api.ClientCluster.GetAllClusterAsync();
             var fieldTask = Api.ClientField.GetAllFieldAsync();
+            var rigTask = Api.ClientRig.GetAllRigAsync();
 
-            List<Task> loadingTaskList = new List<Task> { wellTask, clusterTask, fieldTask };
+            List<Task> loadingTaskList = new List<Task> { wellTask, clusterTask, fieldTask, rigTask };
 
             // Awaiting tasks and retrieve results as they become available
             while (loadingTaskList.Count > 0)
@@ -155,6 +159,18 @@
                         logger.LogError(ex, "Impossible to load fields from client");
                     }
                 }
+                else if (finishedTask == rigTask)
+                {
+                    try
+                    {
+                        rigList = (List<Rig>)await rigTask;
+                        rigList?.Sort((t1, t2) => t1.Name.CompareTo(t2.Name));
+                    }
+                    catch (ApiException ex)
+                    {
+                        logger.LogError(ex, "Impossible to load rigs from client");
+                    }
+                }
                 loadingTaskList.Remove(finishedTask);
             }
         }
@@ -179,7 +195,7 @@
                     CreationDate = creationDate,
                     LastModificationDate = creationDate,
                 };
-            UpdateSelectedClusterDepthReferenceSource();
+            await UpdateSelectedClusterDepthReferenceSourceAsync();
             await Api.ClientWell.PostWellAsync(currentWell);
             logger.LogInformation("Well posted successfully");
             Snackbar.Add("Well posted successfully", Severity.Success);
@@ -216,7 +232,7 @@
         try
         {
             currentWell = await Api.ClientWell.GetWellByIdAsync(id);
-            UpdateSelectedClusterDepthReferenceSource();
+            await UpdateSelectedClusterDepthReferenceSourceAsync();
             if (currentWell != null)
             {
                 isHiddenMainPanel = true;
@@ -240,7 +256,7 @@
         try
         {
             await Api.ClientWell.DeleteWellByIdAsync(id);
-            UpdateSelectedClusterDepthReferenceSource();
+            await UpdateSelectedClusterDepthReferenceSourceAsync();
             await OnInitializedAsync();
         }
         catch (Exception ex)
@@ -257,7 +273,7 @@
             {
                 await Api.ClientWell.DeleteWellByIdAsync(well.MetaInfo.ID);
             }
-            UpdateSelectedClusterDepthReferenceSource();
+            await UpdateSelectedClusterDepthReferenceSourceAsync();
             await OnInitializedAsync();
         }
         catch (Exception ex)
@@ -309,6 +325,11 @@
         await OnInitializedAsync();
     }
 
-    private void UpdateSelectedClusterDepthReferenceSource() => DataUtils.ApplyWellReferenceValues(currentWell, clusterList);
+    private async Task UpdateSelectedClusterDepthReferenceSourceAsync()
+    {
+        DataUtils.ApplyWellReferenceValues(currentWell, clusterList, rigList);
+        DataUtils.UnitAndReferenceParameters.MeanSeaLevelDepthReferenceSource.MeanSeaLevelDepthReference =
+            await MslDepthReferenceUtils.ResolveMeanSeaLevelDepthReferenceAsync(Api, currentWell, clusterList);
+    }
 }
 

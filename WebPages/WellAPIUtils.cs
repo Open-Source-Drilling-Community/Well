@@ -19,11 +19,18 @@ public class WellAPIUtils : APIUtils, IWellAPIUtils
         HttpClientCluster = SetHttpClient(HostNameCluster, HostBasePathCluster);
         ClientCluster = new Client(HttpClientCluster.BaseAddress!.ToString(), HttpClientCluster);
 
+        HostNameRig = Require(configuration.RigHostURL, nameof(configuration.RigHostURL));
+        HttpClientRig = SetHttpClient(HostNameRig, HostBasePathRig);
+        ClientRig = new Client(HttpClientRig.BaseAddress!.ToString(), HttpClientRig);
+
         HostNameTrajectory = Require(configuration.TrajectoryHostURL, nameof(configuration.TrajectoryHostURL));
         HttpClientTrajectory = SetHttpClient(HostNameTrajectory, HostBasePathTrajectory);
         ClientTrajectory = new Client(HttpClientTrajectory.BaseAddress!.ToString(), HttpClientTrajectory);
 
         HostNameUnitConversion = Require(configuration.UnitConversionHostURL, nameof(configuration.UnitConversionHostURL));
+
+        HostNameVerticalDatum = Require(configuration.VerticalDatumHostURL, nameof(configuration.VerticalDatumHostURL));
+        HttpClientVerticalDatum = SetHttpClient(HostNameVerticalDatum, HostBasePathVerticalDatum);
     }
 
     private static string Require(string? value, string propertyName)
@@ -51,6 +58,11 @@ public class WellAPIUtils : APIUtils, IWellAPIUtils
     public HttpClient HttpClientCluster { get; }
     public Client ClientCluster { get; }
 
+    public string HostNameRig { get; }
+    public string HostBasePathRig { get; } = "Rig/api/";
+    public HttpClient HttpClientRig { get; }
+    public Client ClientRig { get; }
+
     public string HostNameTrajectory { get; }
     public string HostBasePathTrajectory { get; } = "Trajectory/api/";
     public HttpClient HttpClientTrajectory { get; }
@@ -58,6 +70,10 @@ public class WellAPIUtils : APIUtils, IWellAPIUtils
 
     public string HostNameUnitConversion { get; }
     public string HostBasePathUnitConversion { get; } = "UnitConversion/api/";
+
+    public string HostNameVerticalDatum { get; }
+    public string HostBasePathVerticalDatum { get; } = "VerticalDatum/api/";
+    public HttpClient HttpClientVerticalDatum { get; }
 
     public double EarthRadiusWGS84 { get; } = 6378137.0;
 }

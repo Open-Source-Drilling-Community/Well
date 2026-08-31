@@ -88,3 +88,9 @@ See `WebApp.csproj` for exact versions and build targets.
 - Swagger (dev): https://dev.digiwells.no/Well/api/swagger
 - Service API (dev): https://dev.digiwells.no/Well/api/Well
 - WebApp (dev): https://dev.digiwells.no/Well/webapp/Well
+
+## Current integrations
+
+The host configures Rig and Vertical Datum service/WebApp URLs for the reusable Well pages. Its embedded page packages are aligned to Field 1.0.19, Cluster 1.0.12, Cartographic Projection 1.0.8, and Geodetic Datum 1.0.7.
+
+Keep the corresponding `appsettings.Development.json` and `appsettings.Production.json` values aligned with the target environment.

@@ -48,3 +48,7 @@ Example routing:
 <Router AppAssembly="@typeof(App).Assembly"
         AdditionalAssemblies="new[] { typeof(NORCE.Drilling.Well.WebPages.WellMain).Assembly }">
 ```
+
+## Rig and Vertical Datum integration
+
+The reusable pages retrieve Rig and Vertical Datum information through the configured API utilities. `MslDepthReferenceUtils` is used by the well editor, survey-run page, and trajectory page to present consistent mean-sea-level depth references. This package uses `OSDC.DotnetLibraries.Drilling.WebAppUtils` 1.1.3.
