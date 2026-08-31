@@ -1,16 +1,18 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "norcedrillingwellwebappclient.fullname" . }}
+  name: {{ include "osdcdrillingwellservice.fullname" . }}
   labels:
-    {{- include "norcedrillingwellwebappclient.labels" . | nindent 4 }}
+    {{- include "osdcdrillingwellservice.labels" . | nindent 4 }}
 spec:
+  strategy:
+    type: {{ .Values.strategy.type }}
   {{- if not .Values.autoscaling.enabled }}
   replicas: {{ .Values.replicaCount }}
   {{- end }}
   selector:
     matchLabels:
-      {{- include "norcedrillingwellwebappclient.selectorLabels" . | nindent 6 }}
+      {{- include "osdcdrillingwellservice.selectorLabels" . | nindent 6 }}
   template:
     metadata:
       {{- with .Values.podAnnotations }}
@@ -18,13 +20,13 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       labels:
-        {{- include "norcedrillingwellwebappclient.selectorLabels" . | nindent 8 }}
+        {{- include "osdcdrillingwellservice.selectorLabels" . | nindent 8 }}
     spec:
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      serviceAccountName: {{ include "norcedrillingwellwebappclient.serviceAccountName" . }}
+      serviceAccountName: {{ include "osdcdrillingwellservice.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
@@ -49,6 +51,17 @@ spec:
           {{- end}}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
+          volumeMounts:
+          - mountPath: /home/
+            name: welldb
+      volumes:
+      - name: welldb
+        {{- if .Values.persistence.enabled }}
+        persistentVolumeClaim:
+          claimName: {{ .Values.persistence.existingClaim | default .Values.persistence.claimName }}
+        {{- else }}
+        emptyDir: {}
+        {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

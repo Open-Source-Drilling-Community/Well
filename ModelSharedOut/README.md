@@ -1,10 +1,15 @@
 # ModelSharedOut
 
-This project generates client-facing contracts from the Well service and the external schemas required by its consumers.
+This project generates the client-facing C# contract and merged OpenAPI document used by Well consumers.
 
-## Current schema inputs
+## Authoritative schema inputs
 
-- `json-schemas/RigModel.json` provides Rig contract types used by the Well UI.
-- `json-schemas/VerticalDatumModel.json` provides Vertical Datum contract types used for mean-sea-level references.
+- `ClusterModel.json`: `Cluster/Service/wwwroot/json-schema/ClusterMergedModel.json`
+- `FieldModel.json`: `Field/Service/wwwroot/json-schema/FieldMergedModel.json`
+- `RigModel.json`: `Rig/Service/wwwroot/json-schema/RigMergedModel.json`
+- `VerticalDatumModel.json`: `EarthVerticalDatum/Service/wwwroot/json-schema/EarthVerticalDatumMergedModel.json`
+- `TrajectoryModel.json`: `Trajectory/Service/wwwroot/json-schema/TrajectoryMergedModel.json`
+- `WellBoreModel.json`: `WellBore/Service/wwwroot/json-schema/WellBoreMergedModel.json`
+- `WellFullName.json`: generated from the Well Service Debug build.
 
-Regenerate the shared output after changing an input schema or the Well REST contract, then rebuild consumers to confirm compatibility.
+After refreshing inputs, run `dotnet build Service/Service.csproj --configuration Debug`, then run `dotnet run --project ModelSharedOut` and confirm overwrite. The generator writes `WellMergedModel.cs` and `Service/wwwroot/json-schema/WellMergedModel.json`. Commit all schema, client, and bundle changes together, then build the full solution.

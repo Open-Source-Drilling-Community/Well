@@ -4,10 +4,10 @@ using Microsoft.Extensions.Logging.Abstractions;
 using ModelContextProtocol.Client;
 using ModelContextProtocol.Protocol;
 using ModelContextProtocol.Server;
-using NORCE.Drilling.Well.Service.Mcp;
-using NORCE.Drilling.Well.Service.Mcp.Tools;
+using OSDC.Drilling.Well.Service.Mcp;
+using OSDC.Drilling.Well.Service.Mcp.Tools;
 
-namespace NORCE.Drilling.Well.ServiceTest;
+namespace OSDC.Drilling.Well.ServiceTest;
 
 [TestFixture]
 public sealed class McpServerHttpTests

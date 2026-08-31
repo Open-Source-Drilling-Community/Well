@@ -2,7 +2,7 @@ using System.Text.Json.Nodes;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace NORCE.Drilling.Well.Service.Mcp;
+namespace OSDC.Drilling.Well.Service.Mcp;
 
 public interface IMcpTool
 {
@@ -10,7 +10,18 @@ public interface IMcpTool
 
     string Description { get; }
 
-    JsonNode? InputSchema { get; }
+    McpToolBehavior Behavior { get; }
+
+    JsonNode InputSchema { get; }
+
+    JsonNode OutputSchema { get; }
 
     Task<JsonNode?> InvokeAsync(JsonObject? arguments, CancellationToken cancellationToken);
 }
+
+public sealed record McpToolBehavior(
+    string Title,
+    bool ReadOnlyHint,
+    bool DestructiveHint,
+    bool IdempotentHint,
+    bool OpenWorldHint = false);

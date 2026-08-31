@@ -1,4 +1,4 @@
-# Model (NORCE.Drilling.Well.Model)
+# Model (OSDC.Drilling.Well.Model)
 
 The Model project contains the domain classes used by the Well microservice and its clients. It provides a simple, serializable representation of a Well and a small utility for tracking API usage over time. These types are shared by the Service layer (Web API) and tests, and are the source for generated API documentation (DocFX).
 
@@ -25,7 +25,7 @@ The Model project contains the domain classes used by the Well microservice and 
 Exact versions are specified in `Model.csproj`.
 
 ## How It Fits in the Solution
-- Service (`Service` project): Controllers accept and return `NORCE.Drilling.Well.Model.Well`. Managers serialize/deserialize `Well` for persistence (SQLite). See `Service/Controllers/WellController.cs` and `Service/Managers/WellManager.cs`.
+- Service (`Service` project): Controllers accept and return `OSDC.Drilling.Well.Model.Well`. Managers serialize/deserialize `Well` for persistence (SQLite). See `Service/Controllers/WellController.cs` and `Service/Managers/WellManager.cs`.
 - Web client (`WebApp`): Calls the Service API that exposes `Well` payloads; it does not reference `Model` directly.
 - Tests (`ModelTest`, `ServiceTest`): Use `Well` as the DTO under test for model behavior and service endpoints.
 - Documentation: DocFX config (`Model/docfx.json`, `Model/articles`, `Model/api`) enables API/guide generation for this project.
@@ -34,7 +34,7 @@ Exact versions are specified in `Model.csproj`.
 
 ### Create a Well
 ```csharp
-using NORCE.Drilling.Well.Model;
+using OSDC.Drilling.Well.Model;
 using OSDC.DotnetLibraries.General.DataManagement;
 
 var well = new Well
@@ -52,7 +52,7 @@ var well = new Well
 ### Serialize/Deserialize
 ```csharp
 using System.Text.Json;
-using NORCE.Drilling.Well.Model;
+using OSDC.Drilling.Well.Model;
 
 string json = JsonSerializer.Serialize(well);
 Well? roundTripped = JsonSerializer.Deserialize<Well>(json);
@@ -60,7 +60,7 @@ Well? roundTripped = JsonSerializer.Deserialize<Well>(json);
 
 ### Record Usage Statistics
 ```csharp
-using NORCE.Drilling.Well.Model;
+using OSDC.Drilling.Well.Model;
 
 // Increment when serving a corresponding API call
 UsageStatisticsWell.Instance.IncrementGetAllWellIdPerDay();

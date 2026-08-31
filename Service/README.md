@@ -1,4 +1,4 @@
-# Service (NORCE.Drilling.Well.Service)
+# Service (OSDC.Drilling.Well.Service)
 
 ASP.NET Core Web API that exposes CRUD endpoints for Well resources, persists data to SQLite, and serves an OpenAPI/Swagger UI. The service is the backend of the solution and the primary integration point for the Web client and external consumers.
 
@@ -32,16 +32,16 @@ Notes
 
 Docker
 1) Build:
-   - `docker build -t digiwells/norcedrillingwellservice:local -f Service/Dockerfile .`
+   - `docker build -t digiwells/osdcdrillingwellservice:local -f Service/Dockerfile .`
 2) Run (persisting the `/home` volume for SQLite data):
-   - `docker run --rm -p 5000:8080 -v wellsvc_home:/home digiwells/norcedrillingwellservice:local`
+   - `docker run --rm -p 5000:8080 -v wellsvc_home:/home digiwells/osdcdrillingwellservice:local`
 3) Open:
    - Swagger UI: `http://localhost:5000/Well/api/swagger`
 
 Helm (Kubernetes)
-- A chart is provided under `Service/charts/norcedrillingwellservice`.
+- A chart is provided under `Service/charts/osdcdrillingwellservice`.
 - Example install with defaults:
-  - `helm upgrade --install well-svc Service/charts/norcedrillingwellservice`
+  - `helm upgrade --install well-svc Service/charts/osdcdrillingwellservice`
 
 ## Usage Examples
 
@@ -98,7 +98,7 @@ curl http://localhost:5000/Well/api/WellUsageStatistics
   - `Swashbuckle.AspNetCore.SwaggerGen` and `Swashbuckle.AspNetCore.SwaggerUI` — OpenAPI generation and UI.
   - `Microsoft.OpenApi` and `Microsoft.OpenApi.Readers` — read and serve a pre-merged OpenAPI document.
 - Project reference
-  - `Model` — provides the `NORCE.Drilling.Well.Model.Well` DTO and usage statistics types.
+  - `Model` — provides the `OSDC.Drilling.Well.Model.Well` DTO and usage statistics types.
 
 See `Service.csproj` for exact versions and build targets. A `CreateSwaggerJson` target runs on Debug builds to export schema artifacts for `ModelSharedOut`.
 
@@ -116,7 +116,7 @@ See `Service.csproj` for exact versions and build targets. A `CreateSwaggerJson`
 - Static files: enabled to serve Swagger JSON and any assets under `wwwroot`.
 
 ## Quick Links
-- Docker image name: `digiwells/norcedrillingwellservice`
+- Docker image name: `digiwells/osdcdrillingwellservice`
 - Swagger (dev): https://dev.digiwells.no/Well/api/swagger
 - Swagger (prod): https://app.digiwells.no/Well/api/swagger
 - API base (dev): https://dev.digiwells.no/Well/api/Well
@@ -124,7 +124,7 @@ See `Service.csproj` for exact versions and build targets. A `CreateSwaggerJson`
 
 ---
 
-This solution was generated from the NORCE Drilling and Wells .NET template. See https://github.com/NORCE-DrillingAndWells/Templates and the related documentation at https://github.com/NORCE-DrillingAndWells/DrillingAndWells/wiki/.NET-Templates
+The service uses the OSDC technical identity while retaining NORCE Research authorship and company metadata where applicable.
 
 ## MCP server
 

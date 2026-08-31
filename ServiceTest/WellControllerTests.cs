@@ -4,12 +4,12 @@ using System.IO;
 using Microsoft.Extensions.Logging;
 using System.Reflection;
 using NUnit.Framework;
-using WellModel = NORCE.Drilling.Well.Model.Well;
-using NORCE.Drilling.Well.Service.Controllers;
-using NORCE.Drilling.Well.Service.Managers;
+using WellModel = OSDC.Drilling.Well.Model.Well;
+using OSDC.Drilling.Well.Service.Controllers;
+using OSDC.Drilling.Well.Service.Managers;
 using OSDC.DotnetLibraries.General.DataManagement;
 
-namespace NORCE.Drilling.Well.ServiceTest
+namespace OSDC.Drilling.Well.ServiceTest
 {
     [TestFixture]
     public class WellControllerTests

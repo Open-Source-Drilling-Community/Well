@@ -4,7 +4,7 @@
 @inject IWellAPIUtils Api
 @using System.Net.Http.Json
 @using System.Text.Json
-@using WellModelShared = NORCE.Drilling.Well.ModelShared
+@using WellModelShared = OSDC.Drilling.Well.ModelShared
 
 <MudUnitAndReferenceChoiceTag HttpHost=@Api.HostNameUnitConversion
                               HttpBasePath=@Api.HostBasePathUnitConversion
@@ -186,7 +186,7 @@
 @code {
     private List<WellModelShared.Field>? fieldList;
     private List<WellModelShared.Cluster>? clusterList;
-    private List<WellModelShared.Rig>? rigList;
+    private List<WellModelShared.RigReadResponse>? rigList;
     private List<WellModelShared.Well>? wellList;
     private List<WellModelShared.TrajectoryLight> trajectoryLightList = [];
     private List<WellModelShared.Trajectory> trajectoryList = [];
@@ -233,7 +233,7 @@
             logger.LogInformation("Trying to load list of Fields, Clusters and Wells");
             Task<ICollection<WellModelShared.Field>> fieldTask = Api.ClientField.GetAllFieldAsync();
             Task<ICollection<WellModelShared.Cluster>> clusterTask = Api.ClientCluster.GetAllClusterAsync();
-            Task<ICollection<WellModelShared.Rig>> rigTask = Api.ClientRig.GetAllRigAsync();
+            Task<ICollection<WellModelShared.RigReadResponse>> rigTask = Api.ClientRig.GetAllRigAsync();
             Task<ICollection<WellModelShared.Well>> wellTask = Api.ClientWell.GetAllWellAsync();
 
             await Task.WhenAll(fieldTask, clusterTask, rigTask, wellTask);

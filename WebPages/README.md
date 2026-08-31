@@ -1,12 +1,14 @@
-# NORCE.Drilling.Well.WebPages
+# OSDC.Drilling.Well.WebPages
 
-`NORCE.Drilling.Well.WebPages` is a Razor class library that packages the `WellMain`, `WellEdit`, and `StatisticsMain` pages together with the page utilities and plotting component they require.
+`OSDC.Drilling.Well.WebPages` is a Razor class library that packages the `WellMain`, `WellEdit`, `WellSurveyRuns`, `WellTrajectories`, and `StatisticsWell` pages together with their API and plotting support.
 
 ## Contents
 
 - `WellMain`
 - `WellEdit`
-- `StatisticsMain`
+- `WellSurveyRuns`
+- `WellTrajectories`
+- `StatisticsWell`
 - `ScatterPlot`
 - Well page support classes such as API access helpers and unit/reference helpers
 
@@ -37,6 +39,9 @@ builder.Services.AddSingleton<IWellWebPagesConfiguration>(new WebPagesHostConfig
     WellHostURL = builder.Configuration["WellHostURL"] ?? string.Empty,
     ClusterHostURL = builder.Configuration["ClusterHostURL"] ?? string.Empty,
     FieldHostURL = builder.Configuration["FieldHostURL"] ?? string.Empty,
+    RigHostURL = builder.Configuration["RigHostURL"] ?? string.Empty,
+    TrajectoryHostURL = builder.Configuration["TrajectoryHostURL"] ?? string.Empty,
+    EarthVerticalDatumHostURL = builder.Configuration["EarthVerticalDatumHostURL"] ?? string.Empty,
     UnitConversionHostURL = builder.Configuration["UnitConversionHostURL"] ?? string.Empty
 });
 builder.Services.AddSingleton<IWellAPIUtils, WellAPIUtils>();
@@ -46,9 +51,9 @@ Example routing:
 
 ```razor
 <Router AppAssembly="@typeof(App).Assembly"
-        AdditionalAssemblies="new[] { typeof(NORCE.Drilling.Well.WebPages.WellMain).Assembly }">
+        AdditionalAssemblies="new[] { typeof(OSDC.Drilling.Well.WebPages.WellMain).Assembly }">
 ```
 
 ## Rig and Vertical Datum integration
 
-The reusable pages retrieve Rig and Vertical Datum information through the configured API utilities. `MslDepthReferenceUtils` is used by the well editor, survey-run page, and trajectory page to present consistent mean-sea-level depth references. This package uses `OSDC.DotnetLibraries.Drilling.WebAppUtils` 1.1.3.
+The reusable pages retrieve Rig and Earth Vertical Datum information through the configured API utilities. `MslDepthReferenceUtils` is used by the well editor, survey-run page, and trajectory page to present consistent mean-sea-level depth references. This package uses `OSDC.DotnetLibraries.Drilling.WebAppUtils` 1.1.4.

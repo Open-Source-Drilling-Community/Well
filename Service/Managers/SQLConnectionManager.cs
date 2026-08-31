@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using Microsoft.Extensions.Logging;
 using System.Text;
@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Data.Sqlite;
 
-namespace NORCE.Drilling.Well.Service.Managers
+namespace OSDC.Drilling.Well.Service.Managers
 {
     /// <summary>
     /// A manager for the sql database connection, registered as a singleton through dependency injection (see Program.cs)

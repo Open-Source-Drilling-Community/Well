@@ -2,9 +2,9 @@ using System;
 using System.Text.Json.Nodes;
 using System.Threading;
 using System.Threading.Tasks;
-using NORCE.Drilling.Well.Service.Mcp;
+using OSDC.Drilling.Well.Service.Mcp;
 
-namespace NORCE.Drilling.Well.Service.Mcp.Tools;
+namespace OSDC.Drilling.Well.Service.Mcp.Tools;
 
 public sealed class PingMcpTool : IMcpTool
 {
@@ -12,7 +12,11 @@ public sealed class PingMcpTool : IMcpTool
 
     public string Description => "Returns a pong response so clients can verify MCP connectivity.";
 
-    public JsonNode? InputSchema => null;
+    public McpToolBehavior Behavior => new("Ping Well MCP", true, false, true, false);
+
+    public JsonNode InputSchema => JsonNode.Parse("""{"type":"object","additionalProperties":false}""")!;
+
+    public JsonNode OutputSchema => JsonNode.Parse("""{"type":"object","properties":{"message":{"type":"string"},"timestamp":{"type":"string","format":"date-time"}},"required":["message","timestamp"],"additionalProperties":false}""")!;
 
     public Task<JsonNode?> InvokeAsync(JsonObject? arguments, CancellationToken cancellationToken)
     {

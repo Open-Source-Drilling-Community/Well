@@ -7,7 +7,7 @@ using System.Text.Json.Nodes;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace NORCE.Drilling.Well.Service.Mcp;
+namespace OSDC.Drilling.Well.Service.Mcp;
 
 public static class McpServiceCollectionExtensions
 {
@@ -31,10 +31,13 @@ public static class McpServiceCollectionExtensions
         string name,
         string description,
         JsonNode? inputSchema,
+        JsonNode outputSchema,
+        McpToolBehavior behavior,
         Func<IServiceProvider, JsonObject?, CancellationToken, Task<JsonNode?>> invokeAsync)
     {
         services.AddSingleton<IMcpTool>(sp => new DelegateMcpTool(
-            name, description, inputSchema, (arguments, cancellationToken) => invokeAsync(sp, arguments, cancellationToken)));
+            name, description, inputSchema ?? EmptyInputSchema(), outputSchema, behavior,
+            (arguments, cancellationToken) => invokeAsync(sp, arguments, cancellationToken)));
         services.AddSingleton<McpServerTool>(sp => new LegacyMcpServerToolAdapter(
             sp.GetServices<IMcpTool>().Last(tool => tool.Name == name),
             sp.GetRequiredService<ILoggerFactory>()));
@@ -45,19 +48,26 @@ public static class McpServiceCollectionExtensions
     {
         private readonly Func<JsonObject?, CancellationToken, Task<JsonNode?>> _invokeAsync;
 
-        public DelegateMcpTool(string name, string description, JsonNode? inputSchema,
+        public DelegateMcpTool(string name, string description, JsonNode inputSchema, JsonNode outputSchema,
+            McpToolBehavior behavior,
             Func<JsonObject?, CancellationToken, Task<JsonNode?>> invokeAsync)
         {
             Name = name;
             Description = description;
             InputSchema = inputSchema;
+            OutputSchema = outputSchema;
+            Behavior = behavior;
             _invokeAsync = invokeAsync;
         }
 
         public string Name { get; }
         public string Description { get; }
-        public JsonNode? InputSchema { get; }
+        public JsonNode InputSchema { get; }
+        public JsonNode OutputSchema { get; }
+        public McpToolBehavior Behavior { get; }
         public Task<JsonNode?> InvokeAsync(JsonObject? arguments, CancellationToken cancellationToken) =>
             _invokeAsync(arguments, cancellationToken);
     }
+
+    private static JsonNode EmptyInputSchema() => JsonNode.Parse("""{"type":"object","additionalProperties":false}""")!;
 }

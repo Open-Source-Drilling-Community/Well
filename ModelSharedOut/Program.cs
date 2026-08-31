@@ -27,10 +27,10 @@ using Microsoft.OpenApi.Extensions;
 /// It capitalizes on the concept of distributed shared model in a microservice architecture
 ///     - which means that a microservice handles the external classes it needs by itself, using the OpenAPI schema of its dependencies as a source of truth
 ///     - default option in this program expects the user to manually collect these dependency schemas
-///             found here (NORCE-generated custom schema registration):    https://someServer:somePort/someMicroserviceDependency/api/swagger/merged/swagger.json
+///             found here (merged schema registration):                    https://someServer:somePort/someMicroserviceDependency/api/swagger/merged/swagger.json
 ///             or here (default SwaggerUI schema registration):            https://someServer:somePort/someMicroserviceDependency/api/swagger/v1/swagger.json
 ///     - option 2 discovers these dependencies online each time the current program executes, the risk being that modifications brought to the dependencies by another team go unaware
-///     - more info: https://github.com/NORCE-DrillingAndWells/DrillingAndWells/wiki/MS-Development#distributed-shared-data-model
+///     - the checked-in dependency schemas and generated outputs are documented in ModelSharedOut/README.md
 /// </summary>
 class Program
 {
@@ -41,7 +41,7 @@ class Program
     private static readonly string CSHARP_MODEL = "WellMergedModel.cs";
     
     // ### BEGIN CODE SPECIFIC TO ModelSharedOut 3/3 ###
-    private static readonly string NAMESPACE = "NORCE.Drilling.Well.ModelShared"; // should be the same as for ModelSharedIn to avoid type name collision
+    private static readonly string NAMESPACE = "OSDC.Drilling.Well.ModelShared"; // should be the same as for ModelSharedIn to avoid type name collision
     private static readonly string MODELSHARED_FOLDER = "ModelSharedOut";
     private static readonly string JSON_OUTPUT_FOLDER = "Service" + Path.DirectorySeparatorChar + "wwwroot" + Path.DirectorySeparatorChar + "json-schema";
     // ### END CODE SPECIFIC TO ModelSharedOut 3/3 ###
@@ -205,6 +205,8 @@ class Program
                         };
                         var generator = new CSharpClientGenerator(nswDocument, settings);
                         var code = generator.GenerateFile();
+                        code = string.Join(Environment.NewLine,
+                            code.Split(["\r\n", "\n"], StringSplitOptions.None).Select(line => line.TrimEnd()));
                         using (StreamWriter writer = new StreamWriter(modelSharedDir + Path.DirectorySeparatorChar + CSHARP_MODEL))
                         {
                             writer.WriteLine(code);

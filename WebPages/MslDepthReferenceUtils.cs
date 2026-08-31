@@ -1,8 +1,8 @@
 using System.Net.Http.Json;
 using System.Text.Json;
-using ModelShared = NORCE.Drilling.Well.ModelShared;
+using ModelShared = OSDC.Drilling.Well.ModelShared;
 
-namespace NORCE.Drilling.Well.WebPages;
+namespace OSDC.Drilling.Well.WebPages;
 
 public static class MslDepthReferenceUtils
 {

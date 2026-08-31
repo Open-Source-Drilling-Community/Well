@@ -1,11 +1,11 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
 using OSDC.DotnetLibraries.General.DataManagement;
 using Microsoft.Data.Sqlite;
 using System.Text.Json;
 
-namespace NORCE.Drilling.Well.Service.Managers
+namespace OSDC.Drilling.Well.Service.Managers
 {
     /// <summary>
     /// A manager for Well. The manager implements the singleton pattern as defined by 

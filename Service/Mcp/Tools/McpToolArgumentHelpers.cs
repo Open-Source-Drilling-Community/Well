@@ -1,7 +1,7 @@
 using System;
 using System.Text.Json.Nodes;
 
-namespace NORCE.Drilling.Well.Service.Mcp.Tools;
+namespace OSDC.Drilling.Well.Service.Mcp.Tools;
 
 internal static class McpToolArgumentHelpers
 {
@@ -64,6 +64,36 @@ internal static class McpToolArgumentHelpers
         };
     }
 
+    public static JsonObject CreateWellResourceSchema() => CreateWellObjectSchema();
+
+    public static JsonObject CreateStatusOnlyOutputSchema() => new()
+    {
+        ["type"] = "object",
+        ["properties"] = new JsonObject { ["status"] = SuccessStatus() },
+        ["required"] = new JsonArray("status"),
+        ["additionalProperties"] = false
+    };
+
+    public static JsonObject CreateIdsOutputSchema() => SuccessEnvelope(new JsonObject
+    {
+        ["type"] = "array",
+        ["items"] = new JsonObject { ["type"] = "string", ["format"] = "uuid" }
+    });
+
+    public static JsonObject CreateMetaInfoListOutputSchema() => SuccessEnvelope(new JsonObject
+    {
+        ["type"] = "array",
+        ["items"] = CreateMetaInfoSchema()
+    });
+
+    public static JsonObject CreateWellOutputSchema() => SuccessEnvelope(CreateWellObjectSchema());
+
+    public static JsonObject CreateWellListOutputSchema() => SuccessEnvelope(new JsonObject
+    {
+        ["type"] = "array",
+        ["items"] = CreateWellObjectSchema()
+    });
+
     private static JsonObject CreateWellObjectSchema()
     {
         return new JsonObject
@@ -72,25 +102,7 @@ internal static class McpToolArgumentHelpers
             ["description"] = "Complete Well resource. MetaInfo.ID must be a non-empty UUID; the service does not generate an identifier.",
             ["properties"] = new JsonObject
             {
-                ["MetaInfo"] = new JsonObject
-                {
-                    ["type"] = "object",
-                    ["description"] = "Identity and optional HTTP location metadata for the well.",
-                    ["properties"] = new JsonObject
-                    {
-                        ["ID"] = new JsonObject
-                        {
-                            ["type"] = "string",
-                            ["format"] = "uuid",
-                            ["description"] = "Non-empty unique identifier of the well."
-                        },
-                        ["HttpHostName"] = NullableString("Optional host name from which the well can be retrieved."),
-                        ["HttpHostBasePath"] = NullableString("Optional service base path from which the well can be retrieved."),
-                        ["HttpEndPoint"] = NullableString("Optional HTTP endpoint for this well resource.")
-                    },
-                    ["required"] = new JsonArray { "ID" },
-                    ["additionalProperties"] = false
-                },
+                ["MetaInfo"] = CreateMetaInfoSchema(),
                 ["Name"] = NullableString("Human-readable well name."),
                 ["Description"] = NullableString("Human-readable description of the well."),
                 ["CreationDate"] = NullableDateTime("UTC or offset timestamp at which the well record was created."),
@@ -108,6 +120,36 @@ internal static class McpToolArgumentHelpers
             ["additionalProperties"] = false
         };
     }
+
+    private static JsonObject CreateMetaInfoSchema() => new()
+    {
+        ["type"] = "object",
+        ["description"] = "Identity and optional HTTP location metadata for the well.",
+        ["properties"] = new JsonObject
+        {
+            ["ID"] = new JsonObject { ["type"] = "string", ["format"] = "uuid", ["description"] = "Non-empty unique identifier." },
+            ["HttpHostName"] = NullableString("Optional host name from which the resource can be retrieved."),
+            ["HttpHostBasePath"] = NullableString("Optional service base path from which the resource can be retrieved."),
+            ["HttpEndPoint"] = NullableString("Optional HTTP endpoint for this resource.")
+        },
+        ["required"] = new JsonArray("ID"),
+        ["additionalProperties"] = false
+    };
+
+    private static JsonObject SuccessEnvelope(JsonObject data) => new()
+    {
+        ["type"] = "object",
+        ["properties"] = new JsonObject { ["status"] = SuccessStatus(), ["data"] = data },
+        ["required"] = new JsonArray("status", "data"),
+        ["additionalProperties"] = false
+    };
+
+    private static JsonObject SuccessStatus() => new()
+    {
+        ["type"] = "integer",
+        ["minimum"] = 200,
+        ["maximum"] = 299
+    };
 
     private static JsonObject NullableString(string description) => new()
     {

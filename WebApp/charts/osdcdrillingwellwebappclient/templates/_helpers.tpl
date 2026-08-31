@@ -1,7 +1,7 @@
 {{/*
 Expand the name of the chart.
 */}}
-{{- define "norcedrillingwellservice.name" -}}
+{{- define "osdcdrillingwellwebappclient.name" -}}
 {{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
@@ -10,7 +10,7 @@ Create a default fully qualified app name.
 We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
 If release name contains chart name it will be used as a full name.
 */}}
-{{- define "norcedrillingwellservice.fullname" -}}
+{{- define "osdcdrillingwellwebappclient.fullname" -}}
 {{- if .Values.fullnameOverride }}
 {{- .Values.fullnameOverride | trunc 63 | trimSuffix "-" }}
 {{- else }}
@@ -26,16 +26,16 @@ If release name contains chart name it will be used as a full name.
 {{/*
 Create chart name and version as used by the chart label.
 */}}
-{{- define "norcedrillingwellservice.chart" -}}
+{{- define "osdcdrillingwellwebappclient.chart" -}}
 {{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
 {{/*
 Common labels
 */}}
-{{- define "norcedrillingwellservice.labels" -}}
-helm.sh/chart: {{ include "norcedrillingwellservice.chart" . }}
-{{ include "norcedrillingwellservice.selectorLabels" . }}
+{{- define "osdcdrillingwellwebappclient.labels" -}}
+helm.sh/chart: {{ include "osdcdrillingwellwebappclient.chart" . }}
+{{ include "osdcdrillingwellwebappclient.selectorLabels" . }}
 {{- if .Chart.AppVersion }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 {{- end }}
@@ -45,17 +45,17 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{/*
 Selector labels
 */}}
-{{- define "norcedrillingwellservice.selectorLabels" -}}
-app.kubernetes.io/name: {{ include "norcedrillingwellservice.name" . }}
+{{- define "osdcdrillingwellwebappclient.selectorLabels" -}}
+app.kubernetes.io/name: {{ include "osdcdrillingwellwebappclient.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 
 {{/*
 Create the name of the service account to use
 */}}
-{{- define "norcedrillingwellservice.serviceAccountName" -}}
+{{- define "osdcdrillingwellwebappclient.serviceAccountName" -}}
 {{- if .Values.serviceAccount.create }}
-{{- default (include "norcedrillingwellservice.fullname" .) .Values.serviceAccount.name }}
+{{- default (include "osdcdrillingwellwebappclient.fullname" .) .Values.serviceAccount.name }}
 {{- else }}
 {{- default "default" .Values.serviceAccount.name }}
 {{- end }}

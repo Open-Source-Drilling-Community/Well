@@ -1,7 +1,7 @@
-﻿using OSDC.DotnetLibraries.General.DataManagement;
+using OSDC.DotnetLibraries.General.DataManagement;
 using System;
 
-namespace NORCE.Drilling.Well.Model
+namespace OSDC.Drilling.Well.Model
 {
     public class Well
     {

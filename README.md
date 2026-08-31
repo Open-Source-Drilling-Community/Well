@@ -39,8 +39,8 @@ Run the WebApp
 - `dotnet run --project WebApp`
 - Open UI: `https://localhost:5011/Well/webapp/Well` (or `http://localhost:5012/Well/webapp/Well`)
 - Ensure the WebApp can reach the Service:
-  - Default dev setting uses `WellHostURL=https://localhost:5001/` (see `WebApp/appsettings.Development.json`).
-  - Override via env var: `WellHostURL=https://localhost:5001/ dotnet run --project WebApp`.
+  - Default development setting uses `WellHostURL=http://localhost:5002/` (see `WebApp/appsettings.Development.json`).
+  - Override in PowerShell with `$env:WellHostURL = "https://localhost:5001/"` when using the HTTPS Service profile.
 
 Useful Notes
 - Paths are mounted under `/Well/api` (Service) and `/Well/webapp` (WebApp). If using a reverse proxy, route accordingly.
@@ -79,18 +79,18 @@ See each project’s `.csproj` for exact versions.
 ## Docker & Helm (optional)
 - Service image/Dockerfile: `Service/Dockerfile` (exposes 8080, mounts `/home` for persistence)
 - WebApp image/Dockerfile: `WebApp/Dockerfile`
-- Helm charts: `Service/charts/norcedrillingwellservice`, `WebApp/charts/norcedrillingwellwebappclient`
+- Helm charts: `Service/charts/osdcdrillingwellservice`, `WebApp/charts/osdcdrillingwellwebappclient`
 
 ## Security & Data
 - SQLite database stored as clear text in the container volume. No authentication/authorization is included by default. Secure behind your ingress/proxy and network controls as required.
 
 ## More
 - Per‑project guides: `Model/README.md`, `Service/README.md`, `WebApp/README.md`
-- Templates and docs: https://github.com/NORCE-DrillingAndWells/Templates and https://github.com/NORCE-DrillingAndWells/DrillingAndWells/wiki
+- The reviewed Kubernetes identity and data-preserving rollout procedure is in `deployment/identity-cutover.md`.
 
 ## Current implementation
 
 - The Well service exposes its ten non-statistics REST operations as MCP tools, plus `ping`; usage-statistics endpoints are intentionally excluded.
 - MCP is available at `/well/api/mcp` over streamable HTTP and `/well/api/mcp/ws` over WebSocket. Optional MCP-hub registration is disabled by default.
 - The Well UI now uses Rig and Vertical Datum information to present mean-sea-level depth references in well, survey-run, and trajectory workflows.
-- The WebApp's embedded service pages use the current Field (1.0.19), Cluster (1.0.12), Cartographic Projection (1.0.8), and Geodetic Datum (1.0.7) packages.
+- The WebApp directly hosts the current OSDC Field 2.0.0, Cluster 1.1.0, Rig 1.1.0, Earth Cartographic Projection 1.1.0, Earth Geodesy 1.1.0, Earth Vertical Datum 1.1.0, Earth Gravity 1.0.1, and Earth Magnetic Field 1.0.1 page integrations.

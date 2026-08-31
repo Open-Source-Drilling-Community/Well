@@ -63,7 +63,7 @@
     private Well? currentWell;
     private List<Field> fieldList = new();
     private List<Cluster> clusterList = new();
-    private List<Rig> rigList = new();
+    private List<RigReadResponse> rigList = new();
 
     // UI related variables
     public bool isHiddenMainPanel;
@@ -163,7 +163,7 @@
                 {
                     try
                     {
-                        rigList = (List<Rig>)await rigTask;
+                        rigList = (await rigTask).ToList();
                         rigList?.Sort((t1, t2) => t1.Name.CompareTo(t2.Name));
                     }
                     catch (ApiException ex)

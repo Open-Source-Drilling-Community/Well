@@ -2,11 +2,11 @@ using System.Text.Json.Nodes;
 using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using ModelContextProtocol.Server;
-using NORCE.Drilling.Well.Service.Controllers;
-using NORCE.Drilling.Well.Service.Mcp;
-using NORCE.Drilling.Well.Service.Mcp.Tools;
+using OSDC.Drilling.Well.Service.Controllers;
+using OSDC.Drilling.Well.Service.Mcp;
+using OSDC.Drilling.Well.Service.Mcp.Tools;
 
-namespace NORCE.Drilling.Well.ServiceTest;
+namespace OSDC.Drilling.Well.ServiceTest;
 
 [TestFixture]
 public sealed class McpToolRegistrationTests
@@ -61,7 +61,19 @@ public sealed class McpToolRegistrationTests
         string[] names = _provider.GetServices<McpServerTool>().Select(tool => tool.ProtocolTool.Name).ToArray();
         Assert.That(names, Has.Length.EqualTo(_tools.Count));
         Assert.That(names, Is.Unique);
-        Assert.That(names.All(name => !name.Contains('.')), Is.True);
+        Assert.That(names.All(name => System.Text.RegularExpressions.Regex.IsMatch(name, "^[a-z0-9_]+$")), Is.True);
+    }
+
+    [Test]
+    public void Every_tool_publishes_titles_input_output_schemas_and_behavior_annotations()
+    {
+        foreach (McpServerTool tool in _provider.GetServices<McpServerTool>())
+        {
+            Assert.That(tool.ProtocolTool.Title, Is.Not.Empty, tool.ProtocolTool.Name);
+            Assert.That(tool.ProtocolTool.InputSchema.ValueKind, Is.EqualTo(System.Text.Json.JsonValueKind.Object), tool.ProtocolTool.Name);
+            Assert.That(tool.ProtocolTool.OutputSchema?.ValueKind, Is.EqualTo(System.Text.Json.JsonValueKind.Object), tool.ProtocolTool.Name);
+            Assert.That(tool.ProtocolTool.Annotations, Is.Not.Null, tool.ProtocolTool.Name);
+        }
     }
 
     [Test]

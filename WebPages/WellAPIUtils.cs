@@ -1,7 +1,7 @@
-using NORCE.Drilling.Well.ModelShared;
+using OSDC.Drilling.Well.ModelShared;
 using OSDC.DotnetLibraries.Drilling.WebAppUtils;
 
-namespace NORCE.Drilling.Well.WebPages;
+namespace OSDC.Drilling.Well.WebPages;
 
 public class WellAPIUtils : APIUtils, IWellAPIUtils
 {
@@ -29,7 +29,7 @@ public class WellAPIUtils : APIUtils, IWellAPIUtils
 
         HostNameUnitConversion = Require(configuration.UnitConversionHostURL, nameof(configuration.UnitConversionHostURL));
 
-        HostNameVerticalDatum = Require(configuration.VerticalDatumHostURL, nameof(configuration.VerticalDatumHostURL));
+        HostNameVerticalDatum = Require(configuration.EarthVerticalDatumHostURL, nameof(configuration.EarthVerticalDatumHostURL));
         HttpClientVerticalDatum = SetHttpClient(HostNameVerticalDatum, HostBasePathVerticalDatum);
     }
 

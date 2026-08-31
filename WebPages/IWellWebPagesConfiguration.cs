@@ -1,6 +1,6 @@
 using OSDC.DotnetLibraries.Drilling.WebAppUtils;
 
-namespace NORCE.Drilling.Well.WebPages;
+namespace OSDC.Drilling.Well.WebPages;
 
 public interface IWellWebPagesConfiguration :
     IWellHostURL,
@@ -10,5 +10,5 @@ public interface IWellWebPagesConfiguration :
     ITrajectoryHostURL,
     IUnitConversionHostURL
 {
-    string? VerticalDatumHostURL { get; set; }
+    string? EarthVerticalDatumHostURL { get; set; }
 }

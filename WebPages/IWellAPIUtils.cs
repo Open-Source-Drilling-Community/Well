@@ -1,6 +1,6 @@
-using NORCE.Drilling.Well.ModelShared;
+using OSDC.Drilling.Well.ModelShared;
 
-namespace NORCE.Drilling.Well.WebPages;
+namespace OSDC.Drilling.Well.WebPages;
 
 public interface IWellAPIUtils
 {

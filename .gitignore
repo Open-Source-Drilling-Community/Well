@@ -2,3 +2,13 @@
 **/obj/**
 **/home/**
 **/.vs/**
+*.db
+*.db-shm
+*.db-wal
+*.sqlite
+*.sqlite3
+*.bak
+*.backup
+deployment/backups/
+deployment/snapshots/
+artifacts/

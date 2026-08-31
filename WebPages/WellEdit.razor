@@ -413,7 +413,9 @@
                             Latitude = cluster.ReferenceLatitude,
                             Longitude = cluster.ReferenceLongitude
                         });
-                        await Api.ClientCluster.PutClusterByIdAsync(_singleWellCluster.MetaInfo.ID, cluster);
+                        DateTimeOffset expectedModifiedUtc = _singleWellCluster.LastModificationDate
+                            ?? throw new InvalidOperationException("The cluster does not provide a revision timestamp.");
+                        await Api.ClientCluster.PutClusterByIdAsync(_singleWellCluster.MetaInfo.ID, expectedModifiedUtc, cluster);
                     }
                     else
                     {

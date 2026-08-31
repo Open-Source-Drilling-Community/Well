@@ -1,7 +1,7 @@
 using MudBlazor;
 using MudBlazor.Services;
-using NORCE.Drilling.Well.WebApp;
-using NORCE.Drilling.Well.WebPages;
+using OSDC.Drilling.Well.WebApp;
+using OSDC.Drilling.Well.WebPages;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,9 +12,11 @@ WebPagesHostConfiguration webPagesConfiguration = new()
     FieldHostURL = builder.Configuration["FieldHostURL"] ?? string.Empty,
     RigHostURL = builder.Configuration["RigHostURL"] ?? string.Empty,
     TrajectoryHostURL = builder.Configuration["TrajectoryHostURL"] ?? string.Empty,
-    CartographicProjectionHostURL = builder.Configuration["CartographicProjectionHostURL"] ?? string.Empty,
-    GeodeticDatumHostURL = builder.Configuration["GeodeticDatumHostURL"] ?? string.Empty,
-    VerticalDatumHostURL = builder.Configuration["VerticalDatumHostURL"] ?? string.Empty,
+    EarthCartographicProjectionHostURL = builder.Configuration["EarthCartographicProjectionHostURL"] ?? string.Empty,
+    EarthGeodesyHostURL = builder.Configuration["EarthGeodesyHostURL"] ?? string.Empty,
+    EarthGravityHostURL = builder.Configuration["EarthGravityHostURL"] ?? string.Empty,
+    EarthMagneticFieldHostURL = builder.Configuration["EarthMagneticFieldHostURL"] ?? string.Empty,
+    EarthVerticalDatumHostURL = builder.Configuration["EarthVerticalDatumHostURL"] ?? string.Empty,
     UnitConversionHostURL = builder.Configuration["UnitConversionHostURL"] ?? string.Empty,
 };
 

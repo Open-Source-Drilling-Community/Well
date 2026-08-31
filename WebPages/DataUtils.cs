@@ -1,7 +1,7 @@
-using NORCE.Drilling.Well.ModelShared;
+using OSDC.Drilling.Well.ModelShared;
 using OSDC.UnitConversion.DrillingRazorMudComponents;
 
-namespace NORCE.Drilling.Well.WebPages;
+namespace OSDC.Drilling.Well.WebPages;
 
 public static class DataUtils
 {
@@ -25,7 +25,7 @@ public static class DataUtils
         public static MeanSeaLevelDepthReferenceSource MeanSeaLevelDepthReferenceSource { get; set; } = new();
     }
 
-    public static void ApplyWellReferenceValues(NORCE.Drilling.Well.ModelShared.Well? well, List<Cluster> clusters, List<Rig>? rigs = null)
+    public static void ApplyWellReferenceValues(OSDC.Drilling.Well.ModelShared.Well? well, List<Cluster> clusters, List<RigReadResponse>? rigs = null)
     {
         UnitAndReferenceParameters.GroundMudLineDepthReferenceSource.GroundMudLineDepthReference = 0;
         UnitAndReferenceParameters.SeaWaterLevelDepthReferenceSource.SeaWaterLevelDepthReference = 0;
@@ -53,7 +53,7 @@ public static class DataUtils
             }
             if (cluster?.RigID is Guid rigId && rigId != Guid.Empty && rigs != null)
             {
-                Rig? rig = rigs.FirstOrDefault(item => item?.MetaInfo?.ID == rigId);
+                RigReadResponse? rig = rigs.FirstOrDefault(item => item?.MetaInfo?.ID == rigId);
                 ApplyRotaryTableDepthWGS84(rig?.DrillFloorElevation);
             }
         }

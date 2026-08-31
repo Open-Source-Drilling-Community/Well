@@ -1,9 +1,9 @@
 using System;
 using NUnit.Framework;
-using NORCE.Drilling.Well.Model;
+using OSDC.Drilling.Well.Model;
 using OSDC.DotnetLibraries.General.DataManagement;
 
-namespace NORCE.Drilling.Well.ModelTest
+namespace OSDC.Drilling.Well.ModelTest
 {
     [TestFixture]
     public class WellTests
@@ -11,7 +11,7 @@ namespace NORCE.Drilling.Well.ModelTest
         [Test]
         public void DefaultConstructor_InitializesWithDefaults()
         {
-            var well = new NORCE.Drilling.Well.Model.Well();
+            var well = new OSDC.Drilling.Well.Model.Well();
 
             Assert.That(well.MetaInfo, Is.Null);
             Assert.That(well.Name, Is.Null);
@@ -26,7 +26,7 @@ namespace NORCE.Drilling.Well.ModelTest
         [Test]
         public void PropertySetters_Getters_WorkAsExpected()
         {
-            var well = new NORCE.Drilling.Well.Model.Well();
+            var well = new OSDC.Drilling.Well.Model.Well();
 
             var meta = new MetaInfo();
             var name = "Test Well";

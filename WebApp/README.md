@@ -1,4 +1,4 @@
-# WebApp (NORCE.Drilling.Well.WebApp)
+# WebApp (OSDC.Drilling.Well.WebApp)
 
 Blazor Server web application providing a user interface for the Well microservice. It lists, creates, edits, and deletes Well records, and displays usage statistics. The app consumes the Service API through a generated client model and uses MudBlazor for UI components.
 
@@ -24,9 +24,16 @@ Local Run
 
 Configure Backend Endpoints
 - Configure the Service and related endpoints via appsettings or environment variables:
-  - `WellHostURL` (default dev: `https://localhost:5001/`)
+  - `WellHostURL` (default dev: `http://localhost:5002/`)
   - `ClusterHostURL`
   - `FieldHostURL`
+  - `RigHostURL`
+  - `TrajectoryHostURL`
+  - `EarthCartographicProjectionHostURL`
+  - `EarthGeodesyHostURL`
+  - `EarthGravityHostURL`
+  - `EarthMagneticFieldHostURL`
+  - `EarthVerticalDatumHostURL`
   - `UnitConversionHostURL`
 - Example (PowerShell):
   - `$env:WellHostURL = "https://localhost:5001/"; dotnet run --project WebApp`
@@ -37,16 +44,16 @@ Notes
 
 Docker
 1) Build:
-   - `docker build -t digiwells/norcedrillingwellwebappclient:local -f WebApp/Dockerfile .`
+   - `docker build -t digiwells/osdcdrillingwellwebappclient:local -f WebApp/Dockerfile .`
 2) Run:
-   - `docker run --rm -p 5002:8080 -e WellHostURL=https://host.docker.internal:5001/ digiwells/norcedrillingwellwebappclient:local`
+   - `docker run --rm -p 5002:8080 -e WellHostURL=https://host.docker.internal:5001/ digiwells/osdcdrillingwellwebappclient:local`
 3) Open:
    - `http://localhost:5002/Well/webapp/Well`
 
 Helm (Kubernetes)
-- A chart is provided under `WebApp/charts/norcedrillingwellwebappclient`.
+- A chart is provided under `WebApp/charts/osdcdrillingwellwebappclient`.
 - Example install with defaults:
-  - `helm upgrade --install well-webapp WebApp/charts/norcedrillingwellwebappclient`
+  - `helm upgrade --install well-webapp WebApp/charts/osdcdrillingwellwebappclient`
 
 ## Usage
 
@@ -66,7 +73,7 @@ Typical Actions
   - `OSDC.UnitConversion.DrillingRazorMudComponents` — unit/quantity input components.
   - `OSDC.DotnetLibraries.General.DataManagement` — shared MetaInfo and helpers.
 - Project reference
-  - `ModelSharedOut` — generated OpenAPI client and DTOs (`NORCE.Drilling.Well.ModelShared`), used by `Shared/APIUtils.cs`.
+  - `ModelSharedOut` — generated OpenAPI client and DTOs (`OSDC.Drilling.Well.ModelShared`), used by `Shared/APIUtils.cs`.
 
 See `WebApp.csproj` for exact versions and build targets.
 
@@ -91,6 +98,6 @@ See `WebApp.csproj` for exact versions and build targets.
 
 ## Current integrations
 
-The host configures Rig and Vertical Datum service/WebApp URLs for the reusable Well pages. Its embedded page packages are aligned to Field 1.0.19, Cluster 1.0.12, Cartographic Projection 1.0.8, and Geodetic Datum 1.0.7.
+The host uses the current OSDC Field, Cluster, Rig, Earth Cartographic Projection, Earth Geodesy, Earth Gravity, Earth Magnetic Field, and Earth Vertical Datum WebPages packages. Their assemblies and required services are registered directly, so reusable pages run inside this host rather than redirecting to separate WebApps.
 
 Keep the corresponding `appsettings.Development.json` and `appsettings.Production.json` values aligned with the target environment.
