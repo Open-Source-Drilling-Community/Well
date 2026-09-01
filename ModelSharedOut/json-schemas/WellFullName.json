@@ -246,11 +246,50 @@
               "type": "string",
               "format": "uuid"
             }
+          },
+          {
+            "name": "expectedModifiedUtc",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
           }
         ],
         "responses": {
           "200": {
             "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OSDC.Drilling.Well.Model.WellMutationErrorEnvelope"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OSDC.Drilling.Well.Model.WellMutationErrorEnvelope"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OSDC.Drilling.Well.Model.WellMutationErrorEnvelope"
+                }
+              }
+            }
           }
         }
       }
@@ -554,72 +593,6 @@
         }
       }
     },
-    "/Well/SlotId": {
-      "get": {
-        "tags": [
-          "Well"
-        ],
-        "operationId": "GetAllWellBySlotId",
-        "parameters": [
-          {
-            "name": "slotId",
-            "in": "query",
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/OSDC.Drilling.Well.Model.Well"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/Well/ClusterId": {
-      "get": {
-        "tags": [
-          "Well"
-        ],
-        "operationId": "GetAllWellByClusterId",
-        "parameters": [
-          {
-            "name": "clusterId",
-            "in": "query",
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/OSDC.Drilling.Well.Model.Well"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/Well/UsedSlot/{clusterId}": {
       "get": {
         "tags": [
@@ -647,6 +620,184 @@
                   "items": {
                     "$ref": "#/components/schemas/OSDC.DotnetLibraries.General.DataManagement.MetaInfo"
                   }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/Well/{id}/Details": {
+      "put": {
+        "tags": [
+          "Well"
+        ],
+        "operationId": "PutWellDetails",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "expectedModifiedUtc",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OSDC.Drilling.Well.Model.WellDetailsUpdate"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OSDC.Drilling.Well.Model.WellDetailsUpdate"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/OSDC.Drilling.Well.Model.WellDetailsUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OSDC.Drilling.Well.Model.Well"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OSDC.Drilling.Well.Model.WellMutationErrorEnvelope"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OSDC.Drilling.Well.Model.WellMutationErrorEnvelope"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OSDC.Drilling.Well.Model.WellMutationErrorEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/Well/{id}/Location": {
+      "put": {
+        "tags": [
+          "Well"
+        ],
+        "operationId": "PutWellLocation",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "expectedModifiedUtc",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OSDC.Drilling.Well.Model.WellLocationUpdate"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OSDC.Drilling.Well.Model.WellLocationUpdate"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/OSDC.Drilling.Well.Model.WellLocationUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OSDC.Drilling.Well.Model.Well"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OSDC.Drilling.Well.Model.WellMutationErrorEnvelope"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OSDC.Drilling.Well.Model.WellMutationErrorEnvelope"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OSDC.Drilling.Well.Model.WellMutationErrorEnvelope"
                 }
               }
             }
@@ -2018,6 +2169,24 @@
         },
         "additionalProperties": false
       },
+      "OSDC.Drilling.Well.Model.WellDetailsUpdate": {
+        "required": [
+          "Description",
+          "Name"
+        ],
+        "type": "object",
+        "properties": {
+          "Name": {
+            "type": "string",
+            "nullable": true
+          },
+          "Description": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
       "OSDC.Drilling.Well.Model.WellFeatureAssignment": {
         "type": "object",
         "properties": {
@@ -2136,6 +2305,30 @@
           "Value": {
             "type": "string",
             "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "OSDC.Drilling.Well.Model.WellLocationUpdate": {
+        "required": [
+          "ClusterID",
+          "IsSingleWell",
+          "SlotID"
+        ],
+        "type": "object",
+        "properties": {
+          "ClusterID": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "SlotID": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "IsSingleWell": {
+            "type": "boolean"
           }
         },
         "additionalProperties": false

@@ -31,11 +31,11 @@ Paths below are relative to `/Well/api`.
 | --- | --- |
 | `/Well` | List IDs, create a Well. |
 | `/Well/MetaInfo` | List Well metadata. |
-| `/Well/{id}` | Get, replace, or delete a Well. |
+| `/Well/{id}` | Get, concurrency-checked replace, or concurrency-checked delete of a Well. |
 | `/Well/HeavyData` | List complete Wells. |
 | `/Well/Search` | Return a deterministic page with total count; filter by name, Cluster, Slot, identity, feature, or modification interval. |
-| `/Well/SlotId?slotId={id}` | List Wells assigned to a Slot. |
-| `/Well/ClusterId?clusterId={id}` | List Wells assigned to a Cluster. |
+| `/Well/{id}/Details` | Replace only `Name` and `Description`; returns the updated Well. |
+| `/Well/{id}/Location` | Replace only `ClusterID`, `SlotID`, and `IsSingleWell`; returns the updated Well. |
 | `/Well/UsedSlot/{clusterId}` | List Slot metadata referenced by a Cluster's Wells. |
 | `/Well/BatchExport` | Export all Wells or an ordered selection with referenced local catalogs. |
 | `/Well/BatchRestore` | Validate and atomically restore a versioned export document. |
@@ -47,7 +47,9 @@ Paths below are relative to `/Well/api`.
 | `/WellFeatureCategory/MetaInfo`, `/HeavyData`, `/{id}` | Category metadata, complete listing, get, concurrency-checked replace, and delete. |
 | `/WellUsageStatistics` | Current daily Well endpoint counters. |
 
-Well and catalog updates require the `expectedModifiedUtc` query parameter from the latest read and reject stale changes with a structured `409` response. Well creation and updates use server-owned timestamps and parameterized SQL. Deleting a referenced definition, or removing a referenced feature option, returns a structured conflict rather than cascading into Well data.
+Well updates, assignment mutations, and deletion require the `expectedModifiedUtc` query parameter from the latest read and reject stale changes with a structured `409` response. Well creation and updates use server-owned timestamps and parameterized SQL. Deleting a referenced definition, or removing a referenced feature option, returns a structured conflict rather than cascading into Well data.
+
+`ClusterID` and `SlotID` are external references owned by the Cluster service. Well enforces valid non-empty UUID shapes and requires a Cluster when a Slot is supplied, but it does not synchronously call another microservice while holding a SQLite mutation transaction to verify external existence.
 
 Legacy Well rows need no rewrite or schema migration. A missing `LastModificationDate` is exposed as the existing `CreationDate`, or as the Unix epoch when both timestamps are absent; the first successful update persists a current server revision.
 
@@ -62,7 +64,9 @@ Invoke-RestMethod "$base/Well" -Method Post -ContentType "application/json" -Bod
     MetaInfo = @{ ID = $id }
     Name = "Example Well"
 } | ConvertTo-Json -Depth 20)
-Invoke-RestMethod "$base/Well/$id" -Method Delete
+$well = Invoke-RestMethod "$base/Well/$id"
+$revision = [uri]::EscapeDataString($well.LastModificationDate)
+Invoke-RestMethod "$base/Well/$id`?expectedModifiedUtc=$revision" -Method Delete
 ```
 
 ## Backup and restore
@@ -112,11 +116,12 @@ Tool families:
 
 - `well_*`: Well queries, CRUD, batch export, and batch restore.
 - `well_search`: bounded pagination and combined server-side Well filters.
+- `well_details_update` and `well_location_update`: concurrency-safe changes to small core sub-resources.
 - `well_identity_assignment_*` and `well_feature_assignment_*`: targeted, concurrency-safe nested assignment mutations.
 - `well_identity_*`: complete Identity definition CRUD and discovery.
 - `well_feature_category_*`: complete Feature Category CRUD and discovery.
 
-Every tool publishes a title, detailed description, closed input/output JSON schemas, and read-only/destructive/idempotent/open-world annotations. Closed schemas are enforced at runtime: unknown top-level and nested properties are rejected instead of ignored. UUID arguments must be non-empty. Well and catalog update tools require `expectedModifiedUtc`. Well mutations additionally validate assignment IDs, required identity values, catalog references, validity periods, exclusive-category overlap, and Slot/Cluster consistency. Tests compare all non-statistics controller actions with registered MCP tools to prevent REST/MCP drift.
+Every tool publishes a title, detailed description, closed input/output JSON schemas, and read-only/destructive/idempotent/open-world annotations. Closed schemas are enforced at runtime: unknown top-level and nested properties are rejected instead of ignored. UUID arguments must be non-empty. Well updates, Well deletion, assignment mutations, and catalog updates require `expectedModifiedUtc`. Well mutations additionally validate assignment IDs, required identity values, catalog references, validity periods, exclusive-category overlap, and Slot/Cluster consistency. Tests compare all non-statistics controller actions with registered MCP tools to prevent REST/MCP drift.
 
 ## Docker and Helm
 

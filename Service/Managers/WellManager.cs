@@ -158,84 +158,6 @@ namespace OSDC.Drilling.Well.Service.Managers
             return null;
         }
         /// <summary>
-        /// Returns the list of Wells with the specified ClusterID present in the microservice database 
-        /// </summary>
-        /// <returns>the list of Wells with the specified ClusterID </returns>
-        public List<Model.Well>? GetAllWellByClusterId(Guid clusterId)
-        {
-            
-            List<Model.Well?> vals = [];
-            var connection = _connectionManager.GetConnection();
-            if (connection != null)
-            {
-                var command = connection.CreateCommand();
-                command.CommandText = "SELECT Well FROM WellTable WHERE ClusterID = $clusterId";
-                command.Parameters.AddWithValue("$clusterId", clusterId.ToString());
-                try
-                {
-                    using var reader = command.ExecuteReader();
-                    while (reader.Read() && !reader.IsDBNull(0))
-                    {
-                        string data = reader.GetString(0);
-                        Model.Well? well = JsonSerializer.Deserialize<Model.Well>(data, JsonSettings.Options);
-                        WellMutationManager.EnsureRevision(well);
-                        vals.Add(well);
-                    }
-                    _logger.LogInformation("Returning the list of existing Well from WellTable");
-                    return vals;
-                }
-                catch (SqliteException ex)
-                {
-                    _logger.LogError(ex, "Impossible to get Well from WellTable");
-                }
-            }
-            else
-            {
-                _logger.LogWarning("Impossible to access the SQLite database");
-            }
-            return null;
-        }
-
-        /// <summary>
-        /// Returns the list of Wells with the specified SlotID present in the microservice database 
-        /// </summary>
-        /// <returns>the list of Wells with the specified SlotID </returns>
-        public List<Model.Well>? GetAllWellBySlotId(Guid slotId)
-        {
-            
-            List<Model.Well?> vals = [];
-            var connection = _connectionManager.GetConnection();
-            if (connection != null)
-            {
-                var command = connection.CreateCommand();
-                command.CommandText = "SELECT Well FROM WellTable WHERE SlotID = $slotId";
-                command.Parameters.AddWithValue("$slotId", slotId.ToString());
-                try
-                {
-                    using var reader = command.ExecuteReader();
-                    while (reader.Read() && !reader.IsDBNull(0))
-                    {
-                        string data = reader.GetString(0);
-                        Model.Well? well = JsonSerializer.Deserialize<Model.Well>(data, JsonSettings.Options);
-                        WellMutationManager.EnsureRevision(well);
-                        vals.Add(well);
-                    }
-                    _logger.LogInformation("Returning the list of existing Well from WellTable");
-                    return vals;
-                }
-                catch (SqliteException ex)
-                {
-                    _logger.LogError(ex, "Impossible to get Well from WellTable");
-                }
-            }
-            else
-            {
-                _logger.LogWarning("Impossible to access the SQLite database");
-            }
-            return null;
-        }
-
-        /// <summary>
         /// Returns the list of MetaInfo of all Well present in the microservice database 
         /// </summary>
         /// <returns>the list of MetaInfo of all Well present in the microservice database</returns>
@@ -545,6 +467,15 @@ namespace OSDC.Drilling.Well.Service.Managers
         internal WellMutationResult UpdateWell(Guid guid, DateTimeOffset expectedModifiedUtc, Model.Well? well) =>
             WellMutationManager.Update(_connectionManager, _logger, guid, expectedModifiedUtc, well);
 
+        internal WellMutationResult UpdateWellDetails(Guid wellId, DateTimeOffset expectedModifiedUtc, WellDetailsUpdate? details) =>
+            WellMutationManager.UpdateDetails(_connectionManager, _logger, wellId, expectedModifiedUtc, details);
+
+        internal WellMutationResult UpdateWellLocation(Guid wellId, DateTimeOffset expectedModifiedUtc, WellLocationUpdate? location) =>
+            WellMutationManager.UpdateLocation(_connectionManager, _logger, wellId, expectedModifiedUtc, location);
+
+        internal WellMutationResult DeleteWell(Guid wellId, DateTimeOffset expectedModifiedUtc) =>
+            WellMutationManager.Delete(_connectionManager, _logger, wellId, expectedModifiedUtc);
+
         internal WellMutationResult AddIdentityAssignment(Guid wellId, DateTimeOffset expectedModifiedUtc, WellIdentityAssignment? assignment) =>
             WellMutationManager.AddIdentityAssignment(_connectionManager, _logger, wellId, expectedModifiedUtc, assignment);
 
@@ -563,59 +494,5 @@ namespace OSDC.Drilling.Well.Service.Managers
         internal WellMutationResult DeleteFeatureAssignment(Guid wellId, Guid assignmentId, DateTimeOffset expectedModifiedUtc) =>
             WellMutationManager.DeleteFeatureAssignment(_connectionManager, _logger, wellId, assignmentId, expectedModifiedUtc);
 
-        /// <summary>
-        /// Deletes the Well of given ID from the microservice database
-        /// </summary>
-        /// <param name="guid"></param>
-        /// <returns>true if the Well was deleted from the microservice database</returns>
-        public bool DeleteWellById(Guid guid)
-        {
-            if (!guid.Equals(Guid.Empty))
-            {
-                var connection = _connectionManager.GetConnection();
-                if (connection != null)
-                {
-                    using var transaction = connection.BeginTransaction();
-                    bool success = true;
-                    //delete Well from WellTable
-                    try
-                    {
-                        var command = connection.CreateCommand();
-                        command.CommandText = "DELETE FROM WellTable WHERE ID = $id";
-                        command.Parameters.AddWithValue("$id", guid.ToString());
-                        int count = command.ExecuteNonQuery();
-                        if (count < 0)
-                        {
-                            _logger.LogWarning("Impossible to delete the Well of given ID from the WellTable");
-                            success = false;
-                        }
-                    }
-                    catch (SqliteException ex)
-                    {
-                        _logger.LogError(ex, "Impossible to delete the Well of given ID from WellTable");
-                        success = false;
-                    }
-                    if (success)
-                    {
-                        transaction.Commit();
-                        _logger.LogInformation("Removed the Well of given ID from the WellTable successfully");
-                    }
-                    else
-                    {
-                        transaction.Rollback();
-                    }
-                    return success;
-                }
-                else
-                {
-                    _logger.LogWarning("Impossible to access the SQLite database");
-                }
-            }
-            else
-            {
-                _logger.LogWarning("The Well ID is null or empty");
-            }
-            return false;
-        }
     }
 }

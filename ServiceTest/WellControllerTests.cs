@@ -322,16 +322,65 @@ namespace OSDC.Drilling.Well.ServiceTest
         }
 
         [Test]
+        public void CoreSubresources_UpdateOnlyDetailsOrLocation()
+        {
+            WellModel well = NewWell();
+            Guid originalCluster = well.ClusterID!.Value;
+            Guid originalSlot = well.SlotID!.Value;
+            Assert.That(_controller.PostWell(well), Is.InstanceOf<Microsoft.AspNetCore.Mvc.OkResult>());
+
+            var detailsResult = _controller.PutWellDetails(well.MetaInfo!.ID, well.LastModificationDate!.Value,
+                new WellDetailsUpdate { Name = "Renamed", Description = "Revised description" });
+            WellModel afterDetails = (WellModel)((Microsoft.AspNetCore.Mvc.OkObjectResult)detailsResult).Value!;
+            Assert.Multiple(() =>
+            {
+                Assert.That(afterDetails.Name, Is.EqualTo("Renamed"));
+                Assert.That(afterDetails.ClusterID, Is.EqualTo(originalCluster));
+                Assert.That(afterDetails.SlotID, Is.EqualTo(originalSlot));
+            });
+
+            Guid newCluster = Guid.NewGuid();
+            Guid newSlot = Guid.NewGuid();
+            var locationResult = _controller.PutWellLocation(well.MetaInfo.ID, afterDetails.LastModificationDate!.Value,
+                new WellLocationUpdate { ClusterID = newCluster, SlotID = newSlot, IsSingleWell = false });
+            WellModel afterLocation = (WellModel)((Microsoft.AspNetCore.Mvc.OkObjectResult)locationResult).Value!;
+            Assert.Multiple(() =>
+            {
+                Assert.That(afterLocation.Name, Is.EqualTo("Renamed"));
+                Assert.That(afterLocation.ClusterID, Is.EqualTo(newCluster));
+                Assert.That(afterLocation.SlotID, Is.EqualTo(newSlot));
+            });
+        }
+
+        [Test]
         public void DeleteWellById_Removes_WhenExists()
         {
             var well = NewWell();
             Assert.That(_controller.PostWell(well), Is.InstanceOf<Microsoft.AspNetCore.Mvc.OkResult>());
 
-            var del = _controller.DeleteWellById(well.MetaInfo!.ID);
+            var del = _controller.DeleteWellById(well.MetaInfo!.ID, well.LastModificationDate!.Value);
             Assert.That(del, Is.InstanceOf<Microsoft.AspNetCore.Mvc.OkResult>());
 
             var after = _controller.GetWellById(well.MetaInfo!.ID);
             Assert.That(after.Result, Is.InstanceOf<Microsoft.AspNetCore.Mvc.NotFoundResult>());
+        }
+
+        [Test]
+        public void DeleteWellById_RejectsStaleRevisionWithoutDeleting()
+        {
+            WellModel well = NewWell();
+            Assert.That(_controller.PostWell(well), Is.InstanceOf<Microsoft.AspNetCore.Mvc.OkResult>());
+            DateTimeOffset staleRevision = well.LastModificationDate!.Value;
+            var update = _controller.PutWellDetails(well.MetaInfo!.ID, staleRevision,
+                new WellDetailsUpdate { Name = "Changed", Description = well.Description });
+            WellModel updated = (WellModel)((Microsoft.AspNetCore.Mvc.OkObjectResult)update).Value!;
+
+            Assert.That(_controller.DeleteWellById(well.MetaInfo.ID, staleRevision),
+                Is.InstanceOf<Microsoft.AspNetCore.Mvc.ConflictObjectResult>());
+            Assert.That(_controller.GetWellById(well.MetaInfo.ID).Result,
+                Is.InstanceOf<Microsoft.AspNetCore.Mvc.OkObjectResult>());
+            Assert.That(_controller.DeleteWellById(well.MetaInfo.ID, updated.LastModificationDate!.Value),
+                Is.InstanceOf<Microsoft.AspNetCore.Mvc.OkResult>());
         }
 
         [Test]

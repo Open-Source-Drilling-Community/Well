@@ -182,43 +182,6 @@ namespace OSDC.Drilling.Well.Service.Controllers
 
 
         /// <summary>
-        /// Returns the list of all Well present in the microservice database with given SlotId, at endpoint Well/api/Well/HeavyData
-        /// </summary>
-        /// <returns>the list of all Well present in the microservice database with given SlotId, at endpoint Well/api/Well/HeavyData</returns>
-        [HttpGet("SlotId", Name = "GetAllWellBySlotId")]
-        public ActionResult<IEnumerable<Model.Well?>> GetAllWellBySlotId(Guid slotId)
-        {
-            UsageStatisticsWell.Instance.IncrementGetAllWellPerDay();
-            var vals = _wellManager.GetAllWellBySlotId(slotId);
-            if (vals != null)
-            {
-                return Ok(vals);
-            }
-            else
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError);
-            }
-        }
-        /// <summary>
-        /// Returns the list of all Well present in the microservice database with given ClusterId, at endpoint Well/api/Well/HeavyData
-        /// </summary>
-        /// <returns>the list of all Well present in the microservice database with given ClusterId, at endpoint Well/api/Well/HeavyData</returns>
-        [HttpGet("ClusterId", Name = "GetAllWellByClusterId")]
-        public ActionResult<IEnumerable<Model.Well?>> GetAllWellByClusterId(Guid clusterId)
-        {
-            UsageStatisticsWell.Instance.IncrementGetAllWellPerDay();
-            var vals = _wellManager.GetAllWellByClusterId(clusterId);
-            if (vals != null)
-            {
-                return Ok(vals);
-            }
-            else
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError);
-            }
-        }
-
-        /// <summary>
         /// Returns the MetaInfo of all the slots used in the cluster of given ID, at endpoint Well/api/Well/UsedSlot/clusterId
         /// </summary>
         /// <param name="guid"></param>
@@ -277,6 +240,30 @@ namespace OSDC.Drilling.Well.Service.Controllers
         {
             UsageStatisticsWell.Instance.IncrementPutWellByIdPerDay();
             return this.ToActionResult(_wellManager.UpdateWell(id, expectedModifiedUtc, data));
+        }
+
+        [HttpPut("{id}/Details", Name = "PutWellDetails")]
+        [ProducesResponseType<Model.Well>(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(WellMutationErrorEnvelope), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(WellMutationErrorEnvelope), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(WellMutationErrorEnvelope), StatusCodes.Status409Conflict)]
+        public ActionResult PutWellDetails(Guid id, [FromQuery, BindRequired] DateTimeOffset expectedModifiedUtc,
+            [FromBody] WellDetailsUpdate? details)
+        {
+            WellMutationResult outcome = _wellManager.UpdateWellDetails(id, expectedModifiedUtc, details);
+            return this.ToActionResult(outcome, outcome.Resource);
+        }
+
+        [HttpPut("{id}/Location", Name = "PutWellLocation")]
+        [ProducesResponseType<Model.Well>(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(WellMutationErrorEnvelope), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(WellMutationErrorEnvelope), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(WellMutationErrorEnvelope), StatusCodes.Status409Conflict)]
+        public ActionResult PutWellLocation(Guid id, [FromQuery, BindRequired] DateTimeOffset expectedModifiedUtc,
+            [FromBody] WellLocationUpdate? location)
+        {
+            WellMutationResult outcome = _wellManager.UpdateWellLocation(id, expectedModifiedUtc, location);
+            return this.ToActionResult(outcome, outcome.Resource);
         }
 
         [HttpPost("{wellId}/IdentityAssignments", Name = "PostWellIdentityAssignment")]
@@ -357,25 +344,14 @@ namespace OSDC.Drilling.Well.Service.Controllers
         /// <param name="guid"></param>
         /// <returns>true if the Well was deleted from the microservice database, at the endpoint Well/api/Well/id</returns>
         [HttpDelete("{id}", Name = "DeleteWellById")]
-        public ActionResult DeleteWellById(Guid id)
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(WellMutationErrorEnvelope), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(WellMutationErrorEnvelope), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(WellMutationErrorEnvelope), StatusCodes.Status409Conflict)]
+        public ActionResult DeleteWellById(Guid id, [FromQuery, BindRequired] DateTimeOffset expectedModifiedUtc)
         {
             UsageStatisticsWell.Instance.IncrementDeleteWellByIdPerDay();
-            if (_wellManager.GetWellById(id) != null)
-            {
-                if (_wellManager.DeleteWellById(id))
-                {
-                    return Ok();
-                }
-                else
-                {
-                    return StatusCode(StatusCodes.Status500InternalServerError);
-                }
-            }
-            else
-            {
-                _logger.LogWarning("The Well of given ID does not exist");
-                return NotFound();
-            }
+            return this.ToActionResult(_wellManager.DeleteWell(id, expectedModifiedUtc));
         }
     }
 }

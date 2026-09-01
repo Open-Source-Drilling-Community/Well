@@ -29,7 +29,8 @@ foreach (var well in wells)
 }
 // Test if the new method works...
 Guid slotID = wells[0].SlotID!.Value;
-List<Well> wellsBySlotId = (List<Well>) (await wellLocalClient.GetAllWellBySlotIdAsync(slotID)).ToList();
+WellSearchResult wellsBySlotPage = await wellLocalClient.SearchWellsAsync(slotId: slotID, limit: 200);
+List<Well> wellsBySlotId = wellsBySlotPage.Items.ToList();
 Console.WriteLine($"Number of wells with slot ID {slotID} in local database: {wellsBySlotId.Count}");
 
 

@@ -12302,11 +12302,50 @@
               "type": "string",
               "format": "uuid"
             }
+          },
+          {
+            "name": "expectedModifiedUtc",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
           }
         ],
         "responses": {
           "200": {
             "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WellMutationErrorEnvelope"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WellMutationErrorEnvelope"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WellMutationErrorEnvelope"
+                }
+              }
+            }
           }
         }
       }
@@ -13227,32 +13266,88 @@
         }
       }
     },
-    "/Well/SlotId": {
-      "get": {
+    "/Well/{id}/Details": {
+      "put": {
         "tags": [
           "Well"
         ],
-        "operationId": "GetAllWellBySlotId",
+        "operationId": "PutWellDetails",
         "parameters": [
           {
-            "name": "slotId",
-            "in": "query",
+            "name": "id",
+            "in": "path",
+            "required": true,
             "schema": {
               "type": "string",
               "format": "uuid"
             }
+          },
+          {
+            "name": "expectedModifiedUtc",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
           }
         ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WellDetailsUpdate"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WellDetailsUpdate"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/WellDetailsUpdate"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Well"
-                  }
+                  "$ref": "#/components/schemas/Well"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WellMutationErrorEnvelope"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WellMutationErrorEnvelope"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WellMutationErrorEnvelope"
                 }
               }
             }
@@ -13260,32 +13355,88 @@
         }
       }
     },
-    "/Well/ClusterId": {
-      "get": {
+    "/Well/{id}/Location": {
+      "put": {
         "tags": [
           "Well"
         ],
-        "operationId": "GetAllWellByClusterId",
+        "operationId": "PutWellLocation",
         "parameters": [
           {
-            "name": "clusterId",
-            "in": "query",
+            "name": "id",
+            "in": "path",
+            "required": true,
             "schema": {
               "type": "string",
               "format": "uuid"
             }
+          },
+          {
+            "name": "expectedModifiedUtc",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
           }
         ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WellLocationUpdate"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WellLocationUpdate"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/WellLocationUpdate"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Well"
-                  }
+                  "$ref": "#/components/schemas/Well"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WellMutationErrorEnvelope"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WellMutationErrorEnvelope"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WellMutationErrorEnvelope"
                 }
               }
             }
@@ -30440,6 +30591,23 @@
           }
         }
       },
+      "WellDetailsUpdate": {
+        "required": [
+          "Description",
+          "Name"
+        ],
+        "type": "object",
+        "properties": {
+          "Name": {
+            "type": "string",
+            "nullable": true
+          },
+          "Description": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
       "WellFeatureAssignment": {
         "type": "object",
         "properties": {
@@ -30554,6 +30722,29 @@
           "Value": {
             "type": "string",
             "nullable": true
+          }
+        }
+      },
+      "WellLocationUpdate": {
+        "required": [
+          "ClusterID",
+          "IsSingleWell",
+          "SlotID"
+        ],
+        "type": "object",
+        "properties": {
+          "ClusterID": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "SlotID": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "IsSingleWell": {
+            "type": "boolean"
           }
         }
       },

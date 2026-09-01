@@ -8,6 +8,7 @@ The Model project is the authoritative serializable contract used by the Well se
 - `WellIdentity`: user-managed symbolic identity definition.
 - `WellIdentityAssignment`: assignment UUID, referenced identity UUID, and Well-specific value.
 - `WellSearchResult`: a bounded page of complete Wells with `Total`, `Offset`, and `Limit` metadata.
+- `WellDetailsUpdate` and `WellLocationUpdate`: complete payloads for the small concurrency-safe core sub-resources.
 - `WellFeatureCategory`: user-managed category with exclusivity and validity-period semantics.
 - `WellFeatureOption`: stable option UUID and name within a feature category.
 - `WellFeatureAssignment`: referenced category and option plus optional validity dates.

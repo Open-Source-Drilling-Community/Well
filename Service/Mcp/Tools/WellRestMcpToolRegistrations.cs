@@ -16,6 +16,8 @@ using WellIdentityModel = OSDC.Drilling.Well.Model.WellIdentity;
 using WellFeatureCategoryModel = OSDC.Drilling.Well.Model.WellFeatureCategory;
 using WellIdentityAssignmentModel = OSDC.Drilling.Well.Model.WellIdentityAssignment;
 using WellFeatureAssignmentModel = OSDC.Drilling.Well.Model.WellFeatureAssignment;
+using WellDetailsUpdateModel = OSDC.Drilling.Well.Model.WellDetailsUpdate;
+using WellLocationUpdateModel = OSDC.Drilling.Well.Model.WellLocationUpdate;
 
 namespace OSDC.Drilling.Well.Service.Mcp.Tools;
 
@@ -42,16 +44,16 @@ public static class WellRestMcpToolRegistrations
             (sp, args, ct) => InvokeWithBodyResult<WellBatchExportRequestModel, OSDC.Drilling.Well.Model.WellBatchExportDocument>(args, "request", ct, request => Controller(sp).BatchExportWells(request)));
         services.AddLegacyMcpTool("well_batch_restore", "Validate and atomically restore a schema-version-1 Well backup document. Source catalog UUIDs map to compatible local definitions by exact UUID or unique normalized name; MapOrCreateMissing can create missing definitions and options. ReplaceExisting can replace matching Well UUIDs. Catalog mapping, reference rewriting, catalog creation, and all Well writes use one transaction, so a validation, conflict, or storage failure changes nothing.", McpToolArgumentHelpers.CreateWellBatchRestoreSchema(), McpToolArgumentHelpers.CreateWellBatchRestoreOutputSchema(), new("Restore Wells and Catalog Dependencies", false, true, false, false),
             (sp, args, ct) => InvokeWithBodyResult<WellBatchRestoreRequestModel, OSDC.Drilling.Well.Model.WellBatchRestoreResponse>(args, "request", ct, request => Controller(sp).BatchRestoreWells(request)));
-        services.AddLegacyMcpTool("well_get_all_by_slot_id", "Retrieve complete records for all wells assigned to one slot UUID. On success, data is an array of Well objects; an empty array means that no wells currently use the slot.", McpToolArgumentHelpers.CreateGuidSchema("slotId", "Identifier of the slot whose wells should be returned."), McpToolArgumentHelpers.CreateWellListOutputSchema(), new("List Wells by Slot", true, false, true, false),
-            (sp, args, ct) => InvokeByGuid(args, "slotId", ct, id => Controller(sp).GetAllWellBySlotId(id)));
-        services.AddLegacyMcpTool("well_get_all_by_cluster_id", "Retrieve complete records for all wells assigned to one cluster UUID. On success, data is an array of Well objects; an empty array means that the cluster currently has no wells.", McpToolArgumentHelpers.CreateGuidSchema("clusterId", "Identifier of the cluster whose wells should be returned."), McpToolArgumentHelpers.CreateWellListOutputSchema(), new("List Wells by Cluster", true, false, true, false),
-            (sp, args, ct) => InvokeByGuid(args, "clusterId", ct, id => Controller(sp).GetAllWellByClusterId(id)));
         services.AddLegacyMcpTool("well_get_used_slot_meta_info_by_cluster_id", "List the slot UUIDs referenced by wells in one cluster. Use this to determine which cluster slots are already occupied without retrieving every well. Returns 404 when no matching data is found.", McpToolArgumentHelpers.CreateGuidSchema("clusterId", "Identifier of the cluster for which used-slot UUIDs should be returned."), McpToolArgumentHelpers.CreateIdsOutputSchema(), new("List Used Slot UUIDs", true, false, true, false),
             (sp, args, ct) => InvokeByGuid(args, "clusterId", ct, id => Controller(sp).GetAllUsedSlotMetaInfoByClusterId(id)));
         services.AddLegacyMcpTool("well_create", "Create and persist a new well. Supply the complete Well object using the documented PascalCase fields; well.MetaInfo.ID must be a caller-generated, non-empty UUID and must not already exist. The service does not generate an ID. Returns status 200 on success, 400 for malformed data, and 409 when the ID already exists.", McpToolArgumentHelpers.CreateWellSchema(), McpToolArgumentHelpers.CreateStatusOnlyOutputSchema(), new("Create Well", false, false, false, false),
             (sp, args, ct) => InvokeWithBody<WellModel>(args, "well", ct, data => Controller(sp).PostWell(data)));
         services.AddLegacyMcpTool("well_update_by_id", "Replace the stored data for an existing well. The top-level id and well.MetaInfo.ID must be the same non-empty UUID; expectedModifiedUtc must equal the LastModificationDate from the latest read. Include the complete desired Well object because this is a full update. A stale revision returns 409 without changing data.", McpToolArgumentHelpers.CreateWellSchema(includeId: true), McpToolArgumentHelpers.CreateStatusOnlyOutputSchema(), new("Update Well", false, true, true, false),
             (sp, args, ct) => InvokeWithIdTimestampAndBody<WellModel>(args, "well", ct, (id, expected, data) => Controller(sp).PutWellById(id, expected, data)));
+        services.AddLegacyMcpTool("well_details_update", "Replace only the Well name and description without resending location or assignment arrays. Both detail properties must be supplied and may be null. expectedModifiedUtc protects against stale edits, and the updated Well with its new revision is returned.", McpToolArgumentHelpers.CreateWellDetailsMutationSchema(), McpToolArgumentHelpers.CreateWellOutputSchema(), new("Update Well Details", false, true, true, false),
+            (sp, args, ct) => InvokeWithIdTimestampAndBody<WellDetailsUpdateModel>(args, "details", ct, (id, expected, data) => Controller(sp).PutWellDetails(id, expected, data)));
+        services.AddLegacyMcpTool("well_location_update", "Replace only ClusterID, SlotID, and IsSingleWell without resending details or assignments. Cluster and Slot are external references owned by the Cluster service; Well enforces UUID and Slot-requires-Cluster structure but does not synchronously verify external existence.", McpToolArgumentHelpers.CreateWellLocationMutationSchema(), McpToolArgumentHelpers.CreateWellOutputSchema(), new("Update Well Location", false, true, true, false),
+            (sp, args, ct) => InvokeWithIdTimestampAndBody<WellLocationUpdateModel>(args, "location", ct, (id, expected, data) => Controller(sp).PutWellLocation(id, expected, data)));
         services.AddLegacyMcpTool("well_identity_assignment_add", "Add one identity assignment to an existing Well without resending the complete Well document. Supply a caller-generated assignment.ID and the latest Well LastModificationDate as expectedModifiedUtc. The updated Well and its new revision are returned.", McpToolArgumentHelpers.CreateIdentityAssignmentMutationSchema(false, true), McpToolArgumentHelpers.CreateWellOutputSchema(), new("Add Well Identity Assignment", false, false, false, false),
             (sp, args, ct) => InvokeAssignmentAdd<WellIdentityAssignmentModel>(args, ct, (wellId, expected, assignment) => Controller(sp).PostWellIdentityAssignment(wellId, expected, assignment)));
         services.AddLegacyMcpTool("well_identity_assignment_update_by_id", "Replace one identity assignment selected by assignmentId without resending other Well fields or assignments. The body ID must match assignmentId and expectedModifiedUtc must match the latest Well revision. Returns the updated Well.", McpToolArgumentHelpers.CreateIdentityAssignmentMutationSchema(true, true), McpToolArgumentHelpers.CreateWellOutputSchema(), new("Update Well Identity Assignment", false, true, true, false),
@@ -64,8 +66,8 @@ public static class WellRestMcpToolRegistrations
             (sp, args, ct) => InvokeAssignmentUpdate<WellFeatureAssignmentModel>(args, ct, (wellId, assignmentId, expected, assignment) => Controller(sp).PutWellFeatureAssignment(wellId, assignmentId, expected, assignment)));
         services.AddLegacyMcpTool("well_feature_assignment_delete_by_id", "Remove one feature assignment selected by assignmentId without resending the complete Well. expectedModifiedUtc must match the latest Well revision; stale requests change nothing. Returns the updated Well and its new revision.", McpToolArgumentHelpers.CreateFeatureAssignmentMutationSchema(true, false), McpToolArgumentHelpers.CreateWellOutputSchema(), new("Delete Well Feature Assignment", false, true, true, false),
             (sp, args, ct) => InvokeAssignmentDelete(args, ct, (wellId, assignmentId, expected) => Controller(sp).DeleteWellFeatureAssignment(wellId, assignmentId, expected)));
-        services.AddLegacyMcpTool("well_delete_by_id", "Permanently delete one stored well by UUID. Confirm the target identifier before calling because this operation removes the record. Returns status 200 on success, 404 when the well does not exist, and 400 for an empty UUID.", McpToolArgumentHelpers.CreateGuidSchema("id", "Unique identifier of the well to delete."), McpToolArgumentHelpers.CreateStatusOnlyOutputSchema(), new("Delete Well", false, true, true, false),
-            (sp, args, ct) => InvokeDelete(args, ct, id => Controller(sp).DeleteWellById(id)));
+        services.AddLegacyMcpTool("well_delete_by_id", "Permanently delete one stored Well only when expectedModifiedUtc matches the latest LastModificationDate. A stale request returns 409 and leaves the Well unchanged; this protects callers deleting from an outdated view.", McpToolArgumentHelpers.CreateWellDeleteSchema(), McpToolArgumentHelpers.CreateStatusOnlyOutputSchema(), new("Delete Well", false, true, true, false),
+            (sp, args, ct) => InvokeIdTimestamp(args, ct, (id, expected) => Controller(sp).DeleteWellById(id, expected)));
         AddCatalogCrudTools<WellIdentityModel>(
             services, "well_identity", "wellIdentity", "Well Identity", "a symbolic identity definition assignable to Wells",
             McpToolArgumentHelpers.CreateWellIdentitySchema, McpToolArgumentHelpers.CreateWellIdentityResourceSchema,
@@ -143,6 +145,17 @@ public static class WellRestMcpToolRegistrations
         return McpToolArgumentHelpers.TryParseGuid(args, "id", out Guid id, out JsonNode? error)
             ? Task.FromResult<JsonNode?>(McpActionResultConverter.FromActionResult(action(id)))
             : Task.FromResult(error);
+    }
+
+    private static Task<JsonNode?> InvokeIdTimestamp(JsonObject? args, CancellationToken ct,
+        Func<Guid, DateTimeOffset, ActionResult> action)
+    {
+        ct.ThrowIfCancellationRequested();
+        if (!HasOnlyArguments(args, out JsonNode? unexpected, "id", "expectedModifiedUtc")) return Task.FromResult(unexpected);
+        if (!McpToolArgumentHelpers.TryParseGuid(args, "id", out Guid id, out JsonNode? idError)) return Task.FromResult(idError);
+        return McpToolArgumentHelpers.TryParseDateTimeOffset(args, "expectedModifiedUtc", out DateTimeOffset expected, out JsonNode? timestampError)
+            ? Task.FromResult<JsonNode?>(McpActionResultConverter.FromActionResult(action(id, expected)))
+            : Task.FromResult(timestampError);
     }
 
     private static Task<JsonNode?> InvokeWithBody<T>(JsonObject? args, string bodyName, CancellationToken ct, Func<T?, ActionResult> action)

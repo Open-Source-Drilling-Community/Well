@@ -119,6 +119,76 @@ internal static class WellMutationManager
         if (well != null && well.LastModificationDate == null) well.LastModificationDate = RevisionOf(well);
     }
 
+    public static WellMutationResult UpdateDetails(SqlConnectionManager manager, ILogger logger, Guid wellId,
+        DateTimeOffset expectedModifiedUtc, WellDetailsUpdate? details) =>
+        Mutate(manager, logger, wellId, expectedModifiedUtc, well =>
+        {
+            if (details == null)
+                return WellMutationResult.Invalid("details", "required", "The Well details sub-resource is required.");
+            well.Name = details.Name;
+            well.Description = details.Description;
+            return null;
+        });
+
+    public static WellMutationResult UpdateLocation(SqlConnectionManager manager, ILogger logger, Guid wellId,
+        DateTimeOffset expectedModifiedUtc, WellLocationUpdate? location) =>
+        Mutate(manager, logger, wellId, expectedModifiedUtc, well =>
+        {
+            if (location == null)
+                return WellMutationResult.Invalid("location", "required", "The Well location sub-resource is required.");
+            well.ClusterID = location.ClusterID;
+            well.SlotID = location.SlotID;
+            well.IsSingleWell = location.IsSingleWell;
+            return null;
+        });
+
+    public static WellMutationResult Delete(SqlConnectionManager manager, ILogger logger, Guid wellId,
+        DateTimeOffset expectedModifiedUtc)
+    {
+        if (wellId == Guid.Empty)
+            return WellMutationResult.Invalid("id", "invalid_id", "A non-empty Well UUID is required.");
+        if (expectedModifiedUtc == default)
+            return WellMutationResult.Invalid("expectedModifiedUtc", "required", "A non-default optimistic-concurrency timestamp is required.");
+
+        using SqliteConnection? connection = manager.GetConnection();
+        if (connection == null) return WellMutationResult.StorageFailure();
+        using SqliteTransaction transaction = connection.BeginTransaction();
+        try
+        {
+            WellModel? stored = Read(connection, transaction, wellId);
+            if (stored == null)
+            {
+                transaction.Rollback();
+                return WellMutationResult.NotFound("The Well does not exist.");
+            }
+            DateTimeOffset storedRevision = RevisionOf(stored);
+            if (storedRevision.UtcTicks != expectedModifiedUtc.UtcTicks)
+            {
+                transaction.Rollback();
+                return WellMutationResult.ConcurrencyConflict("expectedModifiedUtc",
+                    $"Expected {expectedModifiedUtc:O}, but the stored Well was modified at {storedRevision:O}.");
+            }
+
+            using SqliteCommand command = connection.CreateCommand();
+            command.Transaction = transaction;
+            command.CommandText = "DELETE FROM WellTable WHERE ID=$id";
+            command.Parameters.AddWithValue("$id", wellId.ToString());
+            if (command.ExecuteNonQuery() != 1)
+            {
+                transaction.Rollback();
+                return WellMutationResult.StorageFailure();
+            }
+            transaction.Commit();
+            return WellMutationResult.Success();
+        }
+        catch (SqliteException ex)
+        {
+            transaction.Rollback();
+            logger.LogError(ex, "Unable to delete Well {WellId}", wellId);
+            return WellMutationResult.StorageFailure();
+        }
+    }
+
     public static WellMutationResult AddIdentityAssignment(SqlConnectionManager manager, ILogger logger, Guid wellId,
         DateTimeOffset expectedModifiedUtc, WellIdentityAssignment? assignment) =>
         Mutate(manager, logger, wellId, expectedModifiedUtc, well =>

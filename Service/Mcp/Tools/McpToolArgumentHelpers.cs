@@ -73,6 +73,59 @@ internal static class McpToolArgumentHelpers
 
     public static JsonObject CreateWellResourceSchema() => CreateWellObjectSchema();
 
+    public static JsonObject CreateWellDeleteSchema() => CreateTimestampedIdSchema("id", "Identifier of the Well to delete.");
+
+    public static JsonObject CreateWellDetailsMutationSchema() => CreateWellSubresourceMutationSchema("details", new JsonObject
+    {
+        ["type"] = "object",
+        ["properties"] = new JsonObject
+        {
+            ["Name"] = NullableString("Complete replacement value for the Well name."),
+            ["Description"] = NullableString("Complete replacement value for the Well description.")
+        },
+        ["required"] = new JsonArray("Name", "Description"),
+        ["additionalProperties"] = false
+    });
+
+    public static JsonObject CreateWellLocationMutationSchema() => CreateWellSubresourceMutationSchema("location", new JsonObject
+    {
+        ["type"] = "object",
+        ["description"] = "External Cluster/Slot references. UUID existence is owned by the Cluster service and is not synchronously validated by Well.",
+        ["properties"] = new JsonObject
+        {
+            ["ClusterID"] = NullableUuid("External Cluster UUID, or null when unassigned."),
+            ["SlotID"] = NullableUuid("External Slot UUID, or null when unassigned. A non-null SlotID requires ClusterID."),
+            ["IsSingleWell"] = new JsonObject { ["type"] = "boolean" }
+        },
+        ["required"] = new JsonArray("ClusterID", "SlotID", "IsSingleWell"),
+        ["additionalProperties"] = false
+    });
+
+    private static JsonObject CreateWellSubresourceMutationSchema(string bodyName, JsonObject body)
+    {
+        JsonObject schema = CreateTimestampedIdSchema("id", "Identifier of the Well to mutate.");
+        JsonObject properties = (JsonObject)schema["properties"]!;
+        properties[bodyName] = body;
+        ((JsonArray)schema["required"]!).Add(bodyName);
+        return schema;
+    }
+
+    private static JsonObject CreateTimestampedIdSchema(string idName, string description) => new()
+    {
+        ["type"] = "object",
+        ["properties"] = new JsonObject
+        {
+            [idName] = new JsonObject { ["type"] = "string", ["format"] = "uuid", ["description"] = description },
+            ["expectedModifiedUtc"] = new JsonObject
+            {
+                ["type"] = "string", ["format"] = "date-time",
+                ["description"] = "The LastModificationDate from the caller's latest Well read."
+            }
+        },
+        ["required"] = new JsonArray(idName, "expectedModifiedUtc"),
+        ["additionalProperties"] = false
+    };
+
     public static JsonObject CreateWellIdentitySchema(bool includeId = false) =>
         WrapCatalogBody("wellIdentity", CreateIdentityDefinitionSchema(), includeId, "wellIdentity.MetaInfo.ID");
 
@@ -197,8 +250,8 @@ internal static class McpToolArgumentHelpers
                 ["Description"] = NullableString("Human-readable description of the well."),
                 ["CreationDate"] = NullableDateTime("UTC or offset timestamp at which the well record was created."),
                 ["LastModificationDate"] = NullableDateTime("UTC or offset timestamp of the most recent modification."),
-                ["SlotID"] = NullableUuid("Identifier of the slot to which the well belongs."),
-                ["ClusterID"] = NullableUuid("Identifier of the cluster to which the well belongs."),
+                ["SlotID"] = NullableUuid("External Slot-service identifier. Its existence is not synchronously validated by Well."),
+                ["ClusterID"] = NullableUuid("External Cluster-service identifier. Its existence is not synchronously validated by Well."),
                 ["IsSingleWell"] = new JsonObject
                 {
                     ["type"] = "boolean",

@@ -20,11 +20,11 @@ public sealed class McpToolRegistrationTests
         ["SearchWells"] = "well_search",
         ["BatchExportWells"] = "well_batch_export",
         ["BatchRestoreWells"] = "well_batch_restore",
-        ["GetAllWellBySlotId"] = "well_get_all_by_slot_id",
-        ["GetAllWellByClusterId"] = "well_get_all_by_cluster_id",
         ["GetAllUsedSlotMetaInfoByClusterId"] = "well_get_used_slot_meta_info_by_cluster_id",
         ["PostWell"] = "well_create",
         ["PutWellById"] = "well_update_by_id",
+        ["PutWellDetails"] = "well_details_update",
+        ["PutWellLocation"] = "well_location_update",
         ["PostWellIdentityAssignment"] = "well_identity_assignment_add",
         ["PutWellIdentityAssignment"] = "well_identity_assignment_update_by_id",
         ["DeleteWellIdentityAssignment"] = "well_identity_assignment_delete_by_id",
@@ -119,7 +119,8 @@ public sealed class McpToolRegistrationTests
                 Assert.That(tool.Behavior.ReadOnlyHint, Is.False, name);
             }
 
-            if (name.EndsWith("_delete_by_id", StringComparison.Ordinal) || name.EndsWith("_update_by_id", StringComparison.Ordinal))
+            if (name.EndsWith("_delete_by_id", StringComparison.Ordinal) || name.EndsWith("_update_by_id", StringComparison.Ordinal) ||
+                name.EndsWith("_update", StringComparison.Ordinal))
             {
                 Assert.Multiple(() =>
                 {
@@ -201,6 +202,33 @@ public sealed class McpToolRegistrationTests
         Assert.That(root["additionalProperties"]?.GetValue<bool>(), Is.False);
     }
 
+    [Test]
+    public void Obsolete_unbounded_hierarchy_tools_are_not_published()
+    {
+        Assert.That(_tools.Keys, Has.None.EqualTo("well_get_all_by_cluster_id"));
+        Assert.That(_tools.Keys, Has.None.EqualTo("well_get_all_by_slot_id"));
+    }
+
+    [TestCase("well_details_update", "details")]
+    [TestCase("well_location_update", "location")]
+    public void Core_subresource_contracts_require_complete_small_bodies(string toolName, string bodyName)
+    {
+        JsonObject root = RequireObject(_tools[toolName].InputSchema);
+        Assert.That(RequiredNames(root), Is.EquivalentTo(new[] { "id", "expectedModifiedUtc", bodyName }));
+        string[] bodyProperties = bodyName == "details"
+            ? ["Name", "Description"]
+            : ["ClusterID", "SlotID", "IsSingleWell"];
+        Assert.That(RequiredNames(Property(root, bodyName)), Is.EquivalentTo(bodyProperties));
+    }
+
+    [Test]
+    public void Well_delete_contract_requires_latest_revision()
+    {
+        JsonObject root = RequireObject(_tools["well_delete_by_id"].InputSchema);
+        Assert.That(RequiredNames(root), Is.EquivalentTo(new[] { "id", "expectedModifiedUtc" }));
+        Assert.That(Property(root, "expectedModifiedUtc")["format"]?.GetValue<string>(), Is.EqualTo("date-time"));
+    }
+
     [TestCase("well_identity_assignment_add", false)]
     [TestCase("well_identity_assignment_update_by_id", true)]
     [TestCase("well_feature_assignment_add", false)]
@@ -249,8 +277,6 @@ public sealed class McpToolRegistrationTests
     }
 
     [TestCase("well_get_by_id")]
-    [TestCase("well_get_all_by_slot_id")]
-    [TestCase("well_get_all_by_cluster_id")]
     [TestCase("well_get_used_slot_meta_info_by_cluster_id")]
     [TestCase("well_identity_get_by_id")]
     [TestCase("well_identity_delete_by_id")]
@@ -331,6 +357,28 @@ public sealed class McpToolRegistrationTests
         {
             ["id"] = Guid.NewGuid().ToString(),
             ["well"] = new JsonObject()
+        }, CancellationToken.None) as JsonObject;
+        Assert.That(response?["status"]?.GetValue<int>(), Is.EqualTo(400));
+    }
+
+    [Test]
+    public async Task Well_delete_tool_requires_concurrency_timestamp_at_runtime()
+    {
+        JsonObject? response = await _tools["well_delete_by_id"].InvokeAsync(new JsonObject
+        {
+            ["id"] = Guid.NewGuid().ToString()
+        }, CancellationToken.None) as JsonObject;
+        Assert.That(response?["status"]?.GetValue<int>(), Is.EqualTo(400));
+    }
+
+    [Test]
+    public async Task Details_update_requires_both_declared_detail_fields_at_runtime()
+    {
+        JsonObject? response = await _tools["well_details_update"].InvokeAsync(new JsonObject
+        {
+            ["id"] = Guid.NewGuid().ToString(),
+            ["expectedModifiedUtc"] = DateTimeOffset.UtcNow.ToString("O"),
+            ["details"] = new JsonObject { ["Name"] = "Only one field" }
         }, CancellationToken.None) as JsonObject;
         Assert.That(response?["status"]?.GetValue<int>(), Is.EqualTo(400));
     }

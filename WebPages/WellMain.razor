@@ -40,7 +40,7 @@
                     <PropertyColumn Property="x => x.Description" Title="@DataUtils.WellDescrLabel" CellStyle="width: 60%;" Sortable="true" Editable="false" />
                     <TemplateColumn CellStyle="width: 5%;">
                         <EditTemplate>
-                            <MudIconButton Size="@Size.Small" Icon="@Icons.Material.Outlined.Delete" OnClick="(() => DeleteWell(context.Item.MetaInfo.ID))" />
+                            <MudIconButton Size="@Size.Small" Icon="@Icons.Material.Outlined.Delete" OnClick="(() => DeleteWell(context.Item))" />
                         </EditTemplate>
                     </TemplateColumn>
                 </Columns>
@@ -251,11 +251,12 @@
         }
     }
 
-    private async Task DeleteWell(Guid id)
+    private async Task DeleteWell(Well well)
     {
         try
         {
-            await Api.ClientWell.DeleteWellByIdAsync(id);
+            await Api.ClientWell.DeleteWellByIdAsync(well.MetaInfo.ID,
+                well.LastModificationDate ?? throw new InvalidOperationException("The Well revision is missing."));
             await UpdateSelectedClusterDepthReferenceSourceAsync();
             await OnInitializedAsync();
         }
@@ -271,7 +272,8 @@
         {
             foreach (Well well in selectedWellList)
             {
-                await Api.ClientWell.DeleteWellByIdAsync(well.MetaInfo.ID);
+                await Api.ClientWell.DeleteWellByIdAsync(well.MetaInfo.ID,
+                    well.LastModificationDate ?? throw new InvalidOperationException("The Well revision is missing."));
             }
             await UpdateSelectedClusterDepthReferenceSourceAsync();
             await OnInitializedAsync();

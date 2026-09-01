@@ -61,8 +61,11 @@ dotnet run --project WebApp
 - MCP access to every non-statistics REST operation.
 - Bounded, server-side Well search with stable pagination totals and filters for hierarchy, names, identities, features, and modification time.
 - Concurrency-safe APIs for adding, replacing, or removing one identity or feature assignment without resending the complete Well.
+- Concurrency-safe detail and location updates without resending the complete Well; Well deletion is also revision-checked.
 
-Well and catalog replacement operations use optimistic concurrency: callers send the `LastModificationDate` from their latest read as `expectedModifiedUtc`. Stale writes return `409` and do not overwrite the newer record. MCP closed-object schemas are also enforced at runtime, including rejection of unknown nested fields.
+Well mutations and catalog replacement operations use optimistic concurrency: callers send the `LastModificationDate` from their latest read as `expectedModifiedUtc`. Stale updates and deletes return `409` without changing the record. MCP closed-object schemas are also enforced at runtime, including rejection of unknown nested fields.
+
+Cluster and Slot UUIDs are external references owned by the Cluster service. Their UUID shape and Slot-requires-Cluster relationship are validated locally; external existence is not synchronously checked inside a Well database transaction.
 
 ## Data and upgrade safety
 
