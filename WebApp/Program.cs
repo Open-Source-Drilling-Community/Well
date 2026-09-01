@@ -20,6 +20,7 @@ WebPagesHostConfiguration webPagesConfiguration = new()
     UnitConversionHostURL = builder.Configuration["UnitConversionHostURL"] ?? string.Empty,
 };
 
+builder.Services.AddHttpClient();
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddMudServices(config =>

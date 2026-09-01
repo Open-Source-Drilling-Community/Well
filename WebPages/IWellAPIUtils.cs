@@ -32,9 +32,10 @@ public interface IWellAPIUtils
     string HostNameUnitConversion { get; }
     string HostBasePathUnitConversion { get; }
 
-    string HostNameVerticalDatum { get; }
-    string HostBasePathVerticalDatum { get; }
-    HttpClient HttpClientVerticalDatum { get; }
+    string HostNameEarthVerticalDatum { get; }
+    string HostBasePathEarthVerticalDatum { get; }
+    HttpClient HttpClientEarthVerticalDatum { get; }
+    Client ClientEarthVerticalDatum { get; }
 
     double EarthRadiusWGS84 { get; }
 }

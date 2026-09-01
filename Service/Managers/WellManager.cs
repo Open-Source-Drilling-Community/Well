@@ -419,6 +419,14 @@ namespace OSDC.Drilling.Well.Service.Managers
                     bool success = true;
                     try
                     {
+                        List<Model.WellMutationError> referenceErrors = WellReferenceIntegrityValidator.ValidateWell(connection, transaction, well);
+                        if (referenceErrors.Count > 0)
+                        {
+                            _logger.LogWarning("The Well contains invalid local identity or feature references: {Errors}",
+                                JsonSerializer.Serialize(referenceErrors, JsonSettings.Options));
+                            transaction.Rollback();
+                            return false;
+                        }
                         //add the Well to the WellTable
                         string metaInfo = JsonSerializer.Serialize(well.MetaInfo, JsonSettings.Options);
                         string data = JsonSerializer.Serialize(well, JsonSettings.Options);
@@ -490,6 +498,14 @@ namespace OSDC.Drilling.Well.Service.Managers
                     //update fields in WellTable
                     try
                     {
+                        List<Model.WellMutationError> referenceErrors = WellReferenceIntegrityValidator.ValidateWell(connection, transaction, well);
+                        if (referenceErrors.Count > 0)
+                        {
+                            _logger.LogWarning("The Well contains invalid local identity or feature references: {Errors}",
+                                JsonSerializer.Serialize(referenceErrors, JsonSettings.Options));
+                            transaction.Rollback();
+                            return false;
+                        }
                         string metaInfo = JsonSerializer.Serialize(well.MetaInfo, JsonSettings.Options);
                         string data = JsonSerializer.Serialize(well, JsonSettings.Options);
                         var command = connection.CreateCommand();

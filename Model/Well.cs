@@ -1,5 +1,6 @@
 using OSDC.DotnetLibraries.General.DataManagement;
 using System;
+using System.Collections.Generic;
 
 namespace OSDC.Drilling.Well.Model
 {
@@ -44,6 +45,16 @@ namespace OSDC.Drilling.Well.Model
         /// but is a single well for which the cluster is just a proxy
         /// </summary>
         public bool IsSingleWell { get; set; } = false;
+
+        /// <summary>
+        /// identities assigned to this well
+        /// </summary>
+        public List<WellIdentityAssignment>? WellIdentityAssignments { get; set; }
+
+        /// <summary>
+        /// features assigned to this well
+        /// </summary>
+        public List<WellFeatureAssignment>? WellFeatureAssignments { get; set; }
 
         /// <summary>
         /// default constructor required for JSON serialization

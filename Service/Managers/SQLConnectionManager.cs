@@ -11,8 +11,8 @@ namespace OSDC.Drilling.Well.Service.Managers
 {
     /// <summary>
     /// A manager for the sql database connection, registered as a singleton through dependency injection (see Program.cs)
-    /// Prior to creating a database, existing database structure is checked for consistency with the structure defined in tableStructureDict_
-    /// If inconsistent (table count, table names, fields count, fields names), a timestamped backup of the existing database is generated first
+    /// Existing databases are upgraded through additive, transactional schema migrations.
+    /// Malformed or unknown schemas fail startup and are never repaired by dropping user data.
     /// </summary>
     /// <remarks>
     /// SQLite database connection strategy:
@@ -33,6 +33,7 @@ namespace OSDC.Drilling.Well.Service.Managers
         public static readonly string HOME_DIRECTORY = ".." + Path.DirectorySeparatorChar + "home" + Path.DirectorySeparatorChar;
         public static readonly string DATABASE_FILENAME = "Well.db";
         public static readonly string DATE_TIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
+        public const int CURRENT_SCHEMA_VERSION = 1;
 
         // dictionary describing tables format
         private readonly static Dictionary<string, string[]> _tableStructureDict = new Dictionary<string, string[]>()
@@ -43,6 +44,24 @@ namespace OSDC.Drilling.Well.Service.Managers
                     "ClusterID text",
                     "SlotID text",
                     "Well text" }
+                },
+                { "WellIdentityTable", new string[] {
+                    "ID text primary key",
+                    "MetaInfo text",
+                    "Name text",
+                    "CreationDate text",
+                    "LastModificationDate text",
+                    "WellIdentity text" }
+                },
+                { "WellFeatureCategoryTable", new string[] {
+                    "ID text primary key",
+                    "MetaInfo text",
+                    "Name text",
+                    "IsExclusive integer",
+                    "HasValidityPeriod integer",
+                    "CreationDate text",
+                    "LastModificationDate text",
+                    "WellFeatureCategory text" }
                 }
             };
 
@@ -120,115 +139,77 @@ namespace OSDC.Drilling.Well.Service.Managers
         }
 
         /// <summary>
-        /// This function parses the existing database and check that its structure matches the expected one.
-        /// If not, the existing database is backed-up and the actual database is recreated from scratch
+        /// Applies additive schema migrations. Existing tables and rows are never dropped.
+        /// Unexpected or malformed structures fail startup without changing the database.
         /// </summary>
         private void ManageDataBase()
         {
-            var connection = GetConnection();
-            if (connection != null)
+            using var connection = GetConnection();
+            if (connection == null)
             {
-                bool parseOk = true;
-                bool createDb = false;
-                List<string> tableNameList = new();
-                string query = "SELECT name FROM sqlite_master WHERE type = 'table' AND name NOT LIKE 'sqlite_%';";
-
-                using (var command = new SqliteCommand(query, connection))
-                {
-                    using (var reader = command.ExecuteReader())
-                    {
-                        while (reader.Read())
-                        {
-                            tableNameList.Add(reader.GetString(0));
-                        }
-                    }
-                }
-
-                if (tableNameList.Count != _tableStructureDict.Count) // unexpected number of tables
-                {
-                    parseOk = false;
-                }
-                else
-                {
-                    foreach (var tableStruct in _tableStructureDict)
-                    {
-                        bool tmpSuccess = false;
-                        foreach (string tableName in tableNameList)
-                        {
-                            if (tableName == tableStruct.Key) // unexpected table names
-                            {
-                                tmpSuccess = true;
-                                break;
-                            }
-                        }
-                        if (!tmpSuccess ||
-                            !CheckDatabaseStructure(tableStruct)) // badly formatted table
-                        {
-                            parseOk = false;
-                            break;
-                        }
-                    }
-                }
-                if (!parseOk)
-                {
-                    createDb = true;
-                    if (tableNameList.Count > 0)
-                    {
-                        _logger.LogWarning("Unexpected structure of the existing database. A timestamped backup copy will be generated");
-                        // backup existing database
-                        string backupFileName = HOME_DIRECTORY + Path.DirectorySeparatorChar + DATABASE_FILENAME;
-                        string timeStamp = DateTime.UtcNow.ToString(DATE_TIME_FORMAT);
-                        backupFileName = backupFileName.Insert(backupFileName.Length - 3, "-" + timeStamp);
-                        try
-                        {
-                            File.Copy(HOME_DIRECTORY + Path.DirectorySeparatorChar + DATABASE_FILENAME, backupFileName);
-                        }
-                        catch (Exception ex)
-                        {
-                            _logger.LogError(ex, "Problem while generating a timestamped backup copy of the existing database");
-                        }
-                        // drop existing tables
-                        _logger.LogWarning("Dropping tables from existing database");
-                        foreach (string tableName in tableNameList)
-                        {
-                            if (!DropTable(tableName))
-                            {
-                                createDb = false;
-                                _logger.LogError("Impossible to drop {tableName}. Database may be corrupted, consider deleting it", tableName);
-                                break;
-                            }
-                        }
-                    }
-                }
-                if (createDb)
-                {
-                    _logger.LogInformation("Creating database tables");
-                    bool success = true;
-                    foreach (var tableStruct in _tableStructureDict)
-                    {
-                        string tableName = tableStruct.Key;
-                        if (CreateTable(tableStruct))
-                        {
-                            if (!IndexTable(tableName))
-                                success = false;
-                        }
-                        else
-                        {
-                            success = false;
-                        }
-                        if (!success)
-                        {
-                            if (!DropTable(tableName))
-                                _logger.LogError("Impossible to drop {key}. Database may be corrupted, consider deleting it", tableName);
-                        }
-
-                    }
-                }
+                throw new InvalidOperationException("Unable to open the Well database.");
             }
-            else
+
+            List<string> tableNames = [];
+            using (SqliteCommand command = connection.CreateCommand())
             {
-                _logger.LogError("Problem opening a new connection while managing database");
+                command.CommandText = "SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'";
+                using SqliteDataReader reader = command.ExecuteReader();
+                while (reader.Read()) tableNames.Add(reader.GetString(0));
             }
+
+            using SqliteCommand versionCommand = connection.CreateCommand();
+            versionCommand.CommandText = "PRAGMA user_version";
+            int schemaVersion = Convert.ToInt32(versionCommand.ExecuteScalar());
+            if (schemaVersion > CURRENT_SCHEMA_VERSION)
+                throw new InvalidOperationException($"Well database schema version {schemaVersion} is newer than supported version {CURRENT_SCHEMA_VERSION}.");
+
+            string[] legacyTables = ["WellTable"];
+            IEnumerable<string> permittedTables = schemaVersion == 0 ? legacyTables : _tableStructureDict.Keys;
+            List<string> unexpected = tableNames.Except(permittedTables, StringComparer.Ordinal).ToList();
+            if (unexpected.Count > 0)
+                throw new InvalidOperationException($"Unexpected Well database tables. No data was changed: [{string.Join(',', unexpected)}].");
+
+            if (tableNames.Contains("WellTable", StringComparer.Ordinal) &&
+                !CheckDatabaseStructure(new KeyValuePair<string, string[]>("WellTable", _tableStructureDict["WellTable"])))
+                throw new InvalidOperationException("The existing WellTable is malformed. No data was changed.");
+
+            if (schemaVersion == 0)
+            {
+                using SqliteTransaction transaction = connection.BeginTransaction();
+                try
+                {
+                    foreach (KeyValuePair<string, string[]> table in _tableStructureDict.Where(item => !tableNames.Contains(item.Key, StringComparer.Ordinal)))
+                    {
+                        using SqliteCommand create = connection.CreateCommand();
+                        create.Transaction = transaction;
+                        create.CommandText = $"CREATE TABLE {table.Key} ({string.Join(',', table.Value)})";
+                        create.ExecuteNonQuery();
+                        using SqliteCommand index = connection.CreateCommand();
+                        index.Transaction = transaction;
+                        index.CommandText = $"CREATE UNIQUE INDEX {table.Key}Index ON {table.Key} (ID)";
+                        index.ExecuteNonQuery();
+                    }
+                    using SqliteCommand setVersion = connection.CreateCommand();
+                    setVersion.Transaction = transaction;
+                    setVersion.CommandText = $"PRAGMA user_version = {CURRENT_SCHEMA_VERSION}";
+                    setVersion.ExecuteNonQuery();
+                    transaction.Commit();
+                }
+                catch
+                {
+                    transaction.Rollback();
+                    throw;
+                }
+                tableNames = _tableStructureDict.Keys.ToList();
+            }
+
+            List<string> missing = _tableStructureDict.Keys.Except(tableNames, StringComparer.Ordinal).ToList();
+            List<string> malformed = _tableStructureDict
+                .Where(table => tableNames.Contains(table.Key, StringComparer.Ordinal) && !CheckDatabaseStructure(table))
+                .Select(table => table.Key).ToList();
+            if (missing.Count > 0 || malformed.Count > 0)
+                throw new InvalidOperationException($"Unexpected Well database structure. No data was changed. Missing=[{string.Join(',', missing)}], malformed=[{string.Join(',', malformed)}].");
         }
 
         /// <summary>
@@ -283,92 +264,5 @@ namespace OSDC.Drilling.Well.Service.Managers
             return true;
         }
 
-        private bool CreateTable(KeyValuePair<string, string[]> tabStruct)
-        {
-            var connection = GetConnection();
-            if (connection != null)
-            {
-                var command = connection.CreateCommand();
-                string key = tabStruct.Key;
-                StringBuilder sb = new StringBuilder();
-                sb.Append($"CREATE TABLE {key} ()");
-                foreach (string col in tabStruct.Value)
-                {
-                    sb.Insert(sb.Length - 1, col + ",");
-                };
-                sb.Remove(sb.Length - 2, 1);
-                command.CommandText = sb.ToString();
-
-                try
-                {
-                    int res = command.ExecuteNonQuery();
-                    _logger.LogInformation("{key} has been successfully created", key);
-                }
-                catch (SqliteException ex)
-                {
-                    _logger.LogError(ex, "Impossible to create {key} which will be dropped", key);
-                    return false;
-                }
-            }
-            else
-            {
-                _logger.LogError("Problem opening a new connection while creating table");
-                return false;
-            }
-            return true;
-        }
-
-        private bool IndexTable(string dbName)
-        {
-            var connection = GetConnection();
-            if (connection != null)
-            {
-                var command = connection.CreateCommand();
-                command.CommandText = $"CREATE UNIQUE INDEX {dbName}Index ON {dbName} (ID)";
-                try
-                {
-                    int res = command.ExecuteNonQuery();
-                    _logger.LogInformation("{dbName} has been successfully indexed", dbName);
-                }
-                catch (SqliteException ex)
-                {
-                    _logger.LogError(ex, "Impossible to index {dbName} which will be dropped", dbName);
-                    return false;
-                }
-            }
-            else
-            {
-                _logger.LogError("Problem opening a new connection while creating table");
-                return false;
-            }
-            return true;
-        }
-
-        private bool DropTable(string dbName)
-        {
-            var connection = GetConnection();
-            if (connection != null)
-            {
-                var command = connection.CreateCommand();
-                command.CommandText =
-                            $"DROP TABLE {dbName}";
-                try
-                {
-                    int res = command.ExecuteNonQuery();
-                    _logger.LogWarning("{dbName} has been successfully dropped", dbName);
-                }
-                catch (SqliteException ex)
-                {
-                    _logger.LogError(ex, "Impossible to drop {dbName}", dbName);
-                    return false;
-                }
-            }
-            else
-            {
-                _logger.LogError("Problem opening a new connection while creating table");
-                return false;
-            }
-            return true;
-        }
     }
 }

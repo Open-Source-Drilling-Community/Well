@@ -1,5 +1,3 @@
-using System.Net.Http.Json;
-using System.Text.Json;
 using ModelShared = OSDC.Drilling.Well.ModelShared;
 
 namespace OSDC.Drilling.Well.WebPages;
@@ -10,9 +8,7 @@ public static class MslDepthReferenceUtils
     {
         ModelShared.Slot? slot = ResolveSlot(well, clusters);
         return CalculateMeanSeaLevelDepthReferenceAsync(
-            api.HttpClientVerticalDatum,
-            api.HostNameVerticalDatum,
-            api.HostBasePathVerticalDatum,
+            api,
             slot?.Latitude?.GaussianValue?.Mean,
             slot?.Longitude?.GaussianValue?.Mean);
     }
@@ -34,60 +30,30 @@ public static class MslDepthReferenceUtils
         return cluster?.Slots?.Values.FirstOrDefault(slot => slot?.ID == slotId);
     }
 
-    private static async Task<double?> CalculateMeanSeaLevelDepthReferenceAsync(HttpClient client, string hostName, string hostBasePath, double? latitude, double? longitude)
+    public static async Task<double?> CalculateMeanSeaLevelDepthReferenceAsync(
+        IWellAPIUtils api,
+        double? latitude,
+        double? longitude)
     {
         if (latitude == null || longitude == null)
         {
             return null;
         }
 
-        Guid orderId = Guid.NewGuid();
-        object order = new
+        ModelShared.MeanSeaLevelToWgs84Request request = new()
         {
-            MetaInfo = new { ID = orderId, HttpHostName = hostName, HttpHostBasePath = hostBasePath, HttpEndPoint = "VerticalDatumOrder/" },
-            Name = $"MSL reference {orderId}",
-            Description = "Temporary MSL-to-WGS84 conversion.",
-            CreationDate = DateTimeOffset.UtcNow,
-            LastModificationDate = DateTimeOffset.UtcNow,
-            VerticalDatum = new
-            {
-                MetaInfo = new { ID = Guid.NewGuid(), HttpHostName = hostName, HttpHostBasePath = hostBasePath, HttpEndPoint = "VerticalDatum/" },
-                Name = $"MSL reference {orderId}",
-                Description = "Temporary MSL-to-WGS84 conversion.",
-                CreationDate = DateTimeOffset.UtcNow,
-                LastModificationDate = DateTimeOffset.UtcNow,
-                DatumSet = new[] { new { Latitude = latitude.Value, Longitude = longitude.Value, GenericVerticalDatum = 0 } },
-                ConversionFrom = "FromMeanSeaLevel",
-                Type = "Raw"
-            }
+            Positions =
+            [
+                new ModelShared.EarthVerticalDatumPosition
+                {
+                    Latitude = latitude.Value,
+                    Longitude = longitude.Value,
+                    MeanSeaLevelDepth = 0
+                }
+            ]
         };
-
-        try
-        {
-            using HttpResponseMessage postResponse = await client.PostAsJsonAsync("VerticalDatumOrder", order);
-            postResponse.EnsureSuccessStatusCode();
-
-            using JsonDocument document = await client.GetFromJsonAsync<JsonDocument>($"VerticalDatumOrder/{orderId}") ?? throw new InvalidOperationException("VerticalDatumOrder response was empty.");
-            JsonElement datumSet = document.RootElement.GetProperty("VerticalDatum").GetProperty("DatumSet");
-            if (datumSet.GetArrayLength() == 0 ||
-                !datumSet[0].TryGetProperty("VerticalDatumWGS64", out JsonElement valueElement) ||
-                valueElement.ValueKind == JsonValueKind.Null)
-            {
-                return null;
-            }
-
-            return -valueElement.GetDouble();
-        }
-        finally
-        {
-            try
-            {
-                await client.DeleteAsync($"VerticalDatumOrder/{orderId}");
-            }
-            catch
-            {
-                // Best-effort cleanup of a temporary calculation order.
-            }
-        }
+        ModelShared.MeanSeaLevelToWgs84Response response =
+            await api.ClientEarthVerticalDatum.ConvertMeanSeaLevelToWgs84Async(request);
+        return response.Samples?.FirstOrDefault()?.Wgs84EllipsoidalDepth;
     }
 }

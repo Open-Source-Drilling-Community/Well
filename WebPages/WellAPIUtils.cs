@@ -29,8 +29,9 @@ public class WellAPIUtils : APIUtils, IWellAPIUtils
 
         HostNameUnitConversion = Require(configuration.UnitConversionHostURL, nameof(configuration.UnitConversionHostURL));
 
-        HostNameVerticalDatum = Require(configuration.EarthVerticalDatumHostURL, nameof(configuration.EarthVerticalDatumHostURL));
-        HttpClientVerticalDatum = SetHttpClient(HostNameVerticalDatum, HostBasePathVerticalDatum);
+        HostNameEarthVerticalDatum = Require(configuration.EarthVerticalDatumHostURL, nameof(configuration.EarthVerticalDatumHostURL));
+        HttpClientEarthVerticalDatum = SetHttpClient(HostNameEarthVerticalDatum, HostBasePathEarthVerticalDatum);
+        ClientEarthVerticalDatum = new Client(HttpClientEarthVerticalDatum.BaseAddress!.ToString(), HttpClientEarthVerticalDatum);
     }
 
     private static string Require(string? value, string propertyName)
@@ -71,9 +72,10 @@ public class WellAPIUtils : APIUtils, IWellAPIUtils
     public string HostNameUnitConversion { get; }
     public string HostBasePathUnitConversion { get; } = "UnitConversion/api/";
 
-    public string HostNameVerticalDatum { get; }
-    public string HostBasePathVerticalDatum { get; } = "VerticalDatum/api/";
-    public HttpClient HttpClientVerticalDatum { get; }
+    public string HostNameEarthVerticalDatum { get; }
+    public string HostBasePathEarthVerticalDatum { get; } = "EarthVerticalDatum/api/";
+    public HttpClient HttpClientEarthVerticalDatum { get; }
+    public Client ClientEarthVerticalDatum { get; }
 
     public double EarthRadiusWGS84 { get; } = 6378137.0;
 }
