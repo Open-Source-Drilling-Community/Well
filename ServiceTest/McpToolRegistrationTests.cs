@@ -17,6 +17,7 @@ public sealed class McpToolRegistrationTests
         ["GetAllWellMetaInfo"] = "well_get_all_meta_info",
         ["GetWellById"] = "well_get_by_id",
         ["GetAllWell"] = "well_get_all",
+        ["SearchWells"] = "well_search",
         ["BatchExportWells"] = "well_batch_export",
         ["BatchRestoreWells"] = "well_batch_restore",
         ["GetAllWellBySlotId"] = "well_get_all_by_slot_id",
@@ -24,6 +25,12 @@ public sealed class McpToolRegistrationTests
         ["GetAllUsedSlotMetaInfoByClusterId"] = "well_get_used_slot_meta_info_by_cluster_id",
         ["PostWell"] = "well_create",
         ["PutWellById"] = "well_update_by_id",
+        ["PostWellIdentityAssignment"] = "well_identity_assignment_add",
+        ["PutWellIdentityAssignment"] = "well_identity_assignment_update_by_id",
+        ["DeleteWellIdentityAssignment"] = "well_identity_assignment_delete_by_id",
+        ["PostWellFeatureAssignment"] = "well_feature_assignment_add",
+        ["PutWellFeatureAssignment"] = "well_feature_assignment_update_by_id",
+        ["DeleteWellFeatureAssignment"] = "well_feature_assignment_delete_by_id",
         ["DeleteWellById"] = "well_delete_by_id",
         ["GetAllWellIdentityId"] = "well_identity_get_all_ids",
         ["GetAllWellIdentityMetaInfo"] = "well_identity_get_all_meta_info",
@@ -99,7 +106,7 @@ public sealed class McpToolRegistrationTests
         foreach ((string name, IMcpTool tool) in _tools.Where(pair => pair.Key != "ping"))
         {
             Assert.That(tool.Behavior.OpenWorldHint, Is.False, name);
-            if (name.Contains("_get_", StringComparison.Ordinal) || name == "well_batch_export")
+            if (name.Contains("_get_", StringComparison.Ordinal) || name is "well_batch_export" or "well_search")
             {
                 Assert.Multiple(() =>
                 {
@@ -179,6 +186,34 @@ public sealed class McpToolRegistrationTests
         Assert.That(Property(root, "id")["format"]?.GetValue<string>(), Is.EqualTo("uuid"));
         Assert.That(Property(root, "id")["description"]?.GetValue<string>(), Does.Contain("well.MetaInfo.ID"));
         Assert.That(Property(root, "expectedModifiedUtc")["format"]?.GetValue<string>(), Is.EqualTo("date-time"));
+    }
+
+    [Test]
+    public void Search_contract_exposes_bounded_pagination_and_supported_filters()
+    {
+        JsonObject root = RequireObject(_tools["well_search"].InputSchema);
+        Assert.That(PropertyNames(root), Is.EquivalentTo(new[]
+        {
+            "offset", "limit", "name", "clusterId", "slotId", "identityId", "identityValue",
+            "featureCategoryId", "featureOptionId", "modifiedFromUtc", "modifiedToUtc"
+        }));
+        Assert.That(Property(root, "limit")["maximum"]?.GetValue<int>(), Is.EqualTo(200));
+        Assert.That(root["additionalProperties"]?.GetValue<bool>(), Is.False);
+    }
+
+    [TestCase("well_identity_assignment_add", false)]
+    [TestCase("well_identity_assignment_update_by_id", true)]
+    [TestCase("well_feature_assignment_add", false)]
+    [TestCase("well_feature_assignment_update_by_id", true)]
+    public void Assignment_mutation_contract_requires_revision_and_scoped_body(string toolName, bool hasAssignmentId)
+    {
+        JsonObject root = RequireObject(_tools[toolName].InputSchema);
+        string[] expected = hasAssignmentId
+            ? ["wellId", "assignmentId", "expectedModifiedUtc", "assignment"]
+            : ["wellId", "expectedModifiedUtc", "assignment"];
+        Assert.That(RequiredNames(root), Is.EquivalentTo(expected));
+        Assert.That(Property(root, "expectedModifiedUtc")["format"]?.GetValue<string>(), Is.EqualTo("date-time"));
+        Assert.That(Property(root, "assignment")["additionalProperties"]?.GetValue<bool>(), Is.False);
     }
 
     [TestCase("well_identity_update_by_id", "wellIdentity")]
@@ -296,6 +331,28 @@ public sealed class McpToolRegistrationTests
         {
             ["id"] = Guid.NewGuid().ToString(),
             ["well"] = new JsonObject()
+        }, CancellationToken.None) as JsonObject;
+        Assert.That(response?["status"]?.GetValue<int>(), Is.EqualTo(400));
+    }
+
+    [Test]
+    public async Task Search_tool_rejects_malformed_filters_before_controller_invocation()
+    {
+        JsonObject? response = await _tools["well_search"].InvokeAsync(new JsonObject
+        {
+            ["clusterId"] = "not-a-uuid"
+        }, CancellationToken.None) as JsonObject;
+        Assert.That(response?["status"]?.GetValue<int>(), Is.EqualTo(400));
+    }
+
+    [TestCase("well_identity_assignment_add")]
+    [TestCase("well_feature_assignment_add")]
+    public async Task Assignment_add_tools_require_concurrency_timestamp_at_runtime(string toolName)
+    {
+        JsonObject? response = await _tools[toolName].InvokeAsync(new JsonObject
+        {
+            ["wellId"] = Guid.NewGuid().ToString(),
+            ["assignment"] = new JsonObject()
         }, CancellationToken.None) as JsonObject;
         Assert.That(response?["status"]?.GetValue<int>(), Is.EqualTo(400));
     }

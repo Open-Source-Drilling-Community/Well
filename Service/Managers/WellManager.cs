@@ -361,6 +361,51 @@ namespace OSDC.Drilling.Well.Service.Managers
             return null;
         }
 
+        /// <summary>Returns one deterministically ordered page of Wells matching the supplied filters.</summary>
+        public WellSearchResult? SearchWells(int offset, int limit, string? name, Guid? clusterId, Guid? slotId,
+            Guid? identityId, string? identityValue, Guid? featureCategoryId, Guid? featureOptionId,
+            DateTimeOffset? modifiedFromUtc, DateTimeOffset? modifiedToUtc)
+        {
+            List<Model.Well?>? documents = GetAllWell();
+            if (documents == null) return null;
+
+            IEnumerable<Model.Well> query = documents.Where(value => value != null).Cast<Model.Well>();
+            if (!string.IsNullOrWhiteSpace(name))
+                query = query.Where(value => value.Name?.Contains(name.Trim(), StringComparison.OrdinalIgnoreCase) == true);
+            if (clusterId is Guid cluster)
+                query = query.Where(value => value.ClusterID == cluster);
+            if (slotId is Guid slot)
+                query = query.Where(value => value.SlotID == slot);
+            if (identityId is Guid identity || !string.IsNullOrWhiteSpace(identityValue))
+            {
+                string? soughtValue = string.IsNullOrWhiteSpace(identityValue) ? null : identityValue.Trim();
+                query = query.Where(value => (value.WellIdentityAssignments ?? []).Any(assignment =>
+                    (identityId is not Guid requiredIdentity || assignment.IdentityID == requiredIdentity) &&
+                    (soughtValue == null || assignment.Value?.Contains(soughtValue, StringComparison.OrdinalIgnoreCase) == true)));
+            }
+            if (featureCategoryId is Guid category || featureOptionId is Guid option)
+            {
+                query = query.Where(value => (value.WellFeatureAssignments ?? []).Any(assignment =>
+                    (featureCategoryId is not Guid requiredCategory || assignment.FeatureCategoryID == requiredCategory) &&
+                    (featureOptionId is not Guid requiredOption || assignment.FeatureOptionID == requiredOption)));
+            }
+            if (modifiedFromUtc is DateTimeOffset modifiedFrom)
+                query = query.Where(value => WellMutationManager.RevisionOf(value) >= modifiedFrom);
+            if (modifiedToUtc is DateTimeOffset modifiedTo)
+                query = query.Where(value => WellMutationManager.RevisionOf(value) <= modifiedTo);
+
+            List<Model.Well> matches = query
+                .OrderBy(value => value.MetaInfo?.ID ?? Guid.Empty)
+                .ToList();
+            return new WellSearchResult
+            {
+                Total = matches.Count,
+                Offset = offset,
+                Limit = limit,
+                Items = matches.Skip(offset).Take(limit).ToList()
+            };
+        }
+
         /// <summary>Creates a dependency-closed Well backup from one SQLite snapshot.</summary>
         public WellBatchExportOutcome ExportBatch(WellBatchExportRequest? request)
         {
@@ -499,6 +544,24 @@ namespace OSDC.Drilling.Well.Service.Managers
 
         internal WellMutationResult UpdateWell(Guid guid, DateTimeOffset expectedModifiedUtc, Model.Well? well) =>
             WellMutationManager.Update(_connectionManager, _logger, guid, expectedModifiedUtc, well);
+
+        internal WellMutationResult AddIdentityAssignment(Guid wellId, DateTimeOffset expectedModifiedUtc, WellIdentityAssignment? assignment) =>
+            WellMutationManager.AddIdentityAssignment(_connectionManager, _logger, wellId, expectedModifiedUtc, assignment);
+
+        internal WellMutationResult UpdateIdentityAssignment(Guid wellId, Guid assignmentId, DateTimeOffset expectedModifiedUtc, WellIdentityAssignment? assignment) =>
+            WellMutationManager.UpdateIdentityAssignment(_connectionManager, _logger, wellId, assignmentId, expectedModifiedUtc, assignment);
+
+        internal WellMutationResult DeleteIdentityAssignment(Guid wellId, Guid assignmentId, DateTimeOffset expectedModifiedUtc) =>
+            WellMutationManager.DeleteIdentityAssignment(_connectionManager, _logger, wellId, assignmentId, expectedModifiedUtc);
+
+        internal WellMutationResult AddFeatureAssignment(Guid wellId, DateTimeOffset expectedModifiedUtc, WellFeatureAssignment? assignment) =>
+            WellMutationManager.AddFeatureAssignment(_connectionManager, _logger, wellId, expectedModifiedUtc, assignment);
+
+        internal WellMutationResult UpdateFeatureAssignment(Guid wellId, Guid assignmentId, DateTimeOffset expectedModifiedUtc, WellFeatureAssignment? assignment) =>
+            WellMutationManager.UpdateFeatureAssignment(_connectionManager, _logger, wellId, assignmentId, expectedModifiedUtc, assignment);
+
+        internal WellMutationResult DeleteFeatureAssignment(Guid wellId, Guid assignmentId, DateTimeOffset expectedModifiedUtc) =>
+            WellMutationManager.DeleteFeatureAssignment(_connectionManager, _logger, wellId, assignmentId, expectedModifiedUtc);
 
         /// <summary>
         /// Deletes the Well of given ID from the microservice database

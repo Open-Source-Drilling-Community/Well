@@ -14,11 +14,12 @@ internal enum WellMutationFailureKind
 
 internal sealed record WellMutationResult(
     WellMutationFailureKind FailureKind,
-    WellMutationErrorEnvelope? Error = null)
+    WellMutationErrorEnvelope? Error = null,
+    Model.Well? Resource = null)
 {
     public bool Succeeded => FailureKind == WellMutationFailureKind.None;
 
-    public static WellMutationResult Success() => new(WellMutationFailureKind.None);
+    public static WellMutationResult Success(Model.Well? resource = null) => new(WellMutationFailureKind.None, Resource: resource);
 
     public static WellMutationResult Invalid(string property, string code, string message) =>
         Failure(WellMutationFailureKind.InvalidRequest, "invalid_request", "The mutation request is invalid.", property, code, message);

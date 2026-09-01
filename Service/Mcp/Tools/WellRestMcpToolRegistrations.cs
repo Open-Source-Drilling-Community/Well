@@ -14,6 +14,8 @@ using WellBatchExportRequestModel = OSDC.Drilling.Well.Model.WellBatchExportRequ
 using WellBatchRestoreRequestModel = OSDC.Drilling.Well.Model.WellBatchRestoreRequest;
 using WellIdentityModel = OSDC.Drilling.Well.Model.WellIdentity;
 using WellFeatureCategoryModel = OSDC.Drilling.Well.Model.WellFeatureCategory;
+using WellIdentityAssignmentModel = OSDC.Drilling.Well.Model.WellIdentityAssignment;
+using WellFeatureAssignmentModel = OSDC.Drilling.Well.Model.WellFeatureAssignment;
 
 namespace OSDC.Drilling.Well.Service.Mcp.Tools;
 
@@ -34,6 +36,8 @@ public static class WellRestMcpToolRegistrations
             (sp, args, ct) => InvokeByGuid(args, "id", ct, id => Controller(sp).GetWellById(id)));
         services.AddLegacyMcpTool("well_get_all", "Retrieve every stored well as a complete record. Use the ID or metadata listing tools instead when full data is unnecessary. On success, data contains an array of Well objects and the response contains an HTTP-style status code.", McpToolArgumentHelpers.CreateEmptySchema(), McpToolArgumentHelpers.CreateWellListOutputSchema(), new("List Wells", true, false, true, false),
             (sp, args, ct) => InvokeNoArguments(args, ct, () => Controller(sp).GetAllWell()));
+        services.AddLegacyMcpTool("well_search", "Return one deterministic page of complete Wells with a total match count. Optional filters support case-insensitive name and identity-value matching, exact cluster, slot, identity, feature-category and feature-option UUIDs, and inclusive modification timestamps. Limit is capped at 200.", McpToolArgumentHelpers.CreateWellSearchSchema(), McpToolArgumentHelpers.CreateWellSearchOutputSchema(), new("Search Wells", true, false, true, false),
+            (sp, args, ct) => InvokeSearch(args, ct, () => Controller(sp)));
         services.AddLegacyMcpTool("well_batch_export", "Create a read-only schema-version-1 JSON backup of all stored wells or an explicitly ordered selection. The result contains complete Well records and only the Well Identity and Well Feature Category definitions and options referenced by those records. Cluster and Slot identifiers remain external references. A missing or invalid selected well rejects the complete export.", McpToolArgumentHelpers.CreateWellBatchExportSchema(), McpToolArgumentHelpers.CreateWellBatchExportOutputSchema(), new("Export Wells with Catalog Dependencies", true, false, true, false),
             (sp, args, ct) => InvokeWithBodyResult<WellBatchExportRequestModel, OSDC.Drilling.Well.Model.WellBatchExportDocument>(args, "request", ct, request => Controller(sp).BatchExportWells(request)));
         services.AddLegacyMcpTool("well_batch_restore", "Validate and atomically restore a schema-version-1 Well backup document. Source catalog UUIDs map to compatible local definitions by exact UUID or unique normalized name; MapOrCreateMissing can create missing definitions and options. ReplaceExisting can replace matching Well UUIDs. Catalog mapping, reference rewriting, catalog creation, and all Well writes use one transaction, so a validation, conflict, or storage failure changes nothing.", McpToolArgumentHelpers.CreateWellBatchRestoreSchema(), McpToolArgumentHelpers.CreateWellBatchRestoreOutputSchema(), new("Restore Wells and Catalog Dependencies", false, true, false, false),
@@ -48,6 +52,18 @@ public static class WellRestMcpToolRegistrations
             (sp, args, ct) => InvokeWithBody<WellModel>(args, "well", ct, data => Controller(sp).PostWell(data)));
         services.AddLegacyMcpTool("well_update_by_id", "Replace the stored data for an existing well. The top-level id and well.MetaInfo.ID must be the same non-empty UUID; expectedModifiedUtc must equal the LastModificationDate from the latest read. Include the complete desired Well object because this is a full update. A stale revision returns 409 without changing data.", McpToolArgumentHelpers.CreateWellSchema(includeId: true), McpToolArgumentHelpers.CreateStatusOnlyOutputSchema(), new("Update Well", false, true, true, false),
             (sp, args, ct) => InvokeWithIdTimestampAndBody<WellModel>(args, "well", ct, (id, expected, data) => Controller(sp).PutWellById(id, expected, data)));
+        services.AddLegacyMcpTool("well_identity_assignment_add", "Add one identity assignment to an existing Well without resending the complete Well document. Supply a caller-generated assignment.ID and the latest Well LastModificationDate as expectedModifiedUtc. The updated Well and its new revision are returned.", McpToolArgumentHelpers.CreateIdentityAssignmentMutationSchema(false, true), McpToolArgumentHelpers.CreateWellOutputSchema(), new("Add Well Identity Assignment", false, false, false, false),
+            (sp, args, ct) => InvokeAssignmentAdd<WellIdentityAssignmentModel>(args, ct, (wellId, expected, assignment) => Controller(sp).PostWellIdentityAssignment(wellId, expected, assignment)));
+        services.AddLegacyMcpTool("well_identity_assignment_update_by_id", "Replace one identity assignment selected by assignmentId without resending other Well fields or assignments. The body ID must match assignmentId and expectedModifiedUtc must match the latest Well revision. Returns the updated Well.", McpToolArgumentHelpers.CreateIdentityAssignmentMutationSchema(true, true), McpToolArgumentHelpers.CreateWellOutputSchema(), new("Update Well Identity Assignment", false, true, true, false),
+            (sp, args, ct) => InvokeAssignmentUpdate<WellIdentityAssignmentModel>(args, ct, (wellId, assignmentId, expected, assignment) => Controller(sp).PutWellIdentityAssignment(wellId, assignmentId, expected, assignment)));
+        services.AddLegacyMcpTool("well_identity_assignment_delete_by_id", "Remove one identity assignment selected by assignmentId without resending the complete Well. expectedModifiedUtc must match the latest Well revision; stale requests change nothing. Returns the updated Well and its new revision.", McpToolArgumentHelpers.CreateIdentityAssignmentMutationSchema(true, false), McpToolArgumentHelpers.CreateWellOutputSchema(), new("Delete Well Identity Assignment", false, true, true, false),
+            (sp, args, ct) => InvokeAssignmentDelete(args, ct, (wellId, assignmentId, expected) => Controller(sp).DeleteWellIdentityAssignment(wellId, assignmentId, expected)));
+        services.AddLegacyMcpTool("well_feature_assignment_add", "Add one feature assignment to an existing Well without resending the complete Well document. The category, option, validity period and exclusivity rules are validated atomically, and the updated Well with its new revision is returned.", McpToolArgumentHelpers.CreateFeatureAssignmentMutationSchema(false, true), McpToolArgumentHelpers.CreateWellOutputSchema(), new("Add Well Feature Assignment", false, false, false, false),
+            (sp, args, ct) => InvokeAssignmentAdd<WellFeatureAssignmentModel>(args, ct, (wellId, expected, assignment) => Controller(sp).PostWellFeatureAssignment(wellId, expected, assignment)));
+        services.AddLegacyMcpTool("well_feature_assignment_update_by_id", "Replace one feature assignment selected by assignmentId without resending other Well data. The body ID must match assignmentId, expectedModifiedUtc must match the latest Well revision, and all category validity and exclusivity rules remain enforced.", McpToolArgumentHelpers.CreateFeatureAssignmentMutationSchema(true, true), McpToolArgumentHelpers.CreateWellOutputSchema(), new("Update Well Feature Assignment", false, true, true, false),
+            (sp, args, ct) => InvokeAssignmentUpdate<WellFeatureAssignmentModel>(args, ct, (wellId, assignmentId, expected, assignment) => Controller(sp).PutWellFeatureAssignment(wellId, assignmentId, expected, assignment)));
+        services.AddLegacyMcpTool("well_feature_assignment_delete_by_id", "Remove one feature assignment selected by assignmentId without resending the complete Well. expectedModifiedUtc must match the latest Well revision; stale requests change nothing. Returns the updated Well and its new revision.", McpToolArgumentHelpers.CreateFeatureAssignmentMutationSchema(true, false), McpToolArgumentHelpers.CreateWellOutputSchema(), new("Delete Well Feature Assignment", false, true, true, false),
+            (sp, args, ct) => InvokeAssignmentDelete(args, ct, (wellId, assignmentId, expected) => Controller(sp).DeleteWellFeatureAssignment(wellId, assignmentId, expected)));
         services.AddLegacyMcpTool("well_delete_by_id", "Permanently delete one stored well by UUID. Confirm the target identifier before calling because this operation removes the record. Returns status 200 on success, 404 when the well does not exist, and 400 for an empty UUID.", McpToolArgumentHelpers.CreateGuidSchema("id", "Unique identifier of the well to delete."), McpToolArgumentHelpers.CreateStatusOnlyOutputSchema(), new("Delete Well", false, true, true, false),
             (sp, args, ct) => InvokeDelete(args, ct, id => Controller(sp).DeleteWellById(id)));
         AddCatalogCrudTools<WellIdentityModel>(
@@ -168,6 +184,69 @@ public static class WellRestMcpToolRegistrations
             : Task.FromResult(error);
     }
 
+    private static Task<JsonNode?> InvokeSearch(JsonObject? args, CancellationToken ct, Func<WellController> controller)
+    {
+        ct.ThrowIfCancellationRequested();
+        string[] allowed = ["offset", "limit", "name", "clusterId", "slotId", "identityId", "identityValue",
+            "featureCategoryId", "featureOptionId", "modifiedFromUtc", "modifiedToUtc"];
+        if (!HasOnlyArguments(args, out JsonNode? unexpected, allowed)) return Task.FromResult(unexpected);
+        try
+        {
+            WellSearchArguments query = args?.Deserialize<WellSearchArguments>(StrictInputOptions) ?? new();
+            return Task.FromResult<JsonNode?>(McpActionResultConverter.FromActionResult(controller().SearchWells(
+                query.Offset, query.Limit, query.Name, query.ClusterId, query.SlotId, query.IdentityId,
+                query.IdentityValue, query.FeatureCategoryId, query.FeatureOptionId,
+                query.ModifiedFromUtc, query.ModifiedToUtc)));
+        }
+        catch (Exception ex) when (ex is JsonException or InvalidOperationException or NotSupportedException)
+        {
+            return Task.FromResult<JsonNode?>(McpToolResponses.CreateValidationError("One or more Well search arguments are malformed."));
+        }
+    }
+
+    private static Task<JsonNode?> InvokeAssignmentAdd<T>(JsonObject? args, CancellationToken ct,
+        Func<Guid, DateTimeOffset, T?, ActionResult> action)
+    {
+        ct.ThrowIfCancellationRequested();
+        if (!HasOnlyArguments(args, out JsonNode? unexpected, "wellId", "expectedModifiedUtc", "assignment")) return Task.FromResult(unexpected);
+        if (!TryAssignmentMutationArguments(args, includeAssignmentId: false, out Guid wellId, out _, out DateTimeOffset expected, out JsonNode? parseError)) return Task.FromResult(parseError);
+        return TryDeserialize(args, "assignment", out T? assignment, out JsonNode? bodyError)
+            ? Task.FromResult<JsonNode?>(McpActionResultConverter.FromActionResult(action(wellId, expected, assignment)))
+            : Task.FromResult(bodyError);
+    }
+
+    private static Task<JsonNode?> InvokeAssignmentUpdate<T>(JsonObject? args, CancellationToken ct,
+        Func<Guid, Guid, DateTimeOffset, T?, ActionResult> action)
+    {
+        ct.ThrowIfCancellationRequested();
+        if (!HasOnlyArguments(args, out JsonNode? unexpected, "wellId", "assignmentId", "expectedModifiedUtc", "assignment")) return Task.FromResult(unexpected);
+        if (!TryAssignmentMutationArguments(args, includeAssignmentId: true, out Guid wellId, out Guid assignmentId, out DateTimeOffset expected, out JsonNode? parseError)) return Task.FromResult(parseError);
+        return TryDeserialize(args, "assignment", out T? assignment, out JsonNode? bodyError)
+            ? Task.FromResult<JsonNode?>(McpActionResultConverter.FromActionResult(action(wellId, assignmentId, expected, assignment)))
+            : Task.FromResult(bodyError);
+    }
+
+    private static Task<JsonNode?> InvokeAssignmentDelete(JsonObject? args, CancellationToken ct,
+        Func<Guid, Guid, DateTimeOffset, ActionResult> action)
+    {
+        ct.ThrowIfCancellationRequested();
+        if (!HasOnlyArguments(args, out JsonNode? unexpected, "wellId", "assignmentId", "expectedModifiedUtc")) return Task.FromResult(unexpected);
+        return TryAssignmentMutationArguments(args, includeAssignmentId: true, out Guid wellId, out Guid assignmentId,
+            out DateTimeOffset expected, out JsonNode? parseError)
+            ? Task.FromResult<JsonNode?>(McpActionResultConverter.FromActionResult(action(wellId, assignmentId, expected)))
+            : Task.FromResult(parseError);
+    }
+
+    private static bool TryAssignmentMutationArguments(JsonObject? args, bool includeAssignmentId,
+        out Guid wellId, out Guid assignmentId, out DateTimeOffset expected, out JsonNode? error)
+    {
+        assignmentId = Guid.Empty;
+        expected = default;
+        if (!McpToolArgumentHelpers.TryParseGuid(args, "wellId", out wellId, out error)) return false;
+        if (includeAssignmentId && !McpToolArgumentHelpers.TryParseGuid(args, "assignmentId", out assignmentId, out error)) return false;
+        return McpToolArgumentHelpers.TryParseDateTimeOffset(args, "expectedModifiedUtc", out expected, out error);
+    }
+
     private static bool TryDeserialize<T>(JsonObject? args, string bodyName, out T? data, out JsonNode? error)
     {
         data = default;
@@ -204,6 +283,21 @@ public static class WellRestMcpToolRegistrations
             }
         }
         return true;
+    }
+
+    private sealed class WellSearchArguments
+    {
+        [JsonPropertyName("offset")] public int Offset { get; set; }
+        [JsonPropertyName("limit")] public int Limit { get; set; } = 50;
+        [JsonPropertyName("name")] public string? Name { get; set; }
+        [JsonPropertyName("clusterId")] public Guid? ClusterId { get; set; }
+        [JsonPropertyName("slotId")] public Guid? SlotId { get; set; }
+        [JsonPropertyName("identityId")] public Guid? IdentityId { get; set; }
+        [JsonPropertyName("identityValue")] public string? IdentityValue { get; set; }
+        [JsonPropertyName("featureCategoryId")] public Guid? FeatureCategoryId { get; set; }
+        [JsonPropertyName("featureOptionId")] public Guid? FeatureOptionId { get; set; }
+        [JsonPropertyName("modifiedFromUtc")] public DateTimeOffset? ModifiedFromUtc { get; set; }
+        [JsonPropertyName("modifiedToUtc")] public DateTimeOffset? ModifiedToUtc { get; set; }
     }
 
     private static WellController Controller(IServiceProvider sp) => new(

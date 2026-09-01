@@ -59,6 +59,8 @@ dotnet run --project WebApp
 - Cartographic, vertical datum, gravity, and magnetic-field calculators.
 - Per-endpoint usage-statistics dashboard.
 - MCP access to every non-statistics REST operation.
+- Bounded, server-side Well search with stable pagination totals and filters for hierarchy, names, identities, features, and modification time.
+- Concurrency-safe APIs for adding, replacing, or removing one identity or feature assignment without resending the complete Well.
 
 Well and catalog replacement operations use optimistic concurrency: callers send the `LastModificationDate` from their latest read as `expectedModifiedUtc`. Stale writes return `409` and do not overwrite the newer record. MCP closed-object schemas are also enforced at runtime, including rejection of unknown nested fields.
 

@@ -33,8 +33,8 @@ namespace OSDC.Drilling.Well.ServiceTest
         public void SetUp()
         {
             // Reset WellManager singleton to avoid cross-test pollution
-            var instField = typeof(WellManager).GetField("_instance", BindingFlags.Static | BindingFlags.NonPublic);
-            instField?.SetValue(null, null);
+            foreach (Type managerType in new[] { typeof(WellManager), typeof(WellIdentityManager), typeof(WellFeatureCategoryManager) })
+                managerType.GetField("_instance", BindingFlags.Static | BindingFlags.NonPublic)?.SetValue(null, null);
 
             // unique DB file under test work dir per test
             var dbPath = Path.Combine(TestContext.CurrentContext.WorkDirectory, $"WellTests_{Guid.NewGuid()}.db");
@@ -198,6 +198,127 @@ namespace OSDC.Drilling.Well.ServiceTest
             var updated = ((Microsoft.AspNetCore.Mvc.OkObjectResult)updatedRead.Result!).Value as WellModel;
             Assert.That(updated!.Name, Is.EqualTo("Updated legacy Well"));
             Assert.That(updated.LastModificationDate, Is.GreaterThan(DateTimeOffset.UnixEpoch));
+        }
+
+        [Test]
+        public void SearchWells_FiltersAndPaginatesWithStableTotal()
+        {
+            Guid cluster = Guid.NewGuid();
+            WellModel first = NewWell(Guid.Parse("00000000-0000-0000-0000-000000000001"), cluster, Guid.NewGuid());
+            first.Name = "Alpha North";
+            WellModel second = NewWell(Guid.Parse("00000000-0000-0000-0000-000000000002"), cluster, Guid.NewGuid());
+            second.Name = "Alpha South";
+            WellModel third = NewWell(Guid.Parse("00000000-0000-0000-0000-000000000003"));
+            third.Name = "Beta";
+            Assert.That(_controller.PostWell(first), Is.InstanceOf<Microsoft.AspNetCore.Mvc.OkResult>());
+            Assert.That(_controller.PostWell(second), Is.InstanceOf<Microsoft.AspNetCore.Mvc.OkResult>());
+            Assert.That(_controller.PostWell(third), Is.InstanceOf<Microsoft.AspNetCore.Mvc.OkResult>());
+
+            var response = _controller.SearchWells(offset: 1, limit: 1, name: "alpha", clusterId: cluster);
+            var page = ((Microsoft.AspNetCore.Mvc.OkObjectResult)response.Result!).Value as WellSearchResult;
+            Assert.Multiple(() =>
+            {
+                Assert.That(page!.Total, Is.EqualTo(2));
+                Assert.That(page.Offset, Is.EqualTo(1));
+                Assert.That(page.Limit, Is.EqualTo(1));
+                Assert.That(page.Items.Select(value => value.MetaInfo!.ID), Is.EqualTo(new[] { second.MetaInfo!.ID }));
+            });
+        }
+
+        [Test]
+        public void IdentityAssignmentEndpoints_MutateOneAssignmentAndRejectStaleRevision()
+        {
+            WellIdentity identity = CreateIdentity("TestIdentity");
+            WellModel well = NewWell();
+            Assert.That(_controller.PostWell(well), Is.InstanceOf<Microsoft.AspNetCore.Mvc.OkResult>());
+            DateTimeOffset initialRevision = well.LastModificationDate!.Value;
+            var assignment = new WellIdentityAssignment
+            {
+                ID = Guid.NewGuid(), IdentityID = identity.MetaInfo!.ID, Value = "External-1"
+            };
+
+            var add = _controller.PostWellIdentityAssignment(well.MetaInfo!.ID, initialRevision, assignment);
+            WellModel afterAdd = (WellModel)((Microsoft.AspNetCore.Mvc.OkObjectResult)add).Value!;
+            Assert.That(afterAdd.WellIdentityAssignments, Has.Count.EqualTo(1));
+            var identitySearch = _controller.SearchWells(identityId: identity.MetaInfo.ID, identityValue: "external");
+            var identityPage = (WellSearchResult)((Microsoft.AspNetCore.Mvc.OkObjectResult)identitySearch.Result!).Value!;
+            Assert.That(identityPage.Items.Select(value => value.MetaInfo!.ID), Is.EqualTo(new[] { well.MetaInfo.ID }));
+
+            var staleAdd = _controller.PostWellIdentityAssignment(well.MetaInfo.ID, initialRevision,
+                new WellIdentityAssignment { ID = Guid.NewGuid(), IdentityID = identity.MetaInfo.ID, Value = "stale" });
+            Assert.That(staleAdd, Is.InstanceOf<Microsoft.AspNetCore.Mvc.ConflictObjectResult>());
+
+            assignment.Value = "External-2";
+            var update = _controller.PutWellIdentityAssignment(well.MetaInfo.ID, assignment.ID,
+                afterAdd.LastModificationDate!.Value, assignment);
+            WellModel afterUpdate = (WellModel)((Microsoft.AspNetCore.Mvc.OkObjectResult)update).Value!;
+            Assert.That(afterUpdate.WellIdentityAssignments!.Single().Value, Is.EqualTo("External-2"));
+
+            var delete = _controller.DeleteWellIdentityAssignment(well.MetaInfo.ID, assignment.ID,
+                afterUpdate.LastModificationDate!.Value);
+            WellModel afterDelete = (WellModel)((Microsoft.AspNetCore.Mvc.OkObjectResult)delete).Value!;
+            Assert.That(afterDelete.WellIdentityAssignments, Is.Empty);
+        }
+
+        [Test]
+        public void FeatureAssignmentEndpoints_MutateOnlySelectedAssignment()
+        {
+            WellFeatureCategory category = CreateFeatureCategory("TestCategory");
+            WellModel well = NewWell();
+            Assert.That(_controller.PostWell(well), Is.InstanceOf<Microsoft.AspNetCore.Mvc.OkResult>());
+            var assignment = new WellFeatureAssignment
+            {
+                ID = Guid.NewGuid(), FeatureCategoryID = category.MetaInfo!.ID,
+                FeatureOptionID = category.Options!.Single().ID,
+                FromDate = DateTimeOffset.UtcNow.AddDays(-1), ToDate = DateTimeOffset.UtcNow.AddDays(1)
+            };
+
+            var invalid = new WellFeatureAssignment
+            {
+                ID = Guid.NewGuid(), FeatureCategoryID = category.MetaInfo.ID, FeatureOptionID = Guid.NewGuid()
+            };
+            Assert.That(_controller.PostWellFeatureAssignment(well.MetaInfo!.ID, well.LastModificationDate!.Value, invalid),
+                Is.InstanceOf<Microsoft.AspNetCore.Mvc.BadRequestObjectResult>());
+
+            var add = _controller.PostWellFeatureAssignment(well.MetaInfo!.ID, well.LastModificationDate!.Value, assignment);
+            WellModel afterAdd = (WellModel)((Microsoft.AspNetCore.Mvc.OkObjectResult)add).Value!;
+            var featureSearch = _controller.SearchWells(featureCategoryId: category.MetaInfo.ID,
+                featureOptionId: category.Options!.Single().ID);
+            var featurePage = (WellSearchResult)((Microsoft.AspNetCore.Mvc.OkObjectResult)featureSearch.Result!).Value!;
+            Assert.That(featurePage.Items.Select(value => value.MetaInfo!.ID), Is.EqualTo(new[] { well.MetaInfo.ID }));
+            assignment.ToDate = assignment.ToDate!.Value.AddDays(1);
+            var update = _controller.PutWellFeatureAssignment(well.MetaInfo.ID, assignment.ID,
+                afterAdd.LastModificationDate!.Value, assignment);
+            WellModel afterUpdate = (WellModel)((Microsoft.AspNetCore.Mvc.OkObjectResult)update).Value!;
+            Assert.That(afterUpdate.WellFeatureAssignments!.Single().ToDate, Is.EqualTo(assignment.ToDate));
+
+            var delete = _controller.DeleteWellFeatureAssignment(well.MetaInfo.ID, assignment.ID,
+                afterUpdate.LastModificationDate!.Value);
+            WellModel afterDelete = (WellModel)((Microsoft.AspNetCore.Mvc.OkObjectResult)delete).Value!;
+            Assert.That(afterDelete.WellFeatureAssignments, Is.Empty);
+        }
+
+        private WellIdentity CreateIdentity(string name)
+        {
+            var loggerFactory = LoggerFactory.Create(builder => builder.ClearProviders());
+            var controller = new WellIdentityController(loggerFactory.CreateLogger<WellIdentityManager>(), _connMgr);
+            var identity = new WellIdentity { MetaInfo = new MetaInfo { ID = Guid.NewGuid() }, Name = name };
+            Assert.That(controller.PostWellIdentity(identity), Is.InstanceOf<Microsoft.AspNetCore.Mvc.OkObjectResult>());
+            return identity;
+        }
+
+        private WellFeatureCategory CreateFeatureCategory(string name)
+        {
+            var loggerFactory = LoggerFactory.Create(builder => builder.ClearProviders());
+            var controller = new WellFeatureCategoryController(loggerFactory.CreateLogger<WellFeatureCategoryManager>(), _connMgr);
+            var category = new WellFeatureCategory
+            {
+                MetaInfo = new MetaInfo { ID = Guid.NewGuid() }, Name = name,
+                IsExclusive = false, HasValidityPeriod = true,
+                Options = [new WellFeatureOption { ID = Guid.NewGuid(), Name = "Option" }]
+            };
+            Assert.That(controller.PostWellFeatureCategory(category), Is.InstanceOf<Microsoft.AspNetCore.Mvc.OkObjectResult>());
+            return category;
         }
 
         [Test]

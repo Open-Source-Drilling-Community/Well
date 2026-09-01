@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
@@ -106,6 +108,40 @@ namespace OSDC.Drilling.Well.Service.Controllers
             {
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
+        }
+
+        /// <summary>Returns a deterministic, paginated page of Wells matching optional server-side filters.</summary>
+        [HttpGet("Search", Name = "SearchWells")]
+        [ProducesResponseType<WellSearchResult>(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(WellMutationErrorEnvelope), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(WellMutationErrorEnvelope), StatusCodes.Status500InternalServerError)]
+        public ActionResult<WellSearchResult> SearchWells(
+            [FromQuery, Range(0, int.MaxValue)] int offset = 0,
+            [FromQuery, Range(1, 200)] int limit = 50,
+            [FromQuery, StringLength(200)] string? name = null,
+            [FromQuery] Guid? clusterId = null,
+            [FromQuery] Guid? slotId = null,
+            [FromQuery] Guid? identityId = null,
+            [FromQuery, StringLength(500)] string? identityValue = null,
+            [FromQuery] Guid? featureCategoryId = null,
+            [FromQuery] Guid? featureOptionId = null,
+            [FromQuery] DateTimeOffset? modifiedFromUtc = null,
+            [FromQuery] DateTimeOffset? modifiedToUtc = null)
+        {
+            if (offset < 0 || limit is < 1 or > 200)
+                return BadRequest(WellMutationResult.Invalid("pagination", "invalid_range", "Offset must be non-negative and limit must be between 1 and 200.").Error);
+            if (name?.Length > 200 || identityValue?.Length > 500)
+                return BadRequest(WellMutationResult.Invalid("filters", "value_too_long", "Name is limited to 200 characters and identityValue to 500 characters.").Error);
+            if (new[] { clusterId, slotId, identityId, featureCategoryId, featureOptionId }.Any(value => value == Guid.Empty))
+                return BadRequest(WellMutationResult.Invalid("filters", "empty_uuid", "Optional UUID filters must be omitted or non-empty.").Error);
+            if (modifiedFromUtc > modifiedToUtc)
+                return BadRequest(WellMutationResult.Invalid("modifiedFromUtc", "invalid_date_range", "modifiedFromUtc must be earlier than or equal to modifiedToUtc.").Error);
+
+            WellSearchResult? result = _wellManager.SearchWells(offset, limit, name, clusterId, slotId,
+                identityId, identityValue, featureCategoryId, featureOptionId, modifiedFromUtc, modifiedToUtc);
+            return result != null
+                ? Ok(result)
+                : StatusCode(StatusCodes.Status500InternalServerError, WellMutationResult.StorageFailure().Error);
         }
 
         /// <summary>Exports all Wells or an ordered selection with referenced local catalog definitions.</summary>
@@ -241,6 +277,78 @@ namespace OSDC.Drilling.Well.Service.Controllers
         {
             UsageStatisticsWell.Instance.IncrementPutWellByIdPerDay();
             return this.ToActionResult(_wellManager.UpdateWell(id, expectedModifiedUtc, data));
+        }
+
+        [HttpPost("{wellId}/IdentityAssignments", Name = "PostWellIdentityAssignment")]
+        [ProducesResponseType<Model.Well>(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(WellMutationErrorEnvelope), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(WellMutationErrorEnvelope), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(WellMutationErrorEnvelope), StatusCodes.Status409Conflict)]
+        public ActionResult PostWellIdentityAssignment(Guid wellId,
+            [FromQuery, BindRequired] DateTimeOffset expectedModifiedUtc, [FromBody] WellIdentityAssignment? assignment)
+        {
+            WellMutationResult outcome = _wellManager.AddIdentityAssignment(wellId, expectedModifiedUtc, assignment);
+            return this.ToActionResult(outcome, outcome.Resource);
+        }
+
+        [HttpPut("{wellId}/IdentityAssignments/{assignmentId}", Name = "PutWellIdentityAssignment")]
+        [ProducesResponseType<Model.Well>(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(WellMutationErrorEnvelope), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(WellMutationErrorEnvelope), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(WellMutationErrorEnvelope), StatusCodes.Status409Conflict)]
+        public ActionResult PutWellIdentityAssignment(Guid wellId, Guid assignmentId,
+            [FromQuery, BindRequired] DateTimeOffset expectedModifiedUtc, [FromBody] WellIdentityAssignment? assignment)
+        {
+            WellMutationResult outcome = _wellManager.UpdateIdentityAssignment(wellId, assignmentId, expectedModifiedUtc, assignment);
+            return this.ToActionResult(outcome, outcome.Resource);
+        }
+
+        [HttpDelete("{wellId}/IdentityAssignments/{assignmentId}", Name = "DeleteWellIdentityAssignment")]
+        [ProducesResponseType<Model.Well>(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(WellMutationErrorEnvelope), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(WellMutationErrorEnvelope), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(WellMutationErrorEnvelope), StatusCodes.Status409Conflict)]
+        public ActionResult DeleteWellIdentityAssignment(Guid wellId, Guid assignmentId,
+            [FromQuery, BindRequired] DateTimeOffset expectedModifiedUtc)
+        {
+            WellMutationResult outcome = _wellManager.DeleteIdentityAssignment(wellId, assignmentId, expectedModifiedUtc);
+            return this.ToActionResult(outcome, outcome.Resource);
+        }
+
+        [HttpPost("{wellId}/FeatureAssignments", Name = "PostWellFeatureAssignment")]
+        [ProducesResponseType<Model.Well>(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(WellMutationErrorEnvelope), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(WellMutationErrorEnvelope), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(WellMutationErrorEnvelope), StatusCodes.Status409Conflict)]
+        public ActionResult PostWellFeatureAssignment(Guid wellId,
+            [FromQuery, BindRequired] DateTimeOffset expectedModifiedUtc, [FromBody] WellFeatureAssignment? assignment)
+        {
+            WellMutationResult outcome = _wellManager.AddFeatureAssignment(wellId, expectedModifiedUtc, assignment);
+            return this.ToActionResult(outcome, outcome.Resource);
+        }
+
+        [HttpPut("{wellId}/FeatureAssignments/{assignmentId}", Name = "PutWellFeatureAssignment")]
+        [ProducesResponseType<Model.Well>(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(WellMutationErrorEnvelope), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(WellMutationErrorEnvelope), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(WellMutationErrorEnvelope), StatusCodes.Status409Conflict)]
+        public ActionResult PutWellFeatureAssignment(Guid wellId, Guid assignmentId,
+            [FromQuery, BindRequired] DateTimeOffset expectedModifiedUtc, [FromBody] WellFeatureAssignment? assignment)
+        {
+            WellMutationResult outcome = _wellManager.UpdateFeatureAssignment(wellId, assignmentId, expectedModifiedUtc, assignment);
+            return this.ToActionResult(outcome, outcome.Resource);
+        }
+
+        [HttpDelete("{wellId}/FeatureAssignments/{assignmentId}", Name = "DeleteWellFeatureAssignment")]
+        [ProducesResponseType<Model.Well>(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(WellMutationErrorEnvelope), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(WellMutationErrorEnvelope), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(WellMutationErrorEnvelope), StatusCodes.Status409Conflict)]
+        public ActionResult DeleteWellFeatureAssignment(Guid wellId, Guid assignmentId,
+            [FromQuery, BindRequired] DateTimeOffset expectedModifiedUtc)
+        {
+            WellMutationResult outcome = _wellManager.DeleteFeatureAssignment(wellId, assignmentId, expectedModifiedUtc);
+            return this.ToActionResult(outcome, outcome.Resource);
         }
 
         /// <summary>

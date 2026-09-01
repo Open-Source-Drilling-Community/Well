@@ -111,6 +111,71 @@ internal static class McpToolArgumentHelpers
         ["items"] = CreateWellObjectSchema()
     });
 
+    public static JsonObject CreateWellSearchSchema() => new()
+    {
+        ["type"] = "object",
+        ["properties"] = new JsonObject
+        {
+            ["offset"] = new JsonObject { ["type"] = "integer", ["minimum"] = 0, ["default"] = 0 },
+            ["limit"] = new JsonObject { ["type"] = "integer", ["minimum"] = 1, ["maximum"] = 200, ["default"] = 50 },
+            ["name"] = new JsonObject { ["type"] = "string", ["maxLength"] = 200 },
+            ["clusterId"] = new JsonObject { ["type"] = "string", ["format"] = "uuid" },
+            ["slotId"] = new JsonObject { ["type"] = "string", ["format"] = "uuid" },
+            ["identityId"] = new JsonObject { ["type"] = "string", ["format"] = "uuid" },
+            ["identityValue"] = new JsonObject { ["type"] = "string", ["maxLength"] = 500 },
+            ["featureCategoryId"] = new JsonObject { ["type"] = "string", ["format"] = "uuid" },
+            ["featureOptionId"] = new JsonObject { ["type"] = "string", ["format"] = "uuid" },
+            ["modifiedFromUtc"] = new JsonObject { ["type"] = "string", ["format"] = "date-time" },
+            ["modifiedToUtc"] = new JsonObject { ["type"] = "string", ["format"] = "date-time" }
+        },
+        ["additionalProperties"] = false
+    };
+
+    public static JsonObject CreateWellSearchOutputSchema() => SuccessEnvelope(new JsonObject
+    {
+        ["type"] = "object",
+        ["properties"] = new JsonObject
+        {
+            ["Items"] = new JsonObject { ["type"] = "array", ["items"] = CreateWellObjectSchema() },
+            ["Total"] = NonNegativeInteger(),
+            ["Offset"] = NonNegativeInteger(),
+            ["Limit"] = new JsonObject { ["type"] = "integer", ["minimum"] = 1, ["maximum"] = 200 }
+        },
+        ["required"] = new JsonArray("Items", "Total", "Offset", "Limit"),
+        ["additionalProperties"] = false
+    });
+
+    public static JsonObject CreateIdentityAssignmentMutationSchema(bool includeAssignmentId, bool includeBody) =>
+        CreateAssignmentMutationSchema(CreateIdentityAssignmentSchema(), includeAssignmentId, includeBody);
+
+    public static JsonObject CreateFeatureAssignmentMutationSchema(bool includeAssignmentId, bool includeBody) =>
+        CreateAssignmentMutationSchema(CreateFeatureAssignmentSchema(), includeAssignmentId, includeBody);
+
+    private static JsonObject CreateAssignmentMutationSchema(JsonObject assignmentSchema, bool includeAssignmentId, bool includeBody)
+    {
+        JsonObject properties = new()
+        {
+            ["wellId"] = new JsonObject { ["type"] = "string", ["format"] = "uuid" },
+            ["expectedModifiedUtc"] = new JsonObject { ["type"] = "string", ["format"] = "date-time" }
+        };
+        JsonArray required = new("wellId", "expectedModifiedUtc");
+        if (includeAssignmentId)
+        {
+            properties["assignmentId"] = new JsonObject { ["type"] = "string", ["format"] = "uuid" };
+            required.Add("assignmentId");
+        }
+        if (includeBody)
+        {
+            properties["assignment"] = assignmentSchema;
+            required.Add("assignment");
+        }
+        return new JsonObject
+        {
+            ["type"] = "object", ["properties"] = properties, ["required"] = required,
+            ["additionalProperties"] = false
+        };
+    }
+
     public static JsonObject CreateResourceOutputSchema(JsonObject resource) => SuccessEnvelope(resource);
 
     public static JsonObject CreateResourceListOutputSchema(JsonObject resource) => SuccessEnvelope(new JsonObject
@@ -309,8 +374,9 @@ internal static class McpToolArgumentHelpers
         ["type"] = "object", ["properties"] = new JsonObject
         {
             ["ID"] = new JsonObject { ["type"] = "string", ["format"] = "uuid" },
-            ["IdentityID"] = NullableUuid("Referenced identity."), ["Value"] = NullableString("Well-specific identity value.")
-        }, ["required"] = new JsonArray("ID"), ["additionalProperties"] = false
+            ["IdentityID"] = new JsonObject { ["type"] = "string", ["format"] = "uuid", ["description"] = "Referenced identity." },
+            ["Value"] = new JsonObject { ["type"] = "string", ["minLength"] = 1, ["description"] = "Well-specific identity value." }
+        }, ["required"] = new JsonArray("ID", "IdentityID", "Value"), ["additionalProperties"] = false
     };
 
     private static JsonObject CreateFeatureAssignmentSchema() => new()
@@ -318,9 +384,10 @@ internal static class McpToolArgumentHelpers
         ["type"] = "object", ["properties"] = new JsonObject
         {
             ["ID"] = new JsonObject { ["type"] = "string", ["format"] = "uuid" },
-            ["FeatureCategoryID"] = NullableUuid("Referenced feature category."), ["FeatureOptionID"] = NullableUuid("Referenced feature option."),
+            ["FeatureCategoryID"] = new JsonObject { ["type"] = "string", ["format"] = "uuid", ["description"] = "Referenced feature category." },
+            ["FeatureOptionID"] = new JsonObject { ["type"] = "string", ["format"] = "uuid", ["description"] = "Referenced feature option." },
             ["FromDate"] = NullableDateTime("Validity start."), ["ToDate"] = NullableDateTime("Validity end.")
-        }, ["required"] = new JsonArray("ID"), ["additionalProperties"] = false
+        }, ["required"] = new JsonArray("ID", "FeatureCategoryID", "FeatureOptionID"), ["additionalProperties"] = false
     };
 
     private static JsonObject NullableArray(JsonObject item) => new() { ["type"] = new JsonArray("array", "null"), ["items"] = item };

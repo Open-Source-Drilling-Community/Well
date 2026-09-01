@@ -33,11 +33,14 @@ Paths below are relative to `/Well/api`.
 | `/Well/MetaInfo` | List Well metadata. |
 | `/Well/{id}` | Get, replace, or delete a Well. |
 | `/Well/HeavyData` | List complete Wells. |
+| `/Well/Search` | Return a deterministic page with total count; filter by name, Cluster, Slot, identity, feature, or modification interval. |
 | `/Well/SlotId?slotId={id}` | List Wells assigned to a Slot. |
 | `/Well/ClusterId?clusterId={id}` | List Wells assigned to a Cluster. |
 | `/Well/UsedSlot/{clusterId}` | List Slot metadata referenced by a Cluster's Wells. |
 | `/Well/BatchExport` | Export all Wells or an ordered selection with referenced local catalogs. |
 | `/Well/BatchRestore` | Validate and atomically restore a versioned export document. |
+| `/Well/{wellId}/IdentityAssignments[/{assignmentId}]` | Concurrency-checked add, replace, or remove of one identity assignment; returns the updated Well. |
+| `/Well/{wellId}/FeatureAssignments[/{assignmentId}]` | Concurrency-checked add, replace, or remove of one feature assignment; returns the updated Well. |
 | `/WellIdentity` | Identity definition ID listing and create. |
 | `/WellIdentity/MetaInfo`, `/HeavyData`, `/{id}` | Identity metadata, complete listing, get, concurrency-checked replace, and delete. |
 | `/WellFeatureCategory` | Feature-category ID listing and create. |
@@ -98,7 +101,7 @@ See [../deployment/identity-cutover.md](../deployment/identity-cutover.md) for t
 
 ## MCP contract
 
-The service publishes 26 non-statistics REST operations as MCP tools plus `ping`. Usage statistics are intentionally not exposed through MCP.
+The service publishes 33 non-statistics REST operations as MCP tools plus `ping`. Usage statistics are intentionally not exposed through MCP.
 
 - Streamable HTTP: `/well/api/mcp`
 - WebSocket: `/well/api/mcp/ws`
@@ -108,6 +111,8 @@ The service publishes 26 non-statistics REST operations as MCP tools plus `ping`
 Tool families:
 
 - `well_*`: Well queries, CRUD, batch export, and batch restore.
+- `well_search`: bounded pagination and combined server-side Well filters.
+- `well_identity_assignment_*` and `well_feature_assignment_*`: targeted, concurrency-safe nested assignment mutations.
 - `well_identity_*`: complete Identity definition CRUD and discovery.
 - `well_feature_category_*`: complete Feature Category CRUD and discovery.
 
