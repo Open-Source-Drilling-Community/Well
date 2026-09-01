@@ -346,9 +346,9 @@
                 _name = CurrentWell.Name;
                 _descr = CurrentWell.Description;
                 _isSingleWell = CurrentWell.IsSingleWell;
-                _wellIdentities = ((IEnumerable<WellIdentity>)await Api.ClientWell.GetAllWellIdentityAsync()).OrderBy(item => item.Name).ToList();
+                _wellIdentities = await LoadWellIdentitiesAsync();
                 _wellIdentityAssignments = CloneIdentityAssignments(CurrentWell.WellIdentityAssignments);
-                _wellFeatureCategories = ((IEnumerable<WellFeatureCategory>)await Api.ClientWell.GetAllWellFeatureCategoryAsync()).OrderBy(item => item.Name).ToList();
+                _wellFeatureCategories = await LoadWellFeatureCategoriesAsync();
                 _wellFeatureAssignments = CloneFeatureAssignments(CurrentWell.WellFeatureAssignments);
                 _selectedCluster = null;
                 _selectedSlot = null;
@@ -593,6 +593,38 @@
         if (_selectedIdentityId is not Guid identityId || identityId == Guid.Empty ||
             _wellIdentityAssignments.Any(item => item.IdentityID == identityId)) return;
         _wellIdentityAssignments.Add(new WellIdentityAssignment { ID = Guid.NewGuid(), IdentityID = identityId });
+    }
+
+    private async Task<List<WellIdentity>> LoadWellIdentitiesAsync()
+    {
+        try
+        {
+            return ((IEnumerable<WellIdentity>)await Api.ClientWell.GetAllWellIdentityAsync())
+                .OrderBy(item => item.Name, StringComparer.OrdinalIgnoreCase)
+                .ToList();
+        }
+        catch (ApiException exception) when (exception.StatusCode == 404)
+        {
+            logger.LogWarning("The Well service does not yet expose the identity catalog endpoint");
+            Snackbar.Add("Well identities will be available after the Well service is upgraded", Severity.Info);
+            return [];
+        }
+    }
+
+    private async Task<List<WellFeatureCategory>> LoadWellFeatureCategoriesAsync()
+    {
+        try
+        {
+            return ((IEnumerable<WellFeatureCategory>)await Api.ClientWell.GetAllWellFeatureCategoryAsync())
+                .OrderBy(item => item.Name, StringComparer.OrdinalIgnoreCase)
+                .ToList();
+        }
+        catch (ApiException exception) when (exception.StatusCode == 404)
+        {
+            logger.LogWarning("The Well service does not yet expose the feature catalog endpoint");
+            Snackbar.Add("Well features will be available after the Well service is upgraded", Severity.Info);
+            return [];
+        }
     }
 
     private string GetIdentityName(WellIdentityAssignment assignment) =>

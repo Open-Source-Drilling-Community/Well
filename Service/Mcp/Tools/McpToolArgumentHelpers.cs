@@ -114,7 +114,9 @@ internal static class McpToolArgumentHelpers
                     ["type"] = "boolean",
                     ["description"] = "True when the cluster is only a proxy for a standalone well.",
                     ["default"] = false
-                }
+                },
+                ["WellIdentityAssignments"] = NullableArray(CreateIdentityAssignmentSchema()),
+                ["WellFeatureAssignments"] = NullableArray(CreateFeatureAssignmentSchema())
             },
             ["required"] = new JsonArray { "MetaInfo" },
             ["additionalProperties"] = false
@@ -135,6 +137,126 @@ internal static class McpToolArgumentHelpers
         ["required"] = new JsonArray("ID"),
         ["additionalProperties"] = false
     };
+
+    public static JsonObject CreateWellBatchExportSchema() => WrapRequest(new JsonObject
+    {
+        ["type"] = "object",
+        ["properties"] = new JsonObject
+        {
+            ["Scope"] = new JsonObject { ["type"] = "string", ["enum"] = new JsonArray("All", "Selected") },
+            ["WellIDs"] = new JsonObject
+            {
+                ["type"] = new JsonArray("array", "null"), ["uniqueItems"] = true,
+                ["items"] = new JsonObject { ["type"] = "string", ["format"] = "uuid" }
+            }
+        },
+        ["required"] = new JsonArray("Scope"),
+        ["additionalProperties"] = false
+    });
+
+    public static JsonObject CreateWellBatchRestoreSchema() => WrapRequest(new JsonObject
+    {
+        ["type"] = "object",
+        ["properties"] = new JsonObject
+        {
+            ["ConflictPolicy"] = new JsonObject { ["type"] = "string", ["enum"] = new JsonArray("FailIfExists", "ReplaceExisting") },
+            ["CatalogPolicy"] = new JsonObject { ["type"] = "string", ["enum"] = new JsonArray("MapExisting", "MapOrCreateMissing") },
+            ["Document"] = CreateBatchDocumentSchema(1)
+        },
+        ["required"] = new JsonArray("ConflictPolicy", "CatalogPolicy", "Document"),
+        ["additionalProperties"] = false
+    });
+
+    public static JsonObject CreateWellBatchExportOutputSchema() => SuccessEnvelope(CreateBatchDocumentSchema(0));
+
+    public static JsonObject CreateWellBatchRestoreOutputSchema() => SuccessEnvelope(new JsonObject
+    {
+        ["type"] = "object",
+        ["properties"] = new JsonObject
+        {
+            ["RestoredAtUtc"] = new JsonObject { ["type"] = "string", ["format"] = "date-time" },
+            ["CreatedCount"] = NonNegativeInteger(), ["ReplacedCount"] = NonNegativeInteger(),
+            ["CreatedCatalogDefinitionCount"] = NonNegativeInteger(), ["CreatedCatalogOptionCount"] = NonNegativeInteger(),
+            ["CatalogMappings"] = new JsonObject { ["type"] = "array", ["items"] = new JsonObject { ["type"] = "object" } },
+            ["WellIDs"] = new JsonObject { ["type"] = "array", ["items"] = new JsonObject { ["type"] = "string", ["format"] = "uuid" } }
+        },
+        ["required"] = new JsonArray("RestoredAtUtc", "CreatedCount", "ReplacedCount", "CreatedCatalogDefinitionCount", "CreatedCatalogOptionCount", "CatalogMappings", "WellIDs"),
+        ["additionalProperties"] = false
+    });
+
+    private static JsonObject CreateBatchDocumentSchema(int minimumWells) => new()
+    {
+        ["type"] = "object",
+        ["properties"] = new JsonObject
+        {
+            ["FormatIdentifier"] = new JsonObject { ["type"] = "string", ["const"] = "OSDC.Drilling.Well.BatchExport" },
+            ["SchemaVersion"] = new JsonObject { ["type"] = "integer", ["const"] = 1 },
+            ["ExportedAtUtc"] = new JsonObject { ["type"] = "string", ["format"] = "date-time" },
+            ["CatalogDependencies"] = new JsonObject
+            {
+                ["type"] = "object",
+                ["properties"] = new JsonObject
+                {
+                    ["Identities"] = new JsonObject { ["type"] = "array", ["items"] = CreateIdentityDefinitionSchema() },
+                    ["FeatureCategories"] = new JsonObject { ["type"] = "array", ["items"] = CreateFeatureCategorySchema() }
+                },
+                ["required"] = new JsonArray("Identities", "FeatureCategories"), ["additionalProperties"] = false
+            },
+            ["Wells"] = new JsonObject { ["type"] = "array", ["minItems"] = minimumWells, ["items"] = CreateWellObjectSchema() }
+        },
+        ["required"] = new JsonArray("FormatIdentifier", "SchemaVersion", "ExportedAtUtc", "CatalogDependencies", "Wells"),
+        ["additionalProperties"] = false
+    };
+
+    private static JsonObject WrapRequest(JsonObject request) => new()
+    {
+        ["type"] = "object", ["properties"] = new JsonObject { ["request"] = request },
+        ["required"] = new JsonArray("request"), ["additionalProperties"] = false
+    };
+
+    private static JsonObject CreateIdentityDefinitionSchema() => new()
+    {
+        ["type"] = "object", ["properties"] = new JsonObject
+        {
+            ["MetaInfo"] = CreateMetaInfoSchema(), ["Name"] = NullableString("Identity name."),
+            ["CreationDate"] = NullableDateTime("Creation timestamp."), ["LastModificationDate"] = NullableDateTime("Modification timestamp.")
+        },
+        ["required"] = new JsonArray("MetaInfo"), ["additionalProperties"] = false
+    };
+
+    private static JsonObject CreateFeatureCategorySchema() => new()
+    {
+        ["type"] = "object", ["properties"] = new JsonObject
+        {
+            ["MetaInfo"] = CreateMetaInfoSchema(), ["Name"] = NullableString("Category name."),
+            ["IsExclusive"] = new JsonObject { ["type"] = "boolean" }, ["HasValidityPeriod"] = new JsonObject { ["type"] = "boolean" },
+            ["Options"] = NullableArray(new JsonObject { ["type"] = "object", ["properties"] = new JsonObject { ["ID"] = new JsonObject { ["type"] = "string", ["format"] = "uuid" }, ["Name"] = NullableString("Option name.") }, ["required"] = new JsonArray("ID"), ["additionalProperties"] = false }),
+            ["CreationDate"] = NullableDateTime("Creation timestamp."), ["LastModificationDate"] = NullableDateTime("Modification timestamp.")
+        },
+        ["required"] = new JsonArray("MetaInfo", "IsExclusive", "HasValidityPeriod"), ["additionalProperties"] = false
+    };
+
+    private static JsonObject CreateIdentityAssignmentSchema() => new()
+    {
+        ["type"] = "object", ["properties"] = new JsonObject
+        {
+            ["ID"] = new JsonObject { ["type"] = "string", ["format"] = "uuid" },
+            ["IdentityID"] = NullableUuid("Referenced identity."), ["Value"] = NullableString("Well-specific identity value.")
+        }, ["required"] = new JsonArray("ID"), ["additionalProperties"] = false
+    };
+
+    private static JsonObject CreateFeatureAssignmentSchema() => new()
+    {
+        ["type"] = "object", ["properties"] = new JsonObject
+        {
+            ["ID"] = new JsonObject { ["type"] = "string", ["format"] = "uuid" },
+            ["FeatureCategoryID"] = NullableUuid("Referenced feature category."), ["FeatureOptionID"] = NullableUuid("Referenced feature option."),
+            ["FromDate"] = NullableDateTime("Validity start."), ["ToDate"] = NullableDateTime("Validity end.")
+        }, ["required"] = new JsonArray("ID"), ["additionalProperties"] = false
+    };
+
+    private static JsonObject NullableArray(JsonObject item) => new() { ["type"] = new JsonArray("array", "null"), ["items"] = item };
+    private static JsonObject NonNegativeInteger() => new() { ["type"] = "integer", ["minimum"] = 0 };
 
     private static JsonObject SuccessEnvelope(JsonObject data) => new()
     {

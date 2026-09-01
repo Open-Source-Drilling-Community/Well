@@ -107,6 +107,42 @@ namespace OSDC.Drilling.Well.Service.Controllers
             }
         }
 
+        /// <summary>Exports all Wells or an ordered selection with referenced local catalog definitions.</summary>
+        [HttpPost("BatchExport", Name = "BatchExportWells")]
+        [ProducesResponseType<WellBatchExportDocument>(StatusCodes.Status200OK)]
+        [ProducesResponseType<WellBatchErrorEnvelope>(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType<WellBatchErrorEnvelope>(StatusCodes.Status404NotFound)]
+        [ProducesResponseType<WellBatchErrorEnvelope>(StatusCodes.Status500InternalServerError)]
+        public ActionResult<WellBatchExportDocument> BatchExportWells([FromBody] WellBatchExportRequest? request)
+        {
+            WellBatchExportOutcome outcome = _wellManager.ExportBatch(request);
+            if (outcome.IsSuccess) return Ok(outcome.Document);
+            return outcome.FailureKind switch
+            {
+                WellBatchExportFailureKind.InvalidRequest => BadRequest(outcome.Error),
+                WellBatchExportFailureKind.WellNotFound => NotFound(outcome.Error),
+                _ => StatusCode(StatusCodes.Status500InternalServerError, outcome.Error)
+            };
+        }
+
+        /// <summary>Validates and atomically restores Wells and their local catalog dependencies.</summary>
+        [HttpPost("BatchRestore", Name = "BatchRestoreWells")]
+        [ProducesResponseType<WellBatchRestoreResponse>(StatusCodes.Status200OK)]
+        [ProducesResponseType<WellBatchErrorEnvelope>(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType<WellBatchErrorEnvelope>(StatusCodes.Status409Conflict)]
+        [ProducesResponseType<WellBatchErrorEnvelope>(StatusCodes.Status500InternalServerError)]
+        public ActionResult<WellBatchRestoreResponse> BatchRestoreWells([FromBody] WellBatchRestoreRequest? request)
+        {
+            WellBatchRestoreOutcome outcome = _wellManager.RestoreBatch(request);
+            if (outcome.IsSuccess) return Ok(outcome.Response);
+            return outcome.FailureKind switch
+            {
+                WellBatchRestoreFailureKind.InvalidRequest => BadRequest(outcome.Error),
+                WellBatchRestoreFailureKind.Conflict => Conflict(outcome.Error),
+                _ => StatusCode(StatusCodes.Status500InternalServerError, outcome.Error)
+            };
+        }
+
 
         /// <summary>
         /// Returns the list of all Well present in the microservice database with given SlotId, at endpoint Well/api/Well/HeavyData

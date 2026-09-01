@@ -17,6 +17,8 @@ public sealed class McpToolRegistrationTests
         ["GetAllWellMetaInfo"] = "well_get_all_meta_info",
         ["GetWellById"] = "well_get_by_id",
         ["GetAllWell"] = "well_get_all",
+        ["BatchExportWells"] = "well_batch_export",
+        ["BatchRestoreWells"] = "well_batch_restore",
         ["GetAllWellBySlotId"] = "well_get_all_by_slot_id",
         ["GetAllWellByClusterId"] = "well_get_all_by_cluster_id",
         ["GetAllUsedSlotMetaInfoByClusterId"] = "well_get_used_slot_meta_info_by_cluster_id",
@@ -106,7 +108,7 @@ public sealed class McpToolRegistrationTests
         Assert.That(PropertyNames(well), Is.EquivalentTo(new[]
         {
             "MetaInfo", "Name", "Description", "CreationDate", "LastModificationDate",
-            "SlotID", "ClusterID", "IsSingleWell"
+            "SlotID", "ClusterID", "IsSingleWell", "WellIdentityAssignments", "WellFeatureAssignments"
         }));
         Assert.That(well["additionalProperties"]?.GetValue<bool>(), Is.False);
 

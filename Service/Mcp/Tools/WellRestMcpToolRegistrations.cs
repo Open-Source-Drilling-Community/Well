@@ -9,6 +9,8 @@ using Microsoft.Extensions.Logging;
 using OSDC.Drilling.Well.Service.Controllers;
 using OSDC.Drilling.Well.Service.Managers;
 using WellModel = OSDC.Drilling.Well.Model.Well;
+using WellBatchExportRequestModel = OSDC.Drilling.Well.Model.WellBatchExportRequest;
+using WellBatchRestoreRequestModel = OSDC.Drilling.Well.Model.WellBatchRestoreRequest;
 
 namespace OSDC.Drilling.Well.Service.Mcp.Tools;
 
@@ -24,6 +26,10 @@ public static class WellRestMcpToolRegistrations
             (sp, args, ct) => InvokeByGuid(args, "id", ct, id => Controller(sp).GetWellById(id)));
         services.AddLegacyMcpTool("well_get_all", "Retrieve every stored well as a complete record. Use the ID or metadata listing tools instead when full data is unnecessary. On success, data contains an array of Well objects and the response contains an HTTP-style status code.", McpToolArgumentHelpers.CreateEmptySchema(), McpToolArgumentHelpers.CreateWellListOutputSchema(), new("List Wells", true, false, true, false),
             (sp, _, ct) => Invoke(ct, () => Controller(sp).GetAllWell()));
+        services.AddLegacyMcpTool("well_batch_export", "Create a read-only schema-version-1 JSON backup of all stored wells or an explicitly ordered selection. The result contains complete Well records and only the Well Identity and Well Feature Category definitions and options referenced by those records. Cluster and Slot identifiers remain external references. A missing or invalid selected well rejects the complete export.", McpToolArgumentHelpers.CreateWellBatchExportSchema(), McpToolArgumentHelpers.CreateWellBatchExportOutputSchema(), new("Export Wells with Catalog Dependencies", true, false, true, false),
+            (sp, args, ct) => InvokeWithBodyResult<WellBatchExportRequestModel, OSDC.Drilling.Well.Model.WellBatchExportDocument>(args, "request", ct, request => Controller(sp).BatchExportWells(request)));
+        services.AddLegacyMcpTool("well_batch_restore", "Validate and atomically restore a schema-version-1 Well backup document. Source catalog UUIDs map to compatible local definitions by exact UUID or unique normalized name; MapOrCreateMissing can create missing definitions and options. ReplaceExisting can replace matching Well UUIDs. Catalog mapping, reference rewriting, catalog creation, and all Well writes use one transaction, so a validation, conflict, or storage failure changes nothing.", McpToolArgumentHelpers.CreateWellBatchRestoreSchema(), McpToolArgumentHelpers.CreateWellBatchRestoreOutputSchema(), new("Restore Wells and Catalog Dependencies", false, true, false, false),
+            (sp, args, ct) => InvokeWithBodyResult<WellBatchRestoreRequestModel, OSDC.Drilling.Well.Model.WellBatchRestoreResponse>(args, "request", ct, request => Controller(sp).BatchRestoreWells(request)));
         services.AddLegacyMcpTool("well_get_all_by_slot_id", "Retrieve complete records for all wells assigned to one slot UUID. On success, data is an array of Well objects; an empty array means that no wells currently use the slot.", McpToolArgumentHelpers.CreateGuidSchema("slotId", "Identifier of the slot whose wells should be returned."), McpToolArgumentHelpers.CreateWellListOutputSchema(), new("List Wells by Slot", true, false, true, false),
             (sp, args, ct) => InvokeByGuid(args, "slotId", ct, id => Controller(sp).GetAllWellBySlotId(id)));
         services.AddLegacyMcpTool("well_get_all_by_cluster_id", "Retrieve complete records for all wells assigned to one cluster UUID. On success, data is an array of Well objects; an empty array means that the cluster currently has no wells.", McpToolArgumentHelpers.CreateGuidSchema("clusterId", "Identifier of the cluster whose wells should be returned."), McpToolArgumentHelpers.CreateWellListOutputSchema(), new("List Wells by Cluster", true, false, true, false),
@@ -65,6 +71,14 @@ public static class WellRestMcpToolRegistrations
     {
         ct.ThrowIfCancellationRequested();
         return TryDeserialize(args, bodyName, out T? data, out JsonNode? error)
+            ? Task.FromResult<JsonNode?>(McpActionResultConverter.FromActionResult(action(data)))
+            : Task.FromResult(error);
+    }
+
+    private static Task<JsonNode?> InvokeWithBodyResult<TModel, TResult>(JsonObject? args, string bodyName, CancellationToken ct, Func<TModel?, ActionResult<TResult>> action)
+    {
+        ct.ThrowIfCancellationRequested();
+        return TryDeserialize(args, bodyName, out TModel? data, out JsonNode? error)
             ? Task.FromResult<JsonNode?>(McpActionResultConverter.FromActionResult(action(data)))
             : Task.FromResult(error);
     }
