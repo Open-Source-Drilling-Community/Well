@@ -66,6 +66,16 @@ internal static class McpToolArgumentHelpers
 
     public static JsonObject CreateWellResourceSchema() => CreateWellObjectSchema();
 
+    public static JsonObject CreateWellIdentitySchema(bool includeId = false) =>
+        WrapCatalogBody("wellIdentity", CreateIdentityDefinitionSchema(), includeId, "wellIdentity.MetaInfo.ID");
+
+    public static JsonObject CreateWellIdentityResourceSchema() => CreateIdentityDefinitionSchema();
+
+    public static JsonObject CreateWellFeatureCategorySchema(bool includeId = false) =>
+        WrapCatalogBody("wellFeatureCategory", CreateFeatureCategorySchema(), includeId, "wellFeatureCategory.MetaInfo.ID");
+
+    public static JsonObject CreateWellFeatureCategoryResourceSchema() => CreateFeatureCategorySchema();
+
     public static JsonObject CreateStatusOnlyOutputSchema() => new()
     {
         ["type"] = "object",
@@ -92,6 +102,14 @@ internal static class McpToolArgumentHelpers
     {
         ["type"] = "array",
         ["items"] = CreateWellObjectSchema()
+    });
+
+    public static JsonObject CreateResourceOutputSchema(JsonObject resource) => SuccessEnvelope(resource);
+
+    public static JsonObject CreateResourceListOutputSchema(JsonObject resource) => SuccessEnvelope(new JsonObject
+    {
+        ["type"] = "array",
+        ["items"] = resource
     });
 
     private static JsonObject CreateWellObjectSchema()
@@ -177,7 +195,24 @@ internal static class McpToolArgumentHelpers
             ["RestoredAtUtc"] = new JsonObject { ["type"] = "string", ["format"] = "date-time" },
             ["CreatedCount"] = NonNegativeInteger(), ["ReplacedCount"] = NonNegativeInteger(),
             ["CreatedCatalogDefinitionCount"] = NonNegativeInteger(), ["CreatedCatalogOptionCount"] = NonNegativeInteger(),
-            ["CatalogMappings"] = new JsonObject { ["type"] = "array", ["items"] = new JsonObject { ["type"] = "object" } },
+            ["CatalogMappings"] = new JsonObject
+            {
+                ["type"] = "array",
+                ["items"] = new JsonObject
+                {
+                    ["type"] = "object",
+                    ["properties"] = new JsonObject
+                    {
+                        ["Catalog"] = new JsonObject { ["type"] = "string", ["minLength"] = 1 },
+                        ["Name"] = new JsonObject { ["type"] = "string" },
+                        ["SourceID"] = new JsonObject { ["type"] = "string", ["format"] = "uuid" },
+                        ["LocalID"] = new JsonObject { ["type"] = "string", ["format"] = "uuid" },
+                        ["Resolution"] = new JsonObject { ["type"] = "string", ["enum"] = new JsonArray("exact_uuid", "normalized_name", "created") }
+                    },
+                    ["required"] = new JsonArray("Catalog", "Name", "SourceID", "LocalID", "Resolution"),
+                    ["additionalProperties"] = false
+                }
+            },
             ["WellIDs"] = new JsonObject { ["type"] = "array", ["items"] = new JsonObject { ["type"] = "string", ["format"] = "uuid" } }
         },
         ["required"] = new JsonArray("RestoredAtUtc", "CreatedCount", "ReplacedCount", "CreatedCatalogDefinitionCount", "CreatedCatalogOptionCount", "CatalogMappings", "WellIDs"),
@@ -218,23 +253,49 @@ internal static class McpToolArgumentHelpers
     {
         ["type"] = "object", ["properties"] = new JsonObject
         {
-            ["MetaInfo"] = CreateMetaInfoSchema(), ["Name"] = NullableString("Identity name."),
+            ["MetaInfo"] = CreateMetaInfoSchema(), ["Name"] = RequiredName("Identity name."),
             ["CreationDate"] = NullableDateTime("Creation timestamp."), ["LastModificationDate"] = NullableDateTime("Modification timestamp.")
         },
-        ["required"] = new JsonArray("MetaInfo"), ["additionalProperties"] = false
+        ["required"] = new JsonArray("MetaInfo", "Name"), ["additionalProperties"] = false
     };
 
     private static JsonObject CreateFeatureCategorySchema() => new()
     {
         ["type"] = "object", ["properties"] = new JsonObject
         {
-            ["MetaInfo"] = CreateMetaInfoSchema(), ["Name"] = NullableString("Category name."),
+            ["MetaInfo"] = CreateMetaInfoSchema(), ["Name"] = RequiredName("Category name."),
             ["IsExclusive"] = new JsonObject { ["type"] = "boolean" }, ["HasValidityPeriod"] = new JsonObject { ["type"] = "boolean" },
-            ["Options"] = NullableArray(new JsonObject { ["type"] = "object", ["properties"] = new JsonObject { ["ID"] = new JsonObject { ["type"] = "string", ["format"] = "uuid" }, ["Name"] = NullableString("Option name.") }, ["required"] = new JsonArray("ID"), ["additionalProperties"] = false }),
+            ["Options"] = NullableArray(new JsonObject { ["type"] = "object", ["properties"] = new JsonObject { ["ID"] = new JsonObject { ["type"] = "string", ["format"] = "uuid" }, ["Name"] = RequiredName("Option name.") }, ["required"] = new JsonArray("ID", "Name"), ["additionalProperties"] = false }),
             ["CreationDate"] = NullableDateTime("Creation timestamp."), ["LastModificationDate"] = NullableDateTime("Modification timestamp.")
         },
-        ["required"] = new JsonArray("MetaInfo", "IsExclusive", "HasValidityPeriod"), ["additionalProperties"] = false
+        ["required"] = new JsonArray("MetaInfo", "Name", "IsExclusive", "HasValidityPeriod", "Options"), ["additionalProperties"] = false
     };
+
+    private static JsonObject WrapCatalogBody(string key, JsonObject body, bool includeId, string idPath)
+    {
+        JsonObject properties = new() { [key] = body };
+        JsonArray required = new(key);
+        if (includeId)
+        {
+            properties["id"] = new JsonObject
+            {
+                ["type"] = "string", ["format"] = "uuid",
+                ["description"] = $"Identifier of the stored definition to update. It must equal {idPath}."
+            };
+            properties["expectedModifiedUtc"] = new JsonObject
+            {
+                ["type"] = "string", ["format"] = "date-time",
+                ["description"] = "Optimistic-concurrency token. It must equal the latest server LastModificationDate."
+            };
+            required.Add("id");
+            required.Add("expectedModifiedUtc");
+        }
+        return new JsonObject
+        {
+            ["type"] = "object", ["properties"] = properties, ["required"] = required,
+            ["additionalProperties"] = false
+        };
+    }
 
     private static JsonObject CreateIdentityAssignmentSchema() => new()
     {
@@ -279,6 +340,13 @@ internal static class McpToolArgumentHelpers
         ["description"] = description
     };
 
+    private static JsonObject RequiredName(string description) => new()
+    {
+        ["type"] = "string",
+        ["minLength"] = 1,
+        ["description"] = description
+    };
+
     private static JsonObject NullableDateTime(string description) => new()
     {
         ["type"] = new JsonArray { "string", "null" },
@@ -305,12 +373,31 @@ internal static class McpToolArgumentHelpers
             return false;
         }
 
-        if (!Guid.TryParse(node.ToString(), out value))
+        if (!Guid.TryParse(node.ToString(), out value) || value == Guid.Empty)
         {
-            error = McpToolResponses.CreateValidationError($"Argument '{key}' must be a valid UUID.");
+            error = McpToolResponses.CreateValidationError($"Argument '{key}' must be a valid non-empty UUID.");
             return false;
         }
 
+        return true;
+    }
+
+    public static bool TryParseDateTimeOffset(JsonObject? arguments, string key, out DateTimeOffset value, out JsonNode? error)
+    {
+        value = default;
+        error = null;
+        JsonNode? node = arguments?[key];
+        if (node == null)
+        {
+            error = McpToolResponses.CreateValidationError($"Argument '{key}' is required.");
+            return false;
+        }
+        if (!DateTimeOffset.TryParse(node.ToString(), System.Globalization.CultureInfo.InvariantCulture,
+                System.Globalization.DateTimeStyles.RoundtripKind, out value) || value == default)
+        {
+            error = McpToolResponses.CreateValidationError($"Argument '{key}' must be a valid non-default ISO 8601 timestamp.");
+            return false;
+        }
         return true;
     }
 

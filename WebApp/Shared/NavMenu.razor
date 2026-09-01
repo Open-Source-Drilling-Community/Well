@@ -1,15 +1,35 @@
-﻿<MudNavMenu>
-    <MudNavLink Href="/Well/webapp/Well" Match="NavLinkMatch.Prefix">Well</MudNavLink>
-    <MudNavLink Href="/Well/webapp/WellBackupRestore" Match="NavLinkMatch.All">Backup and Restore</MudNavLink>
-    <MudNavLink Href="/Well/webapp/WellIdentities" Match="NavLinkMatch.All">Well Identities</MudNavLink>
-    <MudNavLink Href="/Well/webapp/WellFeatures" Match="NavLinkMatch.All">Well Features</MudNavLink>
-    <MudNavLink Href="/Well/webapp/WellTrajectories" Match="NavLinkMatch.Prefix">Well Trajectories</MudNavLink>
-    <MudNavLink Href="/Well/webapp/WellSurveyRuns" Match="NavLinkMatch.Prefix">Well Survey Runs</MudNavLink>
-    <MudNavLink Href="/Well/webapp/Cluster" Match="NavLinkMatch.All">Cluster</MudNavLink>
-    <MudNavLink Href="/Well/webapp/Field" Match="NavLinkMatch.All">Field</MudNavLink>
-    <MudNavLink Href="/Well/webapp/Rig" Match="NavLinkMatch.Prefix">Rig</MudNavLink>
-    <MudNavLink Href="/Well/webapp/ProjectionDefinition" Match="NavLinkMatch.All">Cartographic Projections</MudNavLink>
-    <MudNavLink Href="/Well/webapp/GeodeticDatum" Match="NavLinkMatch.All">Geodetic Datum</MudNavLink>
-    <MudNavLink Href="/Well/webapp/Spheroid" Match="NavLinkMatch.All">Spheroid</MudNavLink>
-    <MudNavLink Href="/Well/webapp/StatisticsWell" Match="NavLinkMatch.Prefix">Usage Statistics</MudNavLink>
+<MudNavMenu>
+    <MudNavLink Href="/Well/webapp/Home" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Home">Home</MudNavLink>
+
+    <MudNavGroup Title="Well Management" Expanded="true">
+        <MudNavLink Href="/Well/webapp/Well" Match="NavLinkMatch.All">Well</MudNavLink>
+        <MudNavLink Href="/Well/webapp/WellBackupRestore" Match="NavLinkMatch.All">Backup and Restore</MudNavLink>
+        <MudNavLink Href="/Well/webapp/WellFeatures" Match="NavLinkMatch.All">Well Features</MudNavLink>
+        <MudNavLink Href="/Well/webapp/WellIdentities" Match="NavLinkMatch.All">Well Identities</MudNavLink>
+    </MudNavGroup>
+
+    <MudNavGroup Title="Survey Display" Expanded="false">
+        <MudNavLink Href="/Well/webapp/WellTrajectories" Match="NavLinkMatch.All">Well Trajectories</MudNavLink>
+        <MudNavLink Href="/Well/webapp/WellSurveyRuns" Match="NavLinkMatch.All">Well Survey Runs</MudNavLink>
+    </MudNavGroup>
+
+    <MudNavGroup Title="Contextual Data" Expanded="false">
+        <MudNavLink Href="/Well/webapp/Cluster" Match="NavLinkMatch.All">Cluster</MudNavLink>
+        <MudNavLink Href="/Well/webapp/Field" Match="NavLinkMatch.All">Field</MudNavLink>
+        <MudNavLink Href="/Well/webapp/Rig" Match="NavLinkMatch.Prefix">Rig</MudNavLink>
+        <MudNavLink Href="/Well/webapp/ProjectionDefinition" Match="NavLinkMatch.Prefix">Cartographic Projections</MudNavLink>
+        <MudNavLink Href="/Well/webapp/GeodeticDatum" Match="NavLinkMatch.All">Geodetic Datum</MudNavLink>
+        <MudNavLink Href="/Well/webapp/Spheroid" Match="NavLinkMatch.All">Spheroid</MudNavLink>
+    </MudNavGroup>
+
+    <MudNavGroup Title="Calculators" Expanded="false">
+        <MudNavLink Href="/Well/webapp/FieldCartographicConverter" Match="NavLinkMatch.All">Cartographic Conversion</MudNavLink>
+        <MudNavLink Href="/Well/webapp/EarthVerticalDatumCalculation" Match="NavLinkMatch.All">Vertical Datum Conversion</MudNavLink>
+        <MudNavLink Href="/Well/webapp/EarthGravityCalculation" Match="NavLinkMatch.All">Earth Gravity Evaluation</MudNavLink>
+        <MudNavLink Href="/Well/webapp/EarthMagneticFieldCalculation" Match="NavLinkMatch.All">Earth Magnetic Field Evaluation</MudNavLink>
+    </MudNavGroup>
+
+    <MudNavGroup Title="Monitoring" Expanded="false">
+        <MudNavLink Href="/Well/webapp/StatisticsWell" Match="NavLinkMatch.All">Usage Statistics</MudNavLink>
+    </MudNavGroup>
 </MudNavMenu>

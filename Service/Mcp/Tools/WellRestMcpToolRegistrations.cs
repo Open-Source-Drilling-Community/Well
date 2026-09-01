@@ -11,6 +11,8 @@ using OSDC.Drilling.Well.Service.Managers;
 using WellModel = OSDC.Drilling.Well.Model.Well;
 using WellBatchExportRequestModel = OSDC.Drilling.Well.Model.WellBatchExportRequest;
 using WellBatchRestoreRequestModel = OSDC.Drilling.Well.Model.WellBatchRestoreRequest;
+using WellIdentityModel = OSDC.Drilling.Well.Model.WellIdentity;
+using WellFeatureCategoryModel = OSDC.Drilling.Well.Model.WellFeatureCategory;
 
 namespace OSDC.Drilling.Well.Service.Mcp.Tools;
 
@@ -42,7 +44,53 @@ public static class WellRestMcpToolRegistrations
             (sp, args, ct) => InvokeWithIdAndBody<WellModel>(args, "well", ct, (id, data) => Controller(sp).PutWellById(id, data)));
         services.AddLegacyMcpTool("well_delete_by_id", "Permanently delete one stored well by UUID. Confirm the target identifier before calling because this operation removes the record. Returns status 200 on success, 404 when the well does not exist, and 400 for an empty UUID.", McpToolArgumentHelpers.CreateGuidSchema("id", "Unique identifier of the well to delete."), McpToolArgumentHelpers.CreateStatusOnlyOutputSchema(), new("Delete Well", false, true, true, false),
             (sp, args, ct) => InvokeDelete(args, ct, id => Controller(sp).DeleteWellById(id)));
+        AddCatalogCrudTools<WellIdentityModel>(
+            services, "well_identity", "wellIdentity", "Well Identity", "a symbolic identity definition assignable to Wells",
+            McpToolArgumentHelpers.CreateWellIdentitySchema, McpToolArgumentHelpers.CreateWellIdentityResourceSchema,
+            sp => IdentityController(sp).GetAllWellIdentityId(),
+            sp => IdentityController(sp).GetAllWellIdentityMetaInfo(),
+            (sp, id) => IdentityController(sp).GetWellIdentityById(id),
+            sp => IdentityController(sp).GetAllWellIdentity(),
+            (sp, data) => IdentityController(sp).PostWellIdentity(data),
+            (sp, id, expected, data) => IdentityController(sp).PutWellIdentityById(id, expected, data),
+            (sp, id) => IdentityController(sp).DeleteWellIdentityById(id));
+        AddCatalogCrudTools<WellFeatureCategoryModel>(
+            services, "well_feature_category", "wellFeatureCategory", "Well Feature Category", "a definition of allowed feature options assignable to Wells",
+            McpToolArgumentHelpers.CreateWellFeatureCategorySchema, McpToolArgumentHelpers.CreateWellFeatureCategoryResourceSchema,
+            sp => FeatureCategoryController(sp).GetAllWellFeatureCategoryId(),
+            sp => FeatureCategoryController(sp).GetAllWellFeatureCategoryMetaInfo(),
+            (sp, id) => FeatureCategoryController(sp).GetWellFeatureCategoryById(id),
+            sp => FeatureCategoryController(sp).GetAllWellFeatureCategory(),
+            (sp, data) => FeatureCategoryController(sp).PostWellFeatureCategory(data),
+            (sp, id, expected, data) => FeatureCategoryController(sp).PutWellFeatureCategoryById(id, expected, data),
+            (sp, id) => FeatureCategoryController(sp).DeleteWellFeatureCategoryById(id));
         return services;
+    }
+
+    private static void AddCatalogCrudTools<TModel>(IServiceCollection services, string prefix, string bodyName,
+        string entityName, string purpose, Func<bool, JsonObject> inputSchema,
+        Func<JsonObject> resourceSchema, Func<IServiceProvider, ActionResult<System.Collections.Generic.IEnumerable<Guid>>> getIds,
+        Func<IServiceProvider, ActionResult<System.Collections.Generic.IEnumerable<OSDC.DotnetLibraries.General.DataManagement.MetaInfo?>>> getMetaInfo,
+        Func<IServiceProvider, Guid, ActionResult<TModel?>> getById,
+        Func<IServiceProvider, ActionResult<System.Collections.Generic.IEnumerable<TModel?>>> getAll,
+        Func<IServiceProvider, TModel?, ActionResult> create,
+        Func<IServiceProvider, Guid, DateTimeOffset, TModel?, ActionResult> update,
+        Func<IServiceProvider, Guid, ActionResult> delete)
+    {
+        services.AddLegacyMcpTool($"{prefix}_get_all_ids", $"List the UUID of every stored {entityName} without transferring complete definitions. Each UUID identifies {purpose} and can be supplied to the corresponding get-by-ID operation.", McpToolArgumentHelpers.CreateEmptySchema(), McpToolArgumentHelpers.CreateIdsOutputSchema(), new($"List {entityName} UUIDs", true, false, true, false),
+            (sp, _, ct) => Invoke(ct, () => getIds(sp)));
+        services.AddLegacyMcpTool($"{prefix}_get_all_meta_info", $"List identity and optional HTTP location metadata for every stored {entityName} without returning complete definitions. Use this discovery operation when names and options are unnecessary.", McpToolArgumentHelpers.CreateEmptySchema(), McpToolArgumentHelpers.CreateMetaInfoListOutputSchema(), new($"List {entityName} Metadata", true, false, true, false),
+            (sp, _, ct) => Invoke(ct, () => getMetaInfo(sp)));
+        services.AddLegacyMcpTool($"{prefix}_get_by_id", $"Retrieve one complete {entityName} by UUID. The returned resource represents {purpose}. Returns HTTP-style status 404 when absent and validation status 400 for a missing, malformed, or empty UUID.", McpToolArgumentHelpers.CreateGuidSchema("id", $"Non-empty UUID of the {entityName} to retrieve."), McpToolArgumentHelpers.CreateResourceOutputSchema(resourceSchema()), new($"Get {entityName}", true, false, true, false),
+            (sp, args, ct) => InvokeByGuid(args, "id", ct, id => getById(sp, id)));
+        services.AddLegacyMcpTool($"{prefix}_get_all", $"Retrieve every stored {entityName} as a complete definition. Each result represents {purpose}; prefer the ID or metadata listing tools when complete content is unnecessary.", McpToolArgumentHelpers.CreateEmptySchema(), McpToolArgumentHelpers.CreateResourceListOutputSchema(resourceSchema()), new($"List {entityName} Definitions", true, false, true, false),
+            (sp, _, ct) => Invoke(ct, () => getAll(sp)));
+        services.AddLegacyMcpTool($"{prefix}_create", $"Create and persist {purpose}. Supply the complete {bodyName} object with a caller-generated non-empty MetaInfo.ID and a non-blank name. The UUID must not already exist; feature-option UUIDs must be non-empty and unique within a category.", inputSchema(false), McpToolArgumentHelpers.CreateResourceOutputSchema(resourceSchema()), new($"Create {entityName}", false, false, false, false),
+            (sp, args, ct) => InvokeWithBody<TModel>(args, bodyName, ct, data => create(sp, data)));
+        services.AddLegacyMcpTool($"{prefix}_update_by_id", $"Replace an existing {entityName} with the complete supplied definition. The top-level id must equal {bodyName}.MetaInfo.ID, and expectedModifiedUtc must equal the latest LastModificationDate. Removing a definition or option referenced by a Well is rejected atomically with a conflict.", inputSchema(true), McpToolArgumentHelpers.CreateResourceOutputSchema(resourceSchema()), new($"Update {entityName}", false, true, true, false),
+            (sp, args, ct) => InvokeWithIdTimestampAndBody<TModel>(args, bodyName, ct, (id, expected, data) => update(sp, id, expected, data)));
+        services.AddLegacyMcpTool($"{prefix}_delete_by_id", $"Permanently delete one stored {entityName} by non-empty UUID. Deletion is rejected with a conflict while any stored Well references the definition or one of its feature options; the service performs no cascading deletion.", McpToolArgumentHelpers.CreateGuidSchema("id", $"Non-empty UUID of the {entityName} to delete."), McpToolArgumentHelpers.CreateStatusOnlyOutputSchema(), new($"Delete {entityName}", false, true, true, false),
+            (sp, args, ct) => InvokeDelete(args, ct, id => delete(sp, id)));
     }
 
     private static Task<JsonNode?> Invoke<T>(CancellationToken ct, Func<ActionResult<T>> action)
@@ -92,6 +140,16 @@ public static class WellRestMcpToolRegistrations
             : Task.FromResult(error);
     }
 
+    private static Task<JsonNode?> InvokeWithIdTimestampAndBody<T>(JsonObject? args, string bodyName, CancellationToken ct, Func<Guid, DateTimeOffset, T?, ActionResult> action)
+    {
+        ct.ThrowIfCancellationRequested();
+        if (!McpToolArgumentHelpers.TryParseGuid(args, "id", out Guid id, out JsonNode? idError)) return Task.FromResult(idError);
+        if (!McpToolArgumentHelpers.TryParseDateTimeOffset(args, "expectedModifiedUtc", out DateTimeOffset expected, out JsonNode? timestampError)) return Task.FromResult(timestampError);
+        return TryDeserialize(args, bodyName, out T? data, out JsonNode? error)
+            ? Task.FromResult<JsonNode?>(McpActionResultConverter.FromActionResult(action(id, expected, data)))
+            : Task.FromResult(error);
+    }
+
     private static bool TryDeserialize<T>(JsonObject? args, string bodyName, out T? data, out JsonNode? error)
     {
         data = default;
@@ -117,4 +175,10 @@ public static class WellRestMcpToolRegistrations
     private static WellController Controller(IServiceProvider sp) => new(
         sp.GetRequiredService<ILogger<WellManager>>(),
         sp.GetRequiredService<SqlConnectionManager>());
+
+    private static WellIdentityController IdentityController(IServiceProvider sp) => new(
+        sp.GetRequiredService<ILogger<WellIdentityManager>>(), sp.GetRequiredService<SqlConnectionManager>());
+
+    private static WellFeatureCategoryController FeatureCategoryController(IServiceProvider sp) => new(
+        sp.GetRequiredService<ILogger<WellFeatureCategoryManager>>(), sp.GetRequiredService<SqlConnectionManager>());
 }

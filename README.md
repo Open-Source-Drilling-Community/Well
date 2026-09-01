@@ -1,96 +1,98 @@
-# Well — Full Solution
+# Well
 
-Microservice + Web UI for managing Well data. The solution includes a shared model, a REST API (Service), a Blazor Server client (WebApp), and supporting code generation for typed clients.
-
-## Purpose
-- Provide a consistent Well domain model across backend and clients.
-- Expose CRUD endpoints for Well data via an ASP.NET Core Web API.
-- Offer a Blazor Server UI to browse, create, edit, and delete wells and view usage statistics.
-
-## Live Examples
-- Service (Swagger UI): https://dev.digiwells.no/Well/api/swagger
-- Service (API base): https://dev.digiwells.no/Well/api/Well
-- WebApp (UI): https://dev.digiwells.no/Well/webapp/Well
+The Well solution provides an ASP.NET Core microservice and Blazor Server UI for managing Wells, their identity assignments, and their feature assignments. It also includes versioned JSON backup/restore, SQLite persistence, OpenAPI client generation, usage statistics, and an MCP server.
 
 ## Projects
-- Model: Well DTOs and usage statistics helpers. See `Model/README.md`.
-- Service: ASP.NET Core Web API + SQLite persistence + Swagger UI. See `Service/README.md`.
-- WebApp: Blazor Server UI using MudBlazor and generated API client. See `WebApp/README.md`.
-- ModelSharedOut: Generates the OpenAPI client and merged schema consumed by WebApp/ServiceTest.
-- ModelTest, ServiceTest: Unit and API tests for model and service.
 
-## Install & Run Locally
+| Project | Purpose |
+| --- | --- |
+| `Model` | Authoritative Well, identity, feature, backup/restore, mutation-error, and usage-statistics contracts. |
+| `Service` | REST API, transactional SQLite persistence and migration, Swagger, and MCP endpoints. |
+| `ModelSharedOut` | Generates the merged OpenAPI document and typed C# clients used by consumers. |
+| `WebPages` | Reusable Razor pages for Well management, catalogs, backup/restore, surveys, trajectories, and statistics. |
+| `WebApp` | Blazor Server host for Well and related microservice pages. |
+| `ModelTest` / `ServiceTest` | Model, controller, migration, backup/restore, and MCP contract tests. |
+| `DBVersioningManager` | Database-versioning support utility. |
 
-Prerequisites
-- .NET 8 SDK installed
-- Optional: Docker 24+ and Helm if containerizing/deploying
+See the project guides: [Model](Model/README.md), [Service](Service/README.md), [ModelSharedOut](ModelSharedOut/README.md), [WebPages](WebPages/README.md), [WebApp](WebApp/README.md), and [ServiceTest](ServiceTest/README.md).
 
-Build
-- From the repository root:
-  - `dotnet restore`
-  - `dotnet build`
+## Build and run locally
 
-Run the Service
-- `dotnet run --project Service`
-- Open Swagger UI: `http://localhost:5000/Well/api/swagger`
-- API base: `http://localhost:5000/Well/api/Well`
+Prerequisites: .NET 8 SDK. Docker and Helm are optional.
 
-Run the WebApp
-- `dotnet run --project WebApp`
-- Open UI: `https://localhost:5011/Well/webapp/Well` (or `http://localhost:5012/Well/webapp/Well`)
-- Ensure the WebApp can reach the Service:
-  - Default development setting uses `WellHostURL=http://localhost:5002/` (see `WebApp/appsettings.Development.json`).
-  - Override in PowerShell with `$env:WellHostURL = "https://localhost:5001/"` when using the HTTPS Service profile.
+```powershell
+dotnet restore Well.sln
+dotnet build Well.sln
+```
 
-Useful Notes
-- Paths are mounted under `/Well/api` (Service) and `/Well/webapp` (WebApp). If using a reverse proxy, route accordingly.
-- The Service persists data in a SQLite DB at `../home/Well.db` relative to its working directory. Ensure write access.
+Start the service using its launch profile:
 
-## Usage Examples
+```powershell
+dotnet run --project Service
+```
 
-Service (cURL)
-- List IDs: `curl http://localhost:5000/Well/api/Well`
-- MetaInfo list: `curl http://localhost:5000/Well/api/Well/MetaInfo`
-- Get by ID: `curl http://localhost:5000/Well/api/Well/{id}`
-- Full list: `curl http://localhost:5000/Well/api/Well/HeavyData`
-- Create: `curl -X POST http://localhost:5000/Well/api/Well -H "Content-Type: application/json" -d '{"MetaInfo":{"ID":"<guid>"},"Name":"My Well"}'`
-- Update: `curl -X PUT http://localhost:5000/Well/api/Well/{id} -H "Content-Type: application/json" -d '{"MetaInfo":{"ID":"{id}"},"Name":"Updated"}'`
-- Delete: `curl -X DELETE http://localhost:5000/Well/api/Well/{id}`
+- HTTPS: `https://localhost:5001/Well/api`
+- HTTP: `http://localhost:5002/Well/api`
+- Swagger: `https://localhost:5001/Well/api/swagger`
 
-WebApp
-- Browse to the Well page and use the grid to add/edit/delete.
-- Usage statistics available at `/Well/webapp/Statistics`.
+Start the WebApp in another terminal:
 
-## Dependencies (selected)
-- Service
-  - `Microsoft.Data.Sqlite`: SQLite provider
-  - `Swashbuckle.AspNetCore.*`, `Microsoft.OpenApi.*`: OpenAPI docs and UI
-  - Project ref: `Model`
-- Model
-  - `OSDC.DotnetLibraries.General.*`, `OSDC.DotnetLibraries.Drilling.DrillingProperties`
-- WebApp
-  - `MudBlazor`, `Plotly.Blazor`, `OSDC.UnitConversion.DrillingRazorMudComponents`
-  - Project ref: `ModelSharedOut`
-- ModelSharedOut
-  - `NSwag.CodeGeneration.CSharp`, `Microsoft.OpenApi.Readers`
+```powershell
+$env:WellHostURL = "https://localhost:5001/"
+dotnet run --project WebApp
+```
 
-See each project’s `.csproj` for exact versions.
+- HTTPS: `https://localhost:5011/Well/webapp/Well`
+- HTTP: `http://localhost:5012/Well/webapp/Well`
 
-## Docker & Helm (optional)
-- Service image/Dockerfile: `Service/Dockerfile` (exposes 8080, mounts `/home` for persistence)
-- WebApp image/Dockerfile: `WebApp/Dockerfile`
-- Helm charts: `Service/charts/osdcdrillingwellservice`, `WebApp/charts/osdcdrillingwellwebappclient`
+`WebApp/appsettings.Development.json` targets the shared development environment. Set `WellHostURL` and any related service URLs as environment variables when testing against local services.
 
-## Security & Data
-- SQLite database stored as clear text in the container volume. No authentication/authorization is included by default. Secure behind your ingress/proxy and network controls as required.
+## Main capabilities
 
-## More
-- Per‑project guides: `Model/README.md`, `Service/README.md`, `WebApp/README.md`
-- The reviewed Kubernetes identity and data-preserving rollout procedure is in `deployment/identity-cutover.md`.
+- Well CRUD and queries by Cluster or Slot.
+- User-managed Well Identity definitions and per-Well identity values.
+- User-managed Well Feature Categories, options, and validity-aware assignments.
+- Versioned logical JSON backup of all Wells or an ordered selection.
+- Atomic restore with conflict policies and catalog mapping/creation policies.
+- Survey-run and trajectory displays with Rig and mean-sea-level depth-reference integration.
+- Context pages for Field, Cluster, Rig, projections, geodetic datum, and spheroid data.
+- Cartographic, vertical datum, gravity, and magnetic-field calculators.
+- Per-endpoint usage-statistics dashboard.
+- MCP access to every non-statistics REST operation.
 
-## Current implementation
+## Data and upgrade safety
 
-- The Well service exposes its ten non-statistics REST operations as MCP tools, plus `ping`; usage-statistics endpoints are intentionally excluded.
-- MCP is available at `/well/api/mcp` over streamable HTTP and `/well/api/mcp/ws` over WebSocket. Optional MCP-hub registration is disabled by default.
-- The Well UI now uses Rig and Vertical Datum information to present mean-sea-level depth references in well, survey-run, and trajectory workflows.
-- The WebApp directly hosts the current OSDC Field 2.0.0, Cluster 1.1.0, Rig 1.1.0, Earth Cartographic Projection 1.1.0, Earth Geodesy 1.1.0, Earth Vertical Datum 1.1.0, Earth Gravity 1.0.1, and Earth Magnetic Field 1.0.1 page integrations.
+The service stores data in `../home/Well.db` relative to its working directory; the container mounts `/home`. Schema version 1 contains `WellTable`, `WellIdentityTable`, and `WellFeatureCategoryTable`.
+
+Database startup migration is additive and transactional. It never drops an existing table or Well row. Unknown, newer, or malformed schemas stop startup without attempting destructive repair. Backup/restore also uses one SQLite transaction, so validation, catalog mapping, and all writes either commit together or roll back together.
+
+Before deployment, keep an independent copy or storage snapshot of `/home/Well.db`. Kubernetes must not run overlapping service writers against the same SQLite volume. The service chart therefore uses `Recreate`, one replica, and a persistent claim. The reviewed identity-cutover procedure is in [deployment/identity-cutover.md](deployment/identity-cutover.md).
+
+## Docker and Kubernetes
+
+Images:
+
+- `docker.io/digiwells/osdcdrillingwellservice`
+- `docker.io/digiwells/osdcdrillingwellwebappclient`
+
+Charts:
+
+- `Service/charts/osdcdrillingwellservice`
+- `WebApp/charts/osdcdrillingwellwebappclient`
+
+Both charts currently default to tag `stable` with `image.pullPolicy: Always`. A rollout restart creates new pods and therefore checks the registry again, but immutable version or digest references are preferable for reproducible releases. Use `helm --kube-context <context> ...`; Helm does not accept a `--context` flag.
+
+Configured ingress hosts are `dev.digiwells.no`, `app.digiwells.no`, and `awe.web.intra.norceresearch.no` under `/Well/api` and `/Well/webapp`.
+
+## Tests
+
+```powershell
+dotnet test ModelTest\ModelTest.csproj
+dotnet test ServiceTest\ServiceTest.csproj --filter "FullyQualifiedName!~McpServerHttpTests"
+```
+
+The two MCP HTTP tests require a running service at `http://localhost:8080/well/api/mcp`; see [ServiceTest/README.md](ServiceTest/README.md).
+
+## Security
+
+Authentication and authorization are not enabled by default. SQLite data is not encrypted by the service. Protect the API, WebApp, MCP endpoints, backups, and persistent volume through ingress, identity, network, and storage controls appropriate to the deployment.

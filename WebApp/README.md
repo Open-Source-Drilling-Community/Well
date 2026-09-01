@@ -1,103 +1,108 @@
-# WebApp (OSDC.Drilling.Well.WebApp)
+# OSDC.Drilling.Well.WebApp
 
-Blazor Server web application providing a user interface for the Well microservice. It lists, creates, edits, and deletes Well records, and displays usage statistics. The app consumes the Service API through a generated client model and uses MudBlazor for UI components.
+The WebApp is the .NET 8 Blazor Server host for the reusable Well pages and selected pages from related OSDC microservices. It uses MudBlazor and is mounted under `/Well/webapp`.
 
-## Purpose
-- Provide a UI to manage Well data exposed by the backend Service.
-- Visualize and interact with Well lists and details; show usage statistics.
-- Integrate unit/quantity inputs via reusable components and call related microservices when configured.
+## Run locally
 
-## Installation
+`appsettings.Development.json` targets `https://dev.digiwells.no/`. To use a local Well service, override the URL before starting:
 
-Prerequisites
-- .NET 8 SDK
-- Optional: Docker 24+ if containerizing
+```powershell
+$env:WellHostURL = "https://localhost:5001/"
+dotnet run --project WebApp
+```
 
-Local Run
-1) Restore/build from the solution root:
-   - `dotnet restore`
-   - `dotnet build`
-2) Run the WebApp (uses the launch profile URLs 5011/5012):
-   - `dotnet run --project WebApp`
-3) Open the UI:
-   - `https://localhost:5011/Well/webapp/Well` or `http://localhost:5012/Well/webapp/Well`
+- HTTPS: `https://localhost:5011/Well/webapp/Well`
+- HTTP: `http://localhost:5012/Well/webapp/Well`
 
-Configure Backend Endpoints
-- Configure the Service and related endpoints via appsettings or environment variables:
-  - `WellHostURL` (default dev: `http://localhost:5002/`)
-  - `ClusterHostURL`
-  - `FieldHostURL`
-  - `RigHostURL`
-  - `TrajectoryHostURL`
-  - `EarthCartographicProjectionHostURL`
-  - `EarthGeodesyHostURL`
-  - `EarthGravityHostURL`
-  - `EarthMagneticFieldHostURL`
-  - `EarthVerticalDatumHostURL`
-  - `UnitConversionHostURL`
-- Example (PowerShell):
-  - `$env:WellHostURL = "https://localhost:5001/"; dotnet run --project WebApp`
+The backend URL is a host root, not `/Well/api`; each generated client adds its own service base path.
 
-Notes
-- The app is mounted under the path base `/Well/webapp` (Kestrel and reverse proxy must route accordingly).
-- Forwarded headers are enabled for proxy scenarios.
+## Configuration
 
-Docker
-1) Build:
-   - `docker build -t digiwells/osdcdrillingwellwebappclient:local -f WebApp/Dockerfile .`
-2) Run:
-   - `docker run --rm -p 5002:8080 -e WellHostURL=https://host.docker.internal:5001/ digiwells/osdcdrillingwellwebappclient:local`
-3) Open:
-   - `http://localhost:5002/Well/webapp/Well`
+The host reads these keys from appsettings or environment variables:
 
-Helm (Kubernetes)
-- A chart is provided under `WebApp/charts/osdcdrillingwellwebappclient`.
-- Example install with defaults:
-  - `helm upgrade --install well-webapp WebApp/charts/osdcdrillingwellwebappclient`
+- `WellHostURL`
+- `ClusterHostURL`
+- `FieldHostURL`
+- `RigHostURL`
+- `TrajectoryHostURL`
+- `EarthCartographicProjectionHostURL`
+- `EarthGeodesyHostURL`
+- `EarthGravityHostURL`
+- `EarthMagneticFieldHostURL`
+- `EarthVerticalDatumHostURL`
+- `UnitConversionHostURL`
 
-## Usage
+Development settings point to the shared development host. Production settings use Kubernetes service DNS names. Keep all values aligned with the selected environment.
 
-Navigation
-- Main Well page: `/Well/webapp/Well`
-- Usage statistics: `/Well/webapp/Statistics`
+## Navigation and routes
 
-Typical Actions
-- Add Well: click Add, fill details, then Update in the edit view.
-- Edit Well: select a row, modify fields, click Update.
-- Delete Well: use the delete icon or multi-select + Delete.
+The left navigation is grouped like Field and Cluster:
 
-## Dependencies
-- Packages
-  - `MudBlazor` (via MudBlazor.Services) — UI components and theming.
-  - `Plotly.Blazor` — charting support.
-  - `OSDC.UnitConversion.DrillingRazorMudComponents` — unit/quantity input components.
-  - `OSDC.DotnetLibraries.General.DataManagement` — shared MetaInfo and helpers.
-- Project reference
-  - `ModelSharedOut` — generated OpenAPI client and DTOs (`OSDC.Drilling.Well.ModelShared`), used by `Shared/APIUtils.cs`.
+- **Home**: Well-specific landing page and shortcuts to the main workflows.
+- **Well Management**: Well, backup/restore, Well Features, and Well Identities.
+- **Survey Display**: Well Trajectories and Well Survey Runs.
+- **Contextual Data**: Cluster, Field, Rig, cartographic projections, geodetic datum, and spheroid.
+- **Calculators**: cartographic conversion, vertical datum, gravity, and magnetic field.
+- **Monitoring**: expanded usage statistics.
 
-See `WebApp.csproj` for exact versions and build targets.
+Principal Well routes:
 
-## Integration in the Solution
-- Calls the backend `Service` API using the generated `ModelSharedOut` client (`APIUtils.ClientWell`, etc.).
-- Reads base URLs from configuration to reach other microservices (Well, Cluster, Field, UnitConversion).
-- Uses the DTOs and OpenAPI bundle generated by `ModelSharedOut` (sourced from the Service’s merged schema).
-- UI built with MudBlazor; mounted under `/Well/webapp` to align with the Helm ingress and reverse proxy configuration.
+| Page | Route |
+| --- | --- |
+| Well home | `/Well/webapp/Home` |
+| Well management | `/Well/webapp/Well` |
+| Backup and restore | `/Well/webapp/WellBackupRestore` |
+| Identity definitions | `/Well/webapp/WellIdentities` |
+| Feature categories | `/Well/webapp/WellFeatures` |
+| Trajectories | `/Well/webapp/WellTrajectories` |
+| Survey runs | `/Well/webapp/WellSurveyRuns` |
+| Usage statistics | `/Well/webapp/StatisticsWell` |
 
-## Notable Files
-- `Program.cs` — Blazor Server setup, path base `/Well/webapp`, forwarded headers, config ingestion.
-- `Shared/APIUtils.cs` — HttpClient setup and generated client instances for Well/Field/Cluster.
-- `Pages/WellMain.razor` — grid of wells, add/delete/select.
-- `Pages/WellEdit.razor` — edit view with unit-aware inputs.
-- `Pages/StatisticsMain.razor` — displays aggregated usage statistics.
-- `Properties/launchSettings.json` — local URLs and profiles.
+Earth Geodesy's Geodetic Datum and Spheroid pages, plus the vertical datum, gravity, and magnetic-field calculators, use local wrapper components in `WebApp/Pages`. This exposes only the required pages; registering those complete external Razor assemblies would import foreign or duplicate `/Home` routes and make the Blazor route table incorrect or ambiguous.
 
-## Quick Links
-- Swagger (dev): https://dev.digiwells.no/Well/api/swagger
-- Service API (dev): https://dev.digiwells.no/Well/api/Well
-- WebApp (dev): https://dev.digiwells.no/Well/webapp/Well
+## Related WebPages integrations
 
-## Current integrations
+`ExternalWebPagesServiceCollectionExtensions` registers configuration and API utilities for Cluster, Field, Rig, Earth Cartographic Projection, Earth Geodesy, Earth Gravity, Earth Magnetic Field, and Earth Vertical Datum. `ExternalRazorAssemblies` lists only assemblies whose complete route sets are safe to import.
 
-The host uses the current OSDC Field, Cluster, Rig, Earth Cartographic Projection, Earth Geodesy, Earth Gravity, Earth Magnetic Field, and Earth Vertical Datum WebPages packages. Their assemblies and required services are registered directly, so reusable pages run inside this host rather than redirecting to separate WebApps.
+Current package versions are defined in `WebApp.csproj`; do not duplicate version numbers in deployment scripts.
 
-Keep the corresponding `appsettings.Development.json` and `appsettings.Production.json` values aligned with the target environment.
+## Important files
+
+- `Program.cs`: Blazor Server services, related API configuration, forwarded headers, and `/Well/webapp` path base.
+- `App.razor`: router and approved additional assemblies.
+- `ExternalRazorAssemblies.cs`: imported route assemblies.
+- `ExternalWebPagesServiceCollectionExtensions.cs`: dependency-injection registrations for external pages.
+- `Shared/NavMenu.razor`: grouped left navigation.
+- `Pages/Home.razor`: Well-specific landing page.
+- `Pages/GeodeticDatumPage.razor`, `SpheroidPage.razor`, and `*CalculatorPage.razor`: conflict-free wrappers for selected external pages.
+- `appsettings.Development.json` / `appsettings.Production.json`: service host roots.
+
+Well-specific Razor pages and generated-client utilities live in the `WebPages` project; see [../WebPages/README.md](../WebPages/README.md).
+
+## Docker and Helm
+
+Build from the repository root:
+
+```powershell
+docker build -t digiwells/osdcdrillingwellwebappclient:local -f WebApp/Dockerfile .
+docker run --rm -p 5012:8080 `
+  -e WellHostURL=https://host.docker.internal:5001/ `
+  digiwells/osdcdrillingwellwebappclient:local
+```
+
+Chart: `WebApp/charts/osdcdrillingwellwebappclient`.
+
+```powershell
+helm upgrade --install osdcdrillingwellwebappclient WebApp/charts/osdcdrillingwellwebappclient `
+  --kube-context dev-context --namespace default
+```
+
+The chart defaults to `docker.io/digiwells/osdcdrillingwellwebappclient:stable` with `image.pullPolicy: Always`.
+
+## Build
+
+```powershell
+dotnet build WebApp\WebApp.csproj
+```
+
+Warnings in unrelated legacy page code should not be mistaken for route or host-configuration errors; builds must still complete with zero errors.

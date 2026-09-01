@@ -1,136 +1,138 @@
-# Service (OSDC.Drilling.Well.Service)
+# OSDC.Drilling.Well.Service
 
-ASP.NET Core Web API that exposes CRUD endpoints for Well resources, persists data to SQLite, and serves an OpenAPI/Swagger UI. The service is the backend of the solution and the primary integration point for the Web client and external consumers.
+The Service is the .NET 8 backend for Well records, identity definitions, feature categories, backup/restore, usage statistics, Swagger, and MCP. It is mounted under `/Well/api` and persists to SQLite.
 
-## Purpose
-- Host REST endpoints for Well operations under the base path `/Well/api`.
-- Persist Well data in a local SQLite database located under `../home/Well.db`.
-- Serve a merged OpenAPI document and Swagger UI for easy exploration/testing.
-- Act as the contract boundary for clients (e.g., WebApp) using the shared `Model` DTOs.
+## Run locally
 
-## Installation
-
-Prerequisites
-- .NET 8 SDK
-- Optional: Docker 24+ if containerizing
-
-Local Run
-1) Restore/build from the solution root:
-   - `dotnet restore`
-   - `dotnet build`
-2) Run the service:
-   - `dotnet run --project Service`
-3) Browse the API:
-   - Swagger UI: `http://localhost:5000/Well/api/swagger`
-   - API base: `http://localhost:5000/Well/api/Well`
-
-Notes
-- The SQLite database and service state are stored under `../home` relative to the Service working directory. Ensure the process has write access.
-- The app listens on the typical Kestrel defaults. Override with `ASPNETCORE_URLS`, for example:
-  - `ASPNETCORE_URLS=http://0.0.0.0:5000 dotnet run --project Service`
-- Reverse proxy support is enabled via forwarded headers; the app uses `UsePathBase("/Well/api")`.
-
-Docker
-1) Build:
-   - `docker build -t digiwells/osdcdrillingwellservice:local -f Service/Dockerfile .`
-2) Run (persisting the `/home` volume for SQLite data):
-   - `docker run --rm -p 5000:8080 -v wellsvc_home:/home digiwells/osdcdrillingwellservice:local`
-3) Open:
-   - Swagger UI: `http://localhost:5000/Well/api/swagger`
-
-Helm (Kubernetes)
-- A chart is provided under `Service/charts/osdcdrillingwellservice`.
-- Example install with defaults:
-  - `helm upgrade --install well-svc Service/charts/osdcdrillingwellservice`
-
-## Usage Examples
-
-Base URL: `/Well/api`
-
-Swagger
-- UI: `/Well/api/swagger`
-- Served JSON (merged): `/Well/api/swagger/merged/swagger.json`
-
-Well endpoints (`Service/Controllers/WellController.cs`)
-```bash
-# List all well IDs
-curl http://localhost:5000/Well/api/Well
-
-# List all well MetaInfo
-curl http://localhost:5000/Well/api/Well/MetaInfo
-
-# Get a well by ID
-curl http://localhost:5000/Well/api/Well/{id}
-
-# Get all wells (full data)
-curl http://localhost:5000/Well/api/Well/HeavyData
-
-# Get used slots MetaInfo for a cluster
-curl http://localhost:5000/Well/api/Well/UsedSlot/{clusterId}
-
-# Create a well
-curl -X POST http://localhost:5000/Well/api/Well \
-  -H "Content-Type: application/json" \
-  -d '{
-        "MetaInfo": { "ID": "d0e5b56f-6a3e-4d3a-a5cf-3f7a4ab3a11" },
-        "Name": "My Well",
-        "Description": "Example",
-        "CreationDate": "2024-01-01T00:00:00Z"
-      }'
-
-# Update a well by ID
-curl -X PUT http://localhost:5000/Well/api/Well/{id} \
-  -H "Content-Type: application/json" \
-  -d '{ "MetaInfo": { "ID": "{id}" }, "Name": "Updated" }'
-
-# Delete a well by ID
-curl -X DELETE http://localhost:5000/Well/api/Well/{id}
+```powershell
+dotnet build Service\Service.csproj
+dotnet run --project Service
 ```
 
-Usage statistics (`Service/Controllers/WellUsageStatisticsController.cs`)
-```bash
-curl http://localhost:5000/Well/api/WellUsageStatistics
+The launch profile listens on:
+
+- `https://localhost:5001/Well/api`
+- `http://localhost:5002/Well/api`
+- Swagger UI: `https://localhost:5001/Well/api/swagger`
+- Merged OpenAPI: `https://localhost:5001/Well/api/swagger/merged/swagger.json`
+
+Override the listener when needed:
+
+```powershell
+$env:ASPNETCORE_URLS = "http://0.0.0.0:8080"
+dotnet run --project Service --no-launch-profile
 ```
 
-## Dependencies
-- Runtime
-  - `Microsoft.Data.Sqlite` — SQLite database driver used by `SqlConnectionManager` and `WellManager`.
-  - `Swashbuckle.AspNetCore.SwaggerGen` and `Swashbuckle.AspNetCore.SwaggerUI` — OpenAPI generation and UI.
-  - `Microsoft.OpenApi` and `Microsoft.OpenApi.Readers` — read and serve a pre-merged OpenAPI document.
-- Project reference
-  - `Model` — provides the `OSDC.Drilling.Well.Model.Well` DTO and usage statistics types.
+## REST API
 
-See `Service.csproj` for exact versions and build targets. A `CreateSwaggerJson` target runs on Debug builds to export schema artifacts for `ModelSharedOut`.
+Paths below are relative to `/Well/api`.
 
-## Integration in the Solution
-- Uses `Model` DTOs to accept and return Well payloads across endpoints.
-- Persists to SQLite via `SqlConnectionManager` and `WellManager` under `../home/Well.db`.
-- Serves an OpenAPI document from `Service/wwwroot/json-schema/WellMergedModel.json` using `SwaggerMiddlewareExtensions`.
-- Consumed by the Web client (`WebApp`), which calls these endpoints and renders results. Tests under `ServiceTest` exercise controller behaviors against the API.
+| Resource | Operations |
+| --- | --- |
+| `/Well` | List IDs, create a Well. |
+| `/Well/MetaInfo` | List Well metadata. |
+| `/Well/{id}` | Get, replace, or delete a Well. |
+| `/Well/HeavyData` | List complete Wells. |
+| `/Well/SlotId?slotId={id}` | List Wells assigned to a Slot. |
+| `/Well/ClusterId?clusterId={id}` | List Wells assigned to a Cluster. |
+| `/Well/UsedSlot/{clusterId}` | List Slot metadata referenced by a Cluster's Wells. |
+| `/Well/BatchExport` | Export all Wells or an ordered selection with referenced local catalogs. |
+| `/Well/BatchRestore` | Validate and atomically restore a versioned export document. |
+| `/WellIdentity` | Identity definition ID listing and create. |
+| `/WellIdentity/MetaInfo`, `/HeavyData`, `/{id}` | Identity metadata, complete listing, get, concurrency-checked replace, and delete. |
+| `/WellFeatureCategory` | Feature-category ID listing and create. |
+| `/WellFeatureCategory/MetaInfo`, `/HeavyData`, `/{id}` | Category metadata, complete listing, get, concurrency-checked replace, and delete. |
+| `/WellUsageStatistics` | Current daily Well endpoint counters. |
 
-## Configuration & Behavior
-- Base path: `/Well/api` (set with `UsePathBase`).
-- CORS: permissive default allowing any origin/headers/methods (with credentials).
-- Forwarded headers: supports `X-Forwarded-Proto`/`X-Forwarded-Host` for reverse proxies.
-- JSON: uses `System.Text.Json` with custom options from `JsonSettings` (preserves property casing, enum strings).
-- Static files: enabled to serve Swagger JSON and any assets under `wwwroot`.
+Catalog updates require the `expectedModifiedUtc` query parameter and reject stale changes. Deleting a referenced definition, or removing a referenced feature option, returns a structured conflict rather than cascading into Well data.
 
-## Quick Links
-- Docker image name: `digiwells/osdcdrillingwellservice`
-- Swagger (dev): https://dev.digiwells.no/Well/api/swagger
-- Swagger (prod): https://app.digiwells.no/Well/api/swagger
-- API base (dev): https://dev.digiwells.no/Well/api/Well
-- API base (prod): https://app.digiwells.no/Well/api/Well
+Example:
 
----
+```powershell
+$base = "https://localhost:5001/Well/api"
+$id = [guid]::NewGuid()
 
-The service uses the OSDC technical identity while retaining NORCE Research authorship and company metadata where applicable.
+Invoke-RestMethod "$base/Well/HeavyData"
+Invoke-RestMethod "$base/Well" -Method Post -ContentType "application/json" -Body (@{
+    MetaInfo = @{ ID = $id }
+    Name = "Example Well"
+} | ConvertTo-Json -Depth 20)
+Invoke-RestMethod "$base/Well/$id" -Method Delete
+```
 
-## MCP server
+## Backup and restore
 
-The service publishes all ten non-statistics Well REST operations as MCP tools. Tool names use the underscore convention directly, and access-statistics operations are not registered. Each tool includes an explicit JSON input schema; create and update describe the complete Well payload, including `MetaInfo.ID`, timestamps, slot/cluster associations, nullability, and UUID formats.
+The backup is logical, portable JSON rather than a raw SQLite replacement. Format version 1 contains complete Wells plus only the referenced Well Identity and Feature Category definitions/options. Cluster and Slot UUIDs remain external references.
+
+Restore policies:
+
+- `FailIfExists`: reject the complete operation if any Well UUID already exists.
+- `ReplaceExisting`: replace only matching Well UUIDs and create the rest.
+- `MapExisting`: resolve local catalog definitions by compatible UUID or unique normalized name; reject missing definitions.
+- `MapOrCreateMissing`: perform the same mapping and create missing local definitions/options with local UUIDs.
+
+Validation, catalog mapping/creation, reference rewriting, and all Well writes use one SQLite transaction. Any validation error, ambiguity, collision, or storage failure rolls back the complete restore.
+
+## SQLite schema and migrations
+
+The default connection points to `../home/Well.db` relative to the process working directory. In the container, `/home` is a declared volume.
+
+Current schema version: 1.
+
+- `WellTable`
+- `WellIdentityTable`
+- `WellFeatureCategoryTable`
+
+Startup upgrades a legacy version-0 database by creating only the missing catalog tables and setting `PRAGMA user_version` inside one transaction. Existing `WellTable` rows are preserved. The service never drops tables to repair a database. A newer version, unknown table, missing table, or malformed expected table causes startup to fail without destructive modification.
+
+Operational safeguards:
+
+- Back up or snapshot `/home/Well.db` before deploying a build that may migrate the schema.
+- Never run two service writers against the same SQLite volume.
+- Keep the Kubernetes service at one replica with deployment strategy `Recreate`.
+- Preserve and reuse the existing PVC; do not replace it during a Helm identity or release-name change.
+
+See [../deployment/identity-cutover.md](../deployment/identity-cutover.md) for the reviewed Kubernetes procedure.
+
+## MCP contract
+
+The service publishes 26 non-statistics REST operations as MCP tools plus `ping`. Usage statistics are intentionally not exposed through MCP.
 
 - Streamable HTTP: `/well/api/mcp`
 - WebSocket: `/well/api/mcp/ws`
-- Utility tool: `ping`
-- Optional external MCP-hub registration: configured in `appsettings.json`, disabled by default
+- Authentication: none in the service itself
+- Optional MCP-hub registration: `McpHub` configuration section; disabled by default
+
+Tool families:
+
+- `well_*`: Well queries, CRUD, batch export, and batch restore.
+- `well_identity_*`: complete Identity definition CRUD and discovery.
+- `well_feature_category_*`: complete Feature Category CRUD and discovery.
+
+Every tool publishes a title, detailed description, closed input/output JSON schemas, and read-only/destructive/idempotent/open-world annotations. UUID arguments must be non-empty. Catalog update tools require `expectedModifiedUtc`. Tests compare all non-statistics controller actions with registered MCP tools to prevent REST/MCP drift.
+
+## Docker and Helm
+
+Build from the repository root:
+
+```powershell
+docker build -t digiwells/osdcdrillingwellservice:local -f Service/Dockerfile .
+docker run --rm -p 5000:8080 -v wellsvc_home:/home digiwells/osdcdrillingwellservice:local
+```
+
+Chart: `Service/charts/osdcdrillingwellservice`.
+
+```powershell
+helm upgrade --install osdcdrillingwellservice Service/charts/osdcdrillingwellservice `
+  --kube-context dev-context --namespace default
+```
+
+Chart defaults use `docker.io/digiwells/osdcdrillingwellservice:stable`, `image.pullPolicy: Always`, one replica, `Recreate`, and persistent claim `well-claim`. Prefer an immutable tag or digest for controlled releases.
+
+## Generated OpenAPI
+
+A Debug build runs the `CreateSwaggerJson` target and writes `ModelSharedOut/json-schemas/WellFullName.json`. After REST contract changes, follow [../ModelSharedOut/README.md](../ModelSharedOut/README.md) to regenerate the typed client and merged service schema.
+
+## Security
+
+CORS is permissive and the service has no built-in authentication or authorization. Protect REST, Swagger, MCP, SQLite storage, and backups through deployment-level controls.

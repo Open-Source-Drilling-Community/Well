@@ -1,93 +1,82 @@
-# Model (OSDC.Drilling.Well.Model)
+# OSDC.Drilling.Well.Model
 
-The Model project contains the domain classes used by the Well microservice and its clients. It provides a simple, serializable representation of a Well and a small utility for tracking API usage over time. These types are shared by the Service layer (Web API) and tests, and are the source for generated API documentation (DocFX).
+The Model project is the authoritative serializable contract used by the Well service. It targets .NET 8 with nullable reference types enabled.
 
-## Purpose
-- Define the Well data structure exchanged through the API and stored by the service.
-- Offer lightweight usage statistics helpers for counting endpoint calls per day.
-- Serve as a stable contract between the Service and its consumers (e.g., WebApp, tests).
+## Domain contracts
 
-## Key Types
-- `Well`: DTO with metadata and relations.
-  - Properties: `MetaInfo` (from `OSDC.DotnetLibraries.General.DataManagement`), `Name`, `Description`, `CreationDate`, `LastModificationDate`, `SlotID`, `ClusterID`, `IsSingleWell`.
-- `UsageStatisticsWell`: singleton that aggregates daily counters for common Well endpoints and periodically persists them to `..\home\history.json`.
-  - Helpers: `IncrementGetAllWellIdPerDay()`, `IncrementGetAllWellMetaInfoPerDay()`, `IncrementGetWellByIdPerDay()`, `IncrementGetAllWellPerDay()`, `IncrementPostWellPerDay()`, `IncrementPutWellByIdPerDay()`, `IncrementDeleteWellByIdPerDay()`.
+- `Well`: metadata, name, description, timestamps, optional `ClusterID` and `SlotID`, `IsSingleWell`, identity assignments, and feature assignments.
+- `WellIdentity`: user-managed symbolic identity definition.
+- `WellIdentityAssignment`: assignment UUID, referenced identity UUID, and Well-specific value.
+- `WellFeatureCategory`: user-managed category with exclusivity and validity-period semantics.
+- `WellFeatureOption`: stable option UUID and name within a feature category.
+- `WellFeatureAssignment`: referenced category and option plus optional validity dates.
+- `WellMutationErrorEnvelope`: structured mutation and catalog-conflict errors.
 
-## Target Framework
-- .NET 8 (`net8.0`) with nullable reference types enabled.
+The service supplies default identity and feature definitions for initial installations, while the definitions remain editable through the catalog APIs and UI.
 
-## Dependencies
-- `OSDC.DotnetLibraries.Drilling.DrillingProperties` — drilling domain abstractions used across the solution.
-- `OSDC.DotnetLibraries.General.Common` — common utilities.
-- `OSDC.DotnetLibraries.General.DataManagement` — includes `MetaInfo`, used by `Well`.
-- `OSDC.DotnetLibraries.General.Statistics` — general statistics helpers.
+## Backup and restore contracts
 
-Exact versions are specified in `Model.csproj`.
+`WellBatchExport.cs` defines the portable format and policies:
 
-## How It Fits in the Solution
-- Service (`Service` project): Controllers accept and return `OSDC.Drilling.Well.Model.Well`. Managers serialize/deserialize `Well` for persistence (SQLite). See `Service/Controllers/WellController.cs` and `Service/Managers/WellManager.cs`.
-- Web client (`WebApp`): Calls the Service API that exposes `Well` payloads; it does not reference `Model` directly.
-- Tests (`ModelTest`, `ServiceTest`): Use `Well` as the DTO under test for model behavior and service endpoints.
-- Documentation: DocFX config (`Model/docfx.json`, `Model/articles`, `Model/api`) enables API/guide generation for this project.
+- `WellBatchExportRequest`: export `All` Wells or a non-empty ordered `Selected` list.
+- `WellBatchExportDocument`: format identifier `OSDC.Drilling.Well.BatchExport`, schema version 1, UTC export time, referenced catalogs, and complete Wells.
+- `WellBatchRestoreRequest`: conflict and catalog-resolution policies plus the document.
+- Conflict policies: `FailIfExists` and `ReplaceExisting`.
+- Catalog policies: `MapExisting` and `MapOrCreateMissing`.
+- `WellBatchRestoreResponse`: created/replaced counts and source-to-local catalog UUID mappings.
 
-## Usage Examples
+Cluster and Slot UUIDs are external references and are not copied as resources into a Well backup.
 
-### Create a Well
+## Usage statistics
+
+`UsageStatisticsWell` records daily counters for the Well endpoints and periodically persists them to `../home/history.json`. Controllers call the appropriate increment methods; consumers should treat the singleton as service infrastructure rather than domain state.
+
+## Example
+
 ```csharp
-using OSDC.Drilling.Well.Model;
 using OSDC.DotnetLibraries.General.DataManagement;
+using OSDC.Drilling.Well.Model;
+
+var identityId = Guid.NewGuid();
+var categoryId = Guid.NewGuid();
+var optionId = Guid.NewGuid();
 
 var well = new Well
 {
     MetaInfo = new MetaInfo { ID = Guid.NewGuid() },
-    Name = "My Test Well",
-    Description = "Example well payload",
-    CreationDate = DateTimeOffset.UtcNow,
+    Name = "Example Well",
     ClusterID = Guid.NewGuid(),
     SlotID = Guid.NewGuid(),
-    IsSingleWell = false
+    WellIdentityAssignments =
+    [
+        new WellIdentityAssignment
+        {
+            ID = Guid.NewGuid(),
+            IdentityID = identityId,
+            Value = "A-01"
+        }
+    ],
+    WellFeatureAssignments =
+    [
+        new WellFeatureAssignment
+        {
+            ID = Guid.NewGuid(),
+            FeatureCategoryID = categoryId,
+            FeatureOptionID = optionId
+        }
+    ]
 };
 ```
 
-### Serialize/Deserialize
-```csharp
-using System.Text.Json;
-using OSDC.Drilling.Well.Model;
+Catalog references are validated by the Service when a Well is created, updated, exported, or restored.
 
-string json = JsonSerializer.Serialize(well);
-Well? roundTripped = JsonSerializer.Deserialize<Well>(json);
+## Dependencies and build
+
+The project depends on the OSDC drilling-property, common, data-management, and statistics libraries. Exact versions are in `Model.csproj`.
+
+```powershell
+dotnet build Model\Model.csproj
+dotnet test ModelTest\ModelTest.csproj
 ```
 
-### Record Usage Statistics
-```csharp
-using OSDC.Drilling.Well.Model;
-
-// Increment when serving a corresponding API call
-UsageStatisticsWell.Instance.IncrementGetAllWellIdPerDay();
-
-// Adjust the backup cadence if needed (default is 5 minutes)
-UsageStatisticsWell.Instance.BackUpInterval = TimeSpan.FromMinutes(1);
-```
-Notes:
-- The statistics singleton periodically writes to `..\home\history.json` (relative to the Service working directory).
-- Persistence is managed automatically whenever an increment occurs and the backup interval has elapsed.
-
-## Build and Reference
-- Included in `Well.sln`. Build from the solution root:
-  - `dotnet build`
-- Add a project reference from another project (example):
-  - `<ProjectReference Include="..\Model\Model.csproj" />`
-  - or `dotnet add <your_project>.csproj reference ..\Model\Model.csproj`
-
-## Tests
-- See `ModelTest/WellTests.cs` for basic model behavior checks (constructors and property setters/getters).
-
-## Documentation
-- DocFX config is included under `Model/docfx.json` with API and articles scaffolding (`Model/api`, `Model/articles`).
-- If you use DocFX locally, you can generate docs for this project by pointing DocFX to that config.
-
-## Folder Structure (Model)
-- `Well.cs` — core Well DTO.
-- `UsageStatisticsWell.cs` — API usage counters and persistence.
-- `Model.csproj` — project file and package references.
-- `docfx.json`, `api/`, `articles/` — documentation configuration and placeholders.
+DocFX configuration is available in `Model/docfx.json`; `Model/api` and `Model/articles` contain its source files.

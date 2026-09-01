@@ -1,0 +1,83 @@
+@page "/Home"
+
+<MudStack Spacing="4" Class="mt-6">
+    <div>
+        <MudText Typo="Typo.h3">Well Management</MudText>
+        <MudText Typo="Typo.subtitle1" Color="Color.Secondary">
+            Manage Wells, their identities and features, portable backups, survey displays, and related drilling context.
+        </MudText>
+    </div>
+
+    <MudGrid>
+        <MudItem xs="12" md="6" lg="4">
+            <MudCard Class="h-100">
+                <MudCardContent>
+                    <MudText Typo="Typo.h5">Wells</MudText>
+                    <MudText Typo="Typo.body2">Browse, create, edit, and remove Well records and their assignments.</MudText>
+                </MudCardContent>
+                <MudCardActions>
+                    <MudButton Href="/Well/webapp/Well" Color="Color.Primary" Variant="Variant.Text">Open Wells</MudButton>
+                </MudCardActions>
+            </MudCard>
+        </MudItem>
+
+        <MudItem xs="12" md="6" lg="4">
+            <MudCard Class="h-100">
+                <MudCardContent>
+                    <MudText Typo="Typo.h5">Catalogs</MudText>
+                    <MudText Typo="Typo.body2">Maintain Well Identity definitions and Feature Categories with their options.</MudText>
+                </MudCardContent>
+                <MudCardActions>
+                    <MudButton Href="/Well/webapp/WellIdentities" Color="Color.Primary" Variant="Variant.Text">Identities</MudButton>
+                    <MudButton Href="/Well/webapp/WellFeatures" Color="Color.Primary" Variant="Variant.Text">Features</MudButton>
+                </MudCardActions>
+            </MudCard>
+        </MudItem>
+
+        <MudItem xs="12" md="6" lg="4">
+            <MudCard Class="h-100">
+                <MudCardContent>
+                    <MudText Typo="Typo.h5">Backup and Restore</MudText>
+                    <MudText Typo="Typo.body2">Export portable versioned JSON backups and restore them transactionally.</MudText>
+                </MudCardContent>
+                <MudCardActions>
+                    <MudButton Href="/Well/webapp/WellBackupRestore" Color="Color.Primary" Variant="Variant.Text">Open Backup</MudButton>
+                </MudCardActions>
+            </MudCard>
+        </MudItem>
+
+        <MudItem xs="12" md="6" lg="4">
+            <MudCard Class="h-100">
+                <MudCardContent>
+                    <MudText Typo="Typo.h5">Survey Display</MudText>
+                    <MudText Typo="Typo.body2">Inspect Well trajectories and survey runs with consistent depth references.</MudText>
+                </MudCardContent>
+                <MudCardActions>
+                    <MudButton Href="/Well/webapp/WellTrajectories" Color="Color.Primary" Variant="Variant.Text">Trajectories</MudButton>
+                    <MudButton Href="/Well/webapp/WellSurveyRuns" Color="Color.Primary" Variant="Variant.Text">Survey Runs</MudButton>
+                </MudCardActions>
+            </MudCard>
+        </MudItem>
+
+        <MudItem xs="12" md="6" lg="4">
+            <MudCard Class="h-100">
+                <MudCardContent>
+                    <MudText Typo="Typo.h5">Context and Calculators</MudText>
+                    <MudText Typo="Typo.body2">Access Field, Cluster, Rig, geodetic data, projections, and Earth calculators from the navigation menu.</MudText>
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+
+        <MudItem xs="12" md="6" lg="4">
+            <MudCard Class="h-100">
+                <MudCardContent>
+                    <MudText Typo="Typo.h5">Monitoring</MudText>
+                    <MudText Typo="Typo.body2">Review request totals and per-endpoint Well service usage.</MudText>
+                </MudCardContent>
+                <MudCardActions>
+                    <MudButton Href="/Well/webapp/StatisticsWell" Color="Color.Primary" Variant="Variant.Text">Usage Statistics</MudButton>
+                </MudCardActions>
+            </MudCard>
+        </MudItem>
+    </MudGrid>
+</MudStack>
