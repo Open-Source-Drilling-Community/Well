@@ -116,7 +116,10 @@ internal static class WellMutationManager
 
     public static void EnsureRevision(WellModel? well)
     {
-        if (well != null && well.LastModificationDate == null) well.LastModificationDate = RevisionOf(well);
+        if (well == null) return;
+        DateTimeOffset revision = RevisionOf(well);
+        well.CreationDate ??= revision;
+        well.LastModificationDate ??= revision;
     }
 
     public static WellMutationResult UpdateDetails(SqlConnectionManager manager, ILogger logger, Guid wellId,
@@ -340,9 +343,11 @@ internal static class WellMutationManager
         command.Transaction = transaction;
         command.CommandText = "SELECT Well FROM WellTable WHERE ID=$id";
         command.Parameters.AddWithValue("$id", id.ToString());
-        return command.ExecuteScalar() is string json
+        WellModel? well = command.ExecuteScalar() is string json
             ? JsonSerializer.Deserialize<WellModel>(json, JsonSettings.Options)
             : null;
+        EnsureRevision(well);
+        return well;
     }
 
     private static SqliteCommand CreateWriteCommand(SqliteConnection connection, SqliteTransaction transaction,

@@ -18,6 +18,8 @@ using WellIdentityAssignmentModel = OSDC.Drilling.Well.Model.WellIdentityAssignm
 using WellFeatureAssignmentModel = OSDC.Drilling.Well.Model.WellFeatureAssignment;
 using WellDetailsUpdateModel = OSDC.Drilling.Well.Model.WellDetailsUpdate;
 using WellLocationUpdateModel = OSDC.Drilling.Well.Model.WellLocationUpdate;
+using WellExternalReferenceAuditRequestModel = OSDC.Drilling.Well.Model.WellExternalReferenceAuditRequest;
+using WellExternalReferenceAuditResultModel = OSDC.Drilling.Well.Model.WellExternalReferenceAuditResult;
 
 namespace OSDC.Drilling.Well.Service.Mcp.Tools;
 
@@ -40,6 +42,10 @@ public static class WellRestMcpToolRegistrations
             (sp, args, ct) => InvokeNoArguments(args, ct, () => Controller(sp).GetAllWell()));
         services.AddLegacyMcpTool("well_search", "Return one deterministic page of complete Wells with a total match count. Optional filters support case-insensitive name and identity-value matching, exact cluster, slot, identity, feature-category and feature-option UUIDs, and inclusive modification timestamps. Limit is capped at 200.", McpToolArgumentHelpers.CreateWellSearchSchema(), McpToolArgumentHelpers.CreateWellSearchOutputSchema(), new("Search Wells", true, false, true, false),
             (sp, args, ct) => InvokeSearch(args, ct, () => Controller(sp)));
+        services.AddLegacyMcpTool("well_validate_external_references", "Check one stored Well's Cluster and Slot references against the configured Cluster service without changing data. Valid confirms the cluster exists and the slot belongs to it; Invalid identifies broken references; Unavailable distinguishes an external-service or configuration failure.", McpToolArgumentHelpers.CreateGuidSchema("wellId", "UUID of the stored Well whose external references should be checked."), McpToolArgumentHelpers.CreateWellExternalReferenceValidationOutputSchema(), new("Validate Well External References", true, false, true, false),
+            (sp, args, ct) => InvokeByGuidAsync(args, "wellId", ct, (id, token) => Controller(sp).ValidateWellExternalReferences(id, token)));
+        services.AddLegacyMcpTool("well_audit_external_references", "Check a deterministic page of all or selected stored Wells against the configured Cluster service without changing Well data. Results distinguish valid references, invalid references, and checks that could not complete because the external service was unavailable.", McpToolArgumentHelpers.CreateWellExternalReferenceAuditSchema(), McpToolArgumentHelpers.CreateWellExternalReferenceAuditOutputSchema(), new("Audit Well External References", true, false, true, false),
+            (sp, args, ct) => InvokeWithBodyResultAsync<WellExternalReferenceAuditRequestModel, WellExternalReferenceAuditResultModel>(args, "request", ct, (request, token) => Controller(sp).AuditWellExternalReferences(request, token)));
         services.AddLegacyMcpTool("well_batch_export", "Create a read-only schema-version-1 JSON backup of all stored wells or an explicitly ordered selection. The result contains complete Well records and only the Well Identity and Well Feature Category definitions and options referenced by those records. Cluster and Slot identifiers remain external references. A missing or invalid selected well rejects the complete export.", McpToolArgumentHelpers.CreateWellBatchExportSchema(), McpToolArgumentHelpers.CreateWellBatchExportOutputSchema(), new("Export Wells with Catalog Dependencies", true, false, true, false),
             (sp, args, ct) => InvokeWithBodyResult<WellBatchExportRequestModel, OSDC.Drilling.Well.Model.WellBatchExportDocument>(args, "request", ct, request => Controller(sp).BatchExportWells(request)));
         services.AddLegacyMcpTool("well_batch_restore", "Validate and atomically restore a schema-version-1 Well backup document. Source catalog UUIDs map to compatible local definitions by exact UUID or unique normalized name; MapOrCreateMissing can create missing definitions and options. ReplaceExisting can replace matching Well UUIDs. Catalog mapping, reference rewriting, catalog creation, and all Well writes use one transaction, so a validation, conflict, or storage failure changes nothing.", McpToolArgumentHelpers.CreateWellBatchRestoreSchema(), McpToolArgumentHelpers.CreateWellBatchRestoreOutputSchema(), new("Restore Wells and Catalog Dependencies", false, true, false, false),
@@ -138,6 +144,15 @@ public static class WellRestMcpToolRegistrations
             : Task.FromResult(error);
     }
 
+    private static async Task<JsonNode?> InvokeByGuidAsync<T>(JsonObject? args, string key, CancellationToken ct,
+        Func<Guid, CancellationToken, Task<ActionResult<T>>> action)
+    {
+        ct.ThrowIfCancellationRequested();
+        if (!HasOnlyArguments(args, out JsonNode? unexpected, key)) return unexpected;
+        if (!McpToolArgumentHelpers.TryParseGuid(args, key, out Guid id, out JsonNode? error)) return error;
+        return McpActionResultConverter.FromActionResult(await action(id, ct));
+    }
+
     private static Task<JsonNode?> InvokeDelete(JsonObject? args, CancellationToken ct, Func<Guid, ActionResult> action)
     {
         ct.ThrowIfCancellationRequested();
@@ -174,6 +189,15 @@ public static class WellRestMcpToolRegistrations
         return TryDeserialize(args, bodyName, out TModel? data, out JsonNode? error)
             ? Task.FromResult<JsonNode?>(McpActionResultConverter.FromActionResult(action(data)))
             : Task.FromResult(error);
+    }
+
+    private static async Task<JsonNode?> InvokeWithBodyResultAsync<TModel, TResult>(JsonObject? args, string bodyName,
+        CancellationToken ct, Func<TModel?, CancellationToken, Task<ActionResult<TResult>>> action)
+    {
+        ct.ThrowIfCancellationRequested();
+        if (!HasOnlyArguments(args, out JsonNode? unexpected, bodyName)) return unexpected;
+        if (!TryDeserialize(args, bodyName, out TModel? data, out JsonNode? error)) return error;
+        return McpActionResultConverter.FromActionResult(await action(data, ct));
     }
 
     private static Task<JsonNode?> InvokeWithIdAndBody<T>(JsonObject? args, string bodyName, CancellationToken ct, Func<Guid, T?, ActionResult> action)
@@ -315,7 +339,8 @@ public static class WellRestMcpToolRegistrations
 
     private static WellController Controller(IServiceProvider sp) => new(
         sp.GetRequiredService<ILogger<WellManager>>(),
-        sp.GetRequiredService<SqlConnectionManager>());
+        sp.GetRequiredService<SqlConnectionManager>(),
+        sp.GetRequiredService<IWellExternalReferenceValidator>());
 
     private static WellIdentityController IdentityController(IServiceProvider sp) => new(
         sp.GetRequiredService<ILogger<WellIdentityManager>>(), sp.GetRequiredService<SqlConnectionManager>());

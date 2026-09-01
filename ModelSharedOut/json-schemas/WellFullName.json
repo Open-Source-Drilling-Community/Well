@@ -455,6 +455,116 @@
         }
       }
     },
+    "/Well/{id}/ExternalReferences": {
+      "get": {
+        "tags": [
+          "Well"
+        ],
+        "operationId": "ValidateWellExternalReferences",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OSDC.Drilling.Well.Model.WellExternalReferenceValidation"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OSDC.Drilling.Well.Model.WellMutationErrorEnvelope"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OSDC.Drilling.Well.Model.WellMutationErrorEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/Well/ExternalReferenceAudit": {
+      "post": {
+        "tags": [
+          "Well"
+        ],
+        "operationId": "AuditWellExternalReferences",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OSDC.Drilling.Well.Model.WellExternalReferenceAuditRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OSDC.Drilling.Well.Model.WellExternalReferenceAuditRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/OSDC.Drilling.Well.Model.WellExternalReferenceAuditRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OSDC.Drilling.Well.Model.WellExternalReferenceAuditResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OSDC.Drilling.Well.Model.WellMutationErrorEnvelope"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OSDC.Drilling.Well.Model.WellMutationErrorEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/Well/BatchExport": {
       "post": {
         "tags": [
@@ -2186,6 +2296,150 @@
           }
         },
         "additionalProperties": false
+      },
+      "OSDC.Drilling.Well.Model.WellExternalReferenceAuditRequest": {
+        "required": [
+          "Scope"
+        ],
+        "type": "object",
+        "properties": {
+          "Scope": {
+            "$ref": "#/components/schemas/OSDC.Drilling.Well.Model.WellExternalReferenceAuditScope"
+          },
+          "WellIDs": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "nullable": true
+          },
+          "Offset": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "Limit": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "OSDC.Drilling.Well.Model.WellExternalReferenceAuditResult": {
+        "type": "object",
+        "properties": {
+          "CheckedAtUtc": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "Total": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "Offset": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "Limit": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "ValidCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "InvalidCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "UnavailableCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "Items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OSDC.Drilling.Well.Model.WellExternalReferenceValidation"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "OSDC.Drilling.Well.Model.WellExternalReferenceAuditScope": {
+        "enum": [
+          "All",
+          "Selected"
+        ],
+        "type": "string"
+      },
+      "OSDC.Drilling.Well.Model.WellExternalReferenceIssue": {
+        "type": "object",
+        "properties": {
+          "Property": {
+            "type": "string",
+            "nullable": true
+          },
+          "Code": {
+            "type": "string",
+            "nullable": true
+          },
+          "Message": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "OSDC.Drilling.Well.Model.WellExternalReferenceValidation": {
+        "type": "object",
+        "properties": {
+          "WellID": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "ClusterID": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "SlotID": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "ClusterExists": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "SlotBelongsToCluster": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "Status": {
+            "$ref": "#/components/schemas/OSDC.Drilling.Well.Model.WellExternalReferenceValidationStatus"
+          },
+          "CheckedAtUtc": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "Issues": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OSDC.Drilling.Well.Model.WellExternalReferenceIssue"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "OSDC.Drilling.Well.Model.WellExternalReferenceValidationStatus": {
+        "enum": [
+          "Valid",
+          "Invalid",
+          "Unavailable"
+        ],
+        "type": "string"
       },
       "OSDC.Drilling.Well.Model.WellFeatureAssignment": {
         "type": "object",

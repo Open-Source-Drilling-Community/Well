@@ -33,6 +33,8 @@ builder.Services.AddSwaggerGen(config =>
 
 builder.Services.Configure<McpHubOptions>(builder.Configuration.GetSection(McpHubOptions.SectionName));
 builder.Services.AddHttpClient(nameof(McpHubRegistrationService));
+builder.Services.AddHttpClient(nameof(WellExternalReferenceValidator));
+builder.Services.AddSingleton<IWellExternalReferenceValidator, WellExternalReferenceValidator>();
 builder.Services.AddHostedService<McpHubRegistrationService>();
 
 // MCP server registrations

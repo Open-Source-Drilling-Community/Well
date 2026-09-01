@@ -13,6 +13,8 @@ The Model project is the authoritative serializable contract used by the Well se
 - `WellFeatureOption`: stable option UUID and name within a feature category.
 - `WellFeatureAssignment`: referenced category and option plus optional validity dates.
 - `WellMutationErrorEnvelope`: structured mutation and catalog-conflict errors.
+- `WellExternalReferenceValidation`: tri-state (`Valid`, `Invalid`, or `Unavailable`) diagnostic result for one Well's Cluster and Slot UUIDs.
+- `WellExternalReferenceAuditRequest` and `WellExternalReferenceAuditResult`: bounded all/selected audit contracts with per-page status counts.
 
 The service supplies default identity and feature definitions for initial installations, while the definitions remain editable through the catalog APIs and UI.
 

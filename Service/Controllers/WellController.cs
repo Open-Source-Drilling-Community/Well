@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
@@ -19,11 +21,14 @@ namespace OSDC.Drilling.Well.Service.Controllers
     {
         private readonly ILogger<WellManager> _logger;
         private readonly WellManager _wellManager;
+        private readonly IWellExternalReferenceValidator _externalReferenceValidator;
 
-        public WellController(ILogger<WellManager> logger, SqlConnectionManager connectionManager)
+        public WellController(ILogger<WellManager> logger, SqlConnectionManager connectionManager,
+            IWellExternalReferenceValidator? externalReferenceValidator = null)
         {
             _logger = logger;
             _wellManager = WellManager.GetInstance(_logger, connectionManager);
+            _externalReferenceValidator = externalReferenceValidator ?? new UnavailableWellExternalReferenceValidator();
         }
 
         /// <summary>
@@ -142,6 +147,72 @@ namespace OSDC.Drilling.Well.Service.Controllers
             return result != null
                 ? Ok(result)
                 : StatusCode(StatusCodes.Status500InternalServerError, WellMutationResult.StorageFailure().Error);
+        }
+
+        /// <summary>Checks one stored Well's external Cluster and Slot references without modifying data.</summary>
+        [HttpGet("{id}/ExternalReferences", Name = "ValidateWellExternalReferences")]
+        [ProducesResponseType<WellExternalReferenceValidation>(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(WellMutationErrorEnvelope), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(WellMutationErrorEnvelope), StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<WellExternalReferenceValidation>> ValidateWellExternalReferences(
+            Guid id, CancellationToken cancellationToken)
+        {
+            if (id == Guid.Empty)
+                return BadRequest(WellMutationResult.Invalid("id", "invalid_id", "A non-empty Well UUID is required.").Error);
+            Model.Well? well = _wellManager.GetWellById(id);
+            if (well == null) return NotFound(WellMutationResult.NotFound("The Well does not exist.").Error);
+            IReadOnlyList<WellExternalReferenceValidation> results =
+                await _externalReferenceValidator.ValidateAsync([well], cancellationToken);
+            return Ok(results.Single());
+        }
+
+        /// <summary>Checks a bounded page of stored Wells for external Cluster and Slot consistency.</summary>
+        [HttpPost("ExternalReferenceAudit", Name = "AuditWellExternalReferences")]
+        [ProducesResponseType<WellExternalReferenceAuditResult>(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(WellMutationErrorEnvelope), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(WellMutationErrorEnvelope), StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<WellExternalReferenceAuditResult>> AuditWellExternalReferences(
+            [FromBody] WellExternalReferenceAuditRequest? request, CancellationToken cancellationToken)
+        {
+            if (request == null)
+                return BadRequest(WellMutationResult.Invalid("request", "required", "An audit request is required.").Error);
+            if (!Enum.IsDefined(request.Scope))
+                return BadRequest(WellMutationResult.Invalid("Scope", "invalid_value", "Scope must be All or Selected.").Error);
+            if (request.Offset < 0 || request.Limit is < 1 or > 100)
+                return BadRequest(WellMutationResult.Invalid("pagination", "invalid_range", "Offset must be non-negative and limit must be between 1 and 100.").Error);
+            if (request.Scope == WellExternalReferenceAuditScope.Selected && (request.WellIDs == null || request.WellIDs.Count == 0))
+                return BadRequest(WellMutationResult.Invalid("WellIDs", "required", "Selected scope requires at least one Well UUID.").Error);
+            if (request.WellIDs?.Any(value => value == Guid.Empty) == true || request.WellIDs?.Distinct().Count() != request.WellIDs?.Count)
+                return BadRequest(WellMutationResult.Invalid("WellIDs", "invalid_ids", "Well UUIDs must be non-empty and unique.").Error);
+
+            List<Model.Well?>? stored = _wellManager.GetAllWell();
+            if (stored == null)
+                return StatusCode(StatusCodes.Status500InternalServerError, WellMutationResult.StorageFailure().Error);
+            Dictionary<Guid, Model.Well> byId = stored.Where(value => value?.MetaInfo != null)
+                .Cast<Model.Well>().ToDictionary(value => value.MetaInfo!.ID);
+            IEnumerable<Model.Well> selected = byId.Values;
+            if (request.Scope == WellExternalReferenceAuditScope.Selected)
+            {
+                List<Guid> missing = request.WellIDs!.Where(id => !byId.ContainsKey(id)).ToList();
+                if (missing.Count != 0)
+                    return NotFound(WellMutationResult.NotFound($"Selected Well UUID '{missing[0]}' does not exist.").Error);
+                selected = request.WellIDs!.Select(id => byId[id]);
+            }
+            List<Model.Well> matches = selected.OrderBy(value => value.MetaInfo!.ID).ToList();
+            List<Model.Well> page = matches.Skip(request.Offset).Take(request.Limit).ToList();
+            IReadOnlyList<WellExternalReferenceValidation> items =
+                await _externalReferenceValidator.ValidateAsync(page, cancellationToken);
+            return Ok(new WellExternalReferenceAuditResult
+            {
+                CheckedAtUtc = items.FirstOrDefault()?.CheckedAtUtc ?? DateTimeOffset.UtcNow,
+                Total = matches.Count,
+                Offset = request.Offset,
+                Limit = request.Limit,
+                ValidCount = items.Count(value => value.Status == WellExternalReferenceValidationStatus.Valid),
+                InvalidCount = items.Count(value => value.Status == WellExternalReferenceValidationStatus.Invalid),
+                UnavailableCount = items.Count(value => value.Status == WellExternalReferenceValidationStatus.Unavailable),
+                Items = items.ToList()
+            });
         }
 
         /// <summary>Exports all Wells or an ordered selection with referenced local catalog definitions.</summary>

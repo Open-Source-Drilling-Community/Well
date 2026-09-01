@@ -18,6 +18,8 @@ public sealed class McpToolRegistrationTests
         ["GetWellById"] = "well_get_by_id",
         ["GetAllWell"] = "well_get_all",
         ["SearchWells"] = "well_search",
+        ["ValidateWellExternalReferences"] = "well_validate_external_references",
+        ["AuditWellExternalReferences"] = "well_audit_external_references",
         ["BatchExportWells"] = "well_batch_export",
         ["BatchRestoreWells"] = "well_batch_restore",
         ["GetAllUsedSlotMetaInfoByClusterId"] = "well_get_used_slot_meta_info_by_cluster_id",
@@ -106,7 +108,8 @@ public sealed class McpToolRegistrationTests
         foreach ((string name, IMcpTool tool) in _tools.Where(pair => pair.Key != "ping"))
         {
             Assert.That(tool.Behavior.OpenWorldHint, Is.False, name);
-            if (name.Contains("_get_", StringComparison.Ordinal) || name is "well_batch_export" or "well_search")
+            if (name.Contains("_get_", StringComparison.Ordinal) || name is "well_batch_export" or "well_search" or
+                "well_validate_external_references" or "well_audit_external_references")
             {
                 Assert.Multiple(() =>
                 {
@@ -175,8 +178,21 @@ public sealed class McpToolRegistrationTests
         Assert.That(RequiredNames(metaInfo), Does.Contain("ID"));
         Assert.That(Property(metaInfo, "ID")["format"]?.GetValue<string>(), Is.EqualTo("uuid"));
         Assert.That(Property(well, "CreationDate")["format"]?.GetValue<string>(), Is.EqualTo("date-time"));
+        Assert.That(RequiredNames(well), Has.None.EqualTo("CreationDate"));
+        Assert.That(Property(well, "CreationDate")["description"]?.GetValue<string>(), Does.Contain("Server-owned"));
         Assert.That(Property(well, "SlotID")["format"]?.GetValue<string>(), Is.EqualTo("uuid"));
         Assert.That(Property(well, "ClusterID")["format"]?.GetValue<string>(), Is.EqualTo("uuid"));
+    }
+
+    [Test]
+    public void Well_response_schema_guarantees_server_owned_timestamps()
+    {
+        JsonObject output = RequireObject(_tools["well_get_by_id"].OutputSchema);
+        JsonObject well = Property(output, "data");
+        Assert.That(RequiredNames(well), Does.Contain("CreationDate"));
+        Assert.That(RequiredNames(well), Does.Contain("LastModificationDate"));
+        Assert.That(Property(well, "CreationDate")["type"]?.GetValue<string>(), Is.EqualTo("string"));
+        Assert.That(Property(well, "LastModificationDate")["type"]?.GetValue<string>(), Is.EqualTo("string"));
     }
 
     [Test]
@@ -207,6 +223,22 @@ public sealed class McpToolRegistrationTests
     {
         Assert.That(_tools.Keys, Has.None.EqualTo("well_get_all_by_cluster_id"));
         Assert.That(_tools.Keys, Has.None.EqualTo("well_get_all_by_slot_id"));
+    }
+
+    [Test]
+    public void External_reference_audit_contract_is_bounded_closed_and_tri_state()
+    {
+        JsonObject input = RequireObject(_tools["well_audit_external_references"].InputSchema);
+        JsonObject request = Property(input, "request");
+        Assert.That(RequiredNames(request), Is.EquivalentTo(new[] { "Scope" }));
+        Assert.That(Property(request, "Limit")["maximum"]?.GetValue<int>(), Is.EqualTo(100));
+        Assert.That(request["additionalProperties"]?.GetValue<bool>(), Is.False);
+
+        JsonObject output = RequireObject(_tools["well_validate_external_references"].OutputSchema);
+        JsonObject validation = Property(output, "data");
+        JsonArray statuses = (JsonArray)Property(validation, "Status")["enum"]!;
+        Assert.That(statuses.Select(value => value!.GetValue<string>()), Is.EquivalentTo(new[] { "Valid", "Invalid", "Unavailable" }));
+        Assert.That(validation["additionalProperties"]?.GetValue<bool>(), Is.False);
     }
 
     [TestCase("well_details_update", "details")]
@@ -324,6 +356,18 @@ public sealed class McpToolRegistrationTests
             ["id"] = Guid.Empty.ToString()
         }, CancellationToken.None) as JsonObject;
         Assert.That(response?["status"]?.GetValue<int>(), Is.EqualTo(400));
+    }
+
+    [Test]
+    public async Task External_reference_tools_require_their_inputs_before_controller_invocation()
+    {
+        JsonObject? validate = await _tools["well_validate_external_references"].InvokeAsync(new JsonObject(), CancellationToken.None) as JsonObject;
+        JsonObject? audit = await _tools["well_audit_external_references"].InvokeAsync(new JsonObject(), CancellationToken.None) as JsonObject;
+        Assert.Multiple(() =>
+        {
+            Assert.That(validate?["status"]?.GetValue<int>(), Is.EqualTo(400));
+            Assert.That(audit?["status"]?.GetValue<int>(), Is.EqualTo(400));
+        });
     }
 
     [Test]

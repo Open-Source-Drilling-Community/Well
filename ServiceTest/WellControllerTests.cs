@@ -189,6 +189,7 @@ namespace OSDC.Drilling.Well.ServiceTest
 
             var read = _controller.GetWellById(legacy.MetaInfo.ID);
             var normalized = ((Microsoft.AspNetCore.Mvc.OkObjectResult)read.Result!).Value as WellModel;
+            Assert.That(normalized!.CreationDate, Is.EqualTo(DateTimeOffset.UnixEpoch));
             Assert.That(normalized!.LastModificationDate, Is.EqualTo(DateTimeOffset.UnixEpoch));
 
             normalized.Name = "Updated legacy Well";
@@ -397,6 +398,82 @@ namespace OSDC.Drilling.Well.ServiceTest
             var slots = (IEnumerable<Guid>)((Microsoft.AspNetCore.Mvc.OkObjectResult)res.Result!).Value!;
             Assert.That(slots, Does.Contain(w1.SlotID!.Value));
             Assert.That(slots, Does.Contain(w2.SlotID!.Value));
+        }
+
+        [Test]
+        public async Task ExternalReferenceValidation_ReadsStoredWellWithoutChangingIt()
+        {
+            WellModel well = NewWell();
+            Assert.That(_controller.PostWell(well), Is.InstanceOf<Microsoft.AspNetCore.Mvc.OkResult>());
+            var validator = new RecordingExternalValidator(WellExternalReferenceValidationStatus.Valid);
+            var controller = new WellController(_logger, _connMgr, validator);
+
+            var response = await controller.ValidateWellExternalReferences(well.MetaInfo!.ID, CancellationToken.None);
+            var validation = (WellExternalReferenceValidation)((Microsoft.AspNetCore.Mvc.OkObjectResult)response.Result!).Value!;
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(validation.WellID, Is.EqualTo(well.MetaInfo.ID));
+                Assert.That(validator.LastBatch, Has.Count.EqualTo(1));
+                Assert.That(_controller.GetWellById(well.MetaInfo.ID).Result, Is.InstanceOf<Microsoft.AspNetCore.Mvc.OkObjectResult>());
+            });
+        }
+
+        [Test]
+        public async Task ExternalReferenceAudit_PaginatesDeterministicallyAndCountsStatuses()
+        {
+            foreach (Guid id in new[]
+                     {
+                         Guid.Parse("00000000-0000-0000-0000-000000000003"),
+                         Guid.Parse("00000000-0000-0000-0000-000000000001"),
+                         Guid.Parse("00000000-0000-0000-0000-000000000002")
+                     })
+                Assert.That(_controller.PostWell(NewWell(id)), Is.InstanceOf<Microsoft.AspNetCore.Mvc.OkResult>());
+            var validator = new RecordingExternalValidator(WellExternalReferenceValidationStatus.Invalid);
+            var controller = new WellController(_logger, _connMgr, validator);
+
+            var response = await controller.AuditWellExternalReferences(new WellExternalReferenceAuditRequest
+            {
+                Scope = WellExternalReferenceAuditScope.All, Offset = 1, Limit = 1
+            }, CancellationToken.None);
+            var audit = (WellExternalReferenceAuditResult)((Microsoft.AspNetCore.Mvc.OkObjectResult)response.Result!).Value!;
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(audit.Total, Is.EqualTo(3));
+                Assert.That(audit.Items, Has.Count.EqualTo(1));
+                Assert.That(audit.Items[0].WellID, Is.EqualTo(Guid.Parse("00000000-0000-0000-0000-000000000002")));
+                Assert.That(audit.InvalidCount, Is.EqualTo(1));
+            });
+        }
+
+        [Test]
+        public async Task ExternalReferenceAudit_RejectsUndefinedScope()
+        {
+            var response = await _controller.AuditWellExternalReferences(new WellExternalReferenceAuditRequest
+            {
+                Scope = (WellExternalReferenceAuditScope)999
+            }, CancellationToken.None);
+
+            Assert.That(response.Result, Is.InstanceOf<Microsoft.AspNetCore.Mvc.BadRequestObjectResult>());
+        }
+
+        private sealed class RecordingExternalValidator(WellExternalReferenceValidationStatus status) : IWellExternalReferenceValidator
+        {
+            public IReadOnlyCollection<WellModel> LastBatch { get; private set; } = [];
+
+            public Task<IReadOnlyList<WellExternalReferenceValidation>> ValidateAsync(
+                IReadOnlyCollection<WellModel> wells, CancellationToken cancellationToken)
+            {
+                LastBatch = wells;
+                DateTimeOffset checkedAt = DateTimeOffset.UtcNow;
+                IReadOnlyList<WellExternalReferenceValidation> results = wells.Select(well => new WellExternalReferenceValidation
+                {
+                    WellID = well.MetaInfo!.ID, ClusterID = well.ClusterID, SlotID = well.SlotID,
+                    Status = status, CheckedAtUtc = checkedAt
+                }).ToList();
+                return Task.FromResult(results);
+            }
         }
     }
 }

@@ -40,7 +40,7 @@ internal static class McpToolArgumentHelpers
     {
         var properties = new JsonObject
         {
-            ["well"] = CreateWellObjectSchema()
+            ["well"] = CreateWellObjectSchema(includeId ? WellSchemaKind.UpdateInput : WellSchemaKind.CreateInput)
         };
         var required = new JsonArray { "well" };
 
@@ -71,7 +71,7 @@ internal static class McpToolArgumentHelpers
         };
     }
 
-    public static JsonObject CreateWellResourceSchema() => CreateWellObjectSchema();
+    public static JsonObject CreateWellResourceSchema() => CreateWellObjectSchema(WellSchemaKind.Response);
 
     public static JsonObject CreateWellDeleteSchema() => CreateTimestampedIdSchema("id", "Identifier of the Well to delete.");
 
@@ -156,12 +156,12 @@ internal static class McpToolArgumentHelpers
         ["items"] = CreateMetaInfoSchema()
     });
 
-    public static JsonObject CreateWellOutputSchema() => SuccessEnvelope(CreateWellObjectSchema());
+    public static JsonObject CreateWellOutputSchema() => SuccessEnvelope(CreateWellObjectSchema(WellSchemaKind.Response));
 
     public static JsonObject CreateWellListOutputSchema() => SuccessEnvelope(new JsonObject
     {
         ["type"] = "array",
-        ["items"] = CreateWellObjectSchema()
+        ["items"] = CreateWellObjectSchema(WellSchemaKind.Response)
     });
 
     public static JsonObject CreateWellSearchSchema() => new()
@@ -189,7 +189,7 @@ internal static class McpToolArgumentHelpers
         ["type"] = "object",
         ["properties"] = new JsonObject
         {
-            ["Items"] = new JsonObject { ["type"] = "array", ["items"] = CreateWellObjectSchema() },
+            ["Items"] = new JsonObject { ["type"] = "array", ["items"] = CreateWellObjectSchema(WellSchemaKind.Response) },
             ["Total"] = NonNegativeInteger(),
             ["Offset"] = NonNegativeInteger(),
             ["Limit"] = new JsonObject { ["type"] = "integer", ["minimum"] = 1, ["maximum"] = 200 }
@@ -197,6 +197,74 @@ internal static class McpToolArgumentHelpers
         ["required"] = new JsonArray("Items", "Total", "Offset", "Limit"),
         ["additionalProperties"] = false
     });
+
+    public static JsonObject CreateWellExternalReferenceValidationOutputSchema() =>
+        SuccessEnvelope(CreateWellExternalReferenceValidationSchema());
+
+    public static JsonObject CreateWellExternalReferenceAuditSchema() => WrapRequest(new JsonObject
+    {
+        ["type"] = "object",
+        ["properties"] = new JsonObject
+        {
+            ["Scope"] = new JsonObject { ["type"] = "string", ["enum"] = new JsonArray("All", "Selected") },
+            ["WellIDs"] = new JsonObject
+            {
+                ["type"] = new JsonArray("array", "null"), ["uniqueItems"] = true,
+                ["items"] = new JsonObject { ["type"] = "string", ["format"] = "uuid" }
+            },
+            ["Offset"] = new JsonObject { ["type"] = "integer", ["minimum"] = 0, ["default"] = 0 },
+            ["Limit"] = new JsonObject { ["type"] = "integer", ["minimum"] = 1, ["maximum"] = 100, ["default"] = 100 }
+        },
+        ["required"] = new JsonArray("Scope"),
+        ["additionalProperties"] = false
+    });
+
+    public static JsonObject CreateWellExternalReferenceAuditOutputSchema() => SuccessEnvelope(new JsonObject
+    {
+        ["type"] = "object",
+        ["properties"] = new JsonObject
+        {
+            ["CheckedAtUtc"] = DateTimeSchema("Timestamp at which this audit page was checked."),
+            ["Total"] = NonNegativeInteger(), ["Offset"] = NonNegativeInteger(),
+            ["Limit"] = new JsonObject { ["type"] = "integer", ["minimum"] = 1, ["maximum"] = 100 },
+            ["ValidCount"] = NonNegativeInteger(), ["InvalidCount"] = NonNegativeInteger(),
+            ["UnavailableCount"] = NonNegativeInteger(),
+            ["Items"] = new JsonObject { ["type"] = "array", ["items"] = CreateWellExternalReferenceValidationSchema() }
+        },
+        ["required"] = new JsonArray("CheckedAtUtc", "Total", "Offset", "Limit", "ValidCount", "InvalidCount", "UnavailableCount", "Items"),
+        ["additionalProperties"] = false
+    });
+
+    private static JsonObject CreateWellExternalReferenceValidationSchema() => new()
+    {
+        ["type"] = "object",
+        ["properties"] = new JsonObject
+        {
+            ["WellID"] = new JsonObject { ["type"] = "string", ["format"] = "uuid" },
+            ["ClusterID"] = NullableUuid("Cluster UUID recorded by the Well, or null."),
+            ["SlotID"] = NullableUuid("Slot UUID recorded by the Well, or null."),
+            ["ClusterExists"] = new JsonObject { ["type"] = new JsonArray("boolean", "null") },
+            ["SlotBelongsToCluster"] = new JsonObject { ["type"] = new JsonArray("boolean", "null") },
+            ["Status"] = new JsonObject { ["type"] = "string", ["enum"] = new JsonArray("Valid", "Invalid", "Unavailable") },
+            ["CheckedAtUtc"] = DateTimeSchema("Timestamp at which the external references were checked."),
+            ["Issues"] = new JsonObject
+            {
+                ["type"] = "array", ["items"] = new JsonObject
+                {
+                    ["type"] = "object",
+                    ["properties"] = new JsonObject
+                    {
+                        ["Property"] = new JsonObject { ["type"] = "string" },
+                        ["Code"] = new JsonObject { ["type"] = "string" },
+                        ["Message"] = new JsonObject { ["type"] = "string" }
+                    },
+                    ["required"] = new JsonArray("Property", "Code", "Message"), ["additionalProperties"] = false
+                }
+            }
+        },
+        ["required"] = new JsonArray("WellID", "ClusterID", "SlotID", "ClusterExists", "SlotBelongsToCluster", "Status", "CheckedAtUtc", "Issues"),
+        ["additionalProperties"] = false
+    };
 
     public static JsonObject CreateIdentityAssignmentMutationSchema(bool includeAssignmentId, bool includeBody) =>
         CreateAssignmentMutationSchema(CreateIdentityAssignmentSchema(), includeAssignmentId, includeBody);
@@ -237,19 +305,42 @@ internal static class McpToolArgumentHelpers
         ["items"] = resource
     });
 
-    private static JsonObject CreateWellObjectSchema()
+    private enum WellSchemaKind
     {
+        CreateInput,
+        UpdateInput,
+        Response,
+        BatchDocument
+    }
+
+    private static JsonObject CreateWellObjectSchema(WellSchemaKind kind)
+    {
+        bool response = kind == WellSchemaKind.Response;
+        bool mutationInput = kind is WellSchemaKind.CreateInput or WellSchemaKind.UpdateInput;
+        JsonArray required = new("MetaInfo");
+        if (response)
+        {
+            required.Add("CreationDate");
+            required.Add("LastModificationDate");
+        }
+
         return new JsonObject
         {
             ["type"] = "object",
-            ["description"] = "Complete Well resource. MetaInfo.ID must be a non-empty UUID; the service does not generate an identifier.",
+            ["description"] = mutationInput
+                ? "Complete Well write model. MetaInfo.ID must be a non-empty caller-generated UUID. CreationDate and LastModificationDate are server-owned; supplied values are ignored."
+                : "Complete Well resource. MetaInfo.ID is a non-empty UUID and the timestamps are server-owned revisions.",
             ["properties"] = new JsonObject
             {
                 ["MetaInfo"] = CreateMetaInfoSchema(),
                 ["Name"] = NullableString("Human-readable well name."),
                 ["Description"] = NullableString("Human-readable description of the well."),
-                ["CreationDate"] = NullableDateTime("UTC or offset timestamp at which the well record was created."),
-                ["LastModificationDate"] = NullableDateTime("UTC or offset timestamp of the most recent modification."),
+                ["CreationDate"] = response
+                    ? DateTimeSchema("Server-owned creation timestamp.")
+                    : NullableDateTime(mutationInput ? "Server-owned; a supplied value is ignored." : "Creation timestamp retained for portable legacy backup documents."),
+                ["LastModificationDate"] = response
+                    ? DateTimeSchema("Server-owned optimistic-concurrency revision timestamp.")
+                    : NullableDateTime(mutationInput ? "Server-owned; a supplied value is ignored." : "Modification timestamp retained for portable legacy backup documents."),
                 ["SlotID"] = NullableUuid("External Slot-service identifier. Its existence is not synchronously validated by Well."),
                 ["ClusterID"] = NullableUuid("External Cluster-service identifier. Its existence is not synchronously validated by Well."),
                 ["IsSingleWell"] = new JsonObject
@@ -261,7 +352,7 @@ internal static class McpToolArgumentHelpers
                 ["WellIdentityAssignments"] = NullableArray(CreateIdentityAssignmentSchema()),
                 ["WellFeatureAssignments"] = NullableArray(CreateFeatureAssignmentSchema())
             },
-            ["required"] = new JsonArray { "MetaInfo" },
+            ["required"] = required,
             ["additionalProperties"] = false
         };
     }
@@ -362,7 +453,7 @@ internal static class McpToolArgumentHelpers
                 },
                 ["required"] = new JsonArray("Identities", "FeatureCategories"), ["additionalProperties"] = false
             },
-            ["Wells"] = new JsonObject { ["type"] = "array", ["minItems"] = minimumWells, ["items"] = CreateWellObjectSchema() }
+            ["Wells"] = new JsonObject { ["type"] = "array", ["minItems"] = minimumWells, ["items"] = CreateWellObjectSchema(WellSchemaKind.BatchDocument) }
         },
         ["required"] = new JsonArray("FormatIdentifier", "SchemaVersion", "ExportedAtUtc", "CatalogDependencies", "Wells"),
         ["additionalProperties"] = false
@@ -477,6 +568,13 @@ internal static class McpToolArgumentHelpers
     private static JsonObject NullableDateTime(string description) => new()
     {
         ["type"] = new JsonArray { "string", "null" },
+        ["format"] = "date-time",
+        ["description"] = description
+    };
+
+    private static JsonObject DateTimeSchema(string description) => new()
+    {
+        ["type"] = "string",
         ["format"] = "date-time",
         ["description"] = description
     };

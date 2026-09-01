@@ -49,7 +49,7 @@ dotnet run --project WebApp
 
 ## Main capabilities
 
-- Well CRUD and queries by Cluster or Slot.
+- Well CRUD plus bounded search by Cluster, Slot, name, identity, feature, and modification time.
 - User-managed Well Identity definitions and per-Well identity values.
 - User-managed Well Feature Categories, options, and validity-aware assignments.
 - Versioned logical JSON backup of all Wells or an ordered selection.
@@ -62,10 +62,11 @@ dotnet run --project WebApp
 - Bounded, server-side Well search with stable pagination totals and filters for hierarchy, names, identities, features, and modification time.
 - Concurrency-safe APIs for adding, replacing, or removing one identity or feature assignment without resending the complete Well.
 - Concurrency-safe detail and location updates without resending the complete Well; Well deletion is also revision-checked.
+- Read-only single-Well and paged batch audits of external Cluster/Slot references, with dependency outages reported separately from invalid references.
 
 Well mutations and catalog replacement operations use optimistic concurrency: callers send the `LastModificationDate` from their latest read as `expectedModifiedUtc`. Stale updates and deletes return `409` without changing the record. MCP closed-object schemas are also enforced at runtime, including rejection of unknown nested fields.
 
-Cluster and Slot UUIDs are external references owned by the Cluster service. Their UUID shape and Slot-requires-Cluster relationship are validated locally; external existence is not synchronously checked inside a Well database transaction.
+Cluster and Slot UUIDs are external references owned by the Cluster service. Their UUID shape and Slot-requires-Cluster relationship are validated locally; external existence is never checked inside a Well database transaction. Separate read-only validation endpoints use `ClusterHostURL` and report `Unavailable` when the Cluster service cannot be reached.
 
 ## Data and upgrade safety
 

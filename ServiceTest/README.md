@@ -4,10 +4,11 @@
 
 ## Coverage
 
-- `WellControllerTests`: Well controller validation and CRUD behavior.
+- `WellControllerTests`: Well controller validation, CRUD behavior, external-reference validation, and deterministic audit pagination.
 - `CatalogAndMigrationTests`: default Identity/Feature catalogs, reference protection, optimistic concurrency, additive schema migration, and preservation checks against captured Kubernetes database copies when available.
 - `WellBatchBackupRestoreTests`: ordered export, dependency closure, catalog remapping/creation, collision rollback, corrupt-document rejection, and legacy-upgrade data preservation.
-- `McpToolRegistrationTests`: parity between all 33 non-statistics REST actions and MCP tools, strict schemas, required UUID/body/timestamp arguments, bounded search, detailed descriptions, and behavior annotations.
+- `WellExternalReferenceValidatorTests`: Cluster/Slot membership checks, tri-state dependency failures, and per-batch Cluster-read caching.
+- `McpToolRegistrationTests`: parity between all 35 non-statistics REST actions and MCP tools, operation-specific write/response schemas, strict inputs, bounded search/audit, detailed descriptions, and behavior annotations.
 - `McpServerHttpTests`: live streamable-HTTP initialization, tool discovery, and `ping` invocation.
 
 ## Run without the live MCP tests
