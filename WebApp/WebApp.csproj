@@ -28,7 +28,7 @@
     <PackageReference Include="OSDC.Drilling.Cluster.WebPages" Version="1.1.0" />
     <PackageReference Include="OSDC.Drilling.EarthCartographicProjection.WebPages" Version="1.1.0" />
     <PackageReference Include="OSDC.Drilling.EarthGeodesy.WebPages" Version="1.1.0" />
-    <PackageReference Include="OSDC.Drilling.EarthGravity.WebPages" Version="1.0.1" />
+    <PackageReference Include="OSDC.Drilling.EarthGravity.WebPages" Version="1.0.2" />
     <PackageReference Include="OSDC.Drilling.EarthMagneticField.WebPages" Version="1.0.1" />
     <PackageReference Include="OSDC.Drilling.EarthVerticalDatum.WebPages" Version="1.1.0" />
     <PackageReference Include="OSDC.Drilling.Field.WebPages" Version="2.0.0" />

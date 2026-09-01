@@ -107,7 +107,7 @@ See [../deployment/identity-cutover.md](../deployment/identity-cutover.md) for t
 
 ## MCP contract
 
-The service publishes 35 non-statistics REST operations as MCP tools plus `ping`. Usage statistics are intentionally not exposed through MCP.
+The service advertises 36 MCP tools: 35 non-statistics REST operations plus `ping`. Usage statistics are intentionally not exposed through MCP.
 
 - Streamable HTTP: `/well/api/mcp`
 - WebSocket: `/well/api/mcp/ws`
@@ -123,6 +123,8 @@ Tool families:
 - `well_identity_assignment_*` and `well_feature_assignment_*`: targeted, concurrency-safe nested assignment mutations.
 - `well_identity_*`: complete Identity definition CRUD and discovery.
 - `well_feature_category_*`: complete Feature Category CRUD and discovery.
+
+Well discovery consists of `well_get_all_ids`, `well_get_all_meta_info`, `well_get_by_id`, the complete unbounded `well_get_all`, and bounded `well_search`. There is no separate `well_get_all_light`; use metadata for a lightweight listing or `well_search` for filtered, paginated complete records. Search supports name, Cluster, Slot, identity definition/value, feature category/option, and modification-time filters. Field-level navigation remains a cross-service workflow because Well stores Cluster and Slot UUIDs, not a Field UUID.
 
 Every tool publishes a title, detailed description, closed input/output JSON schemas, and read-only/destructive/idempotent/open-world annotations. Closed schemas are enforced at runtime: unknown top-level and nested properties are rejected instead of ignored. Well write schemas mark timestamps as optional server-owned fields, while Well response schemas require non-null creation and modification timestamps. UUID arguments must be non-empty. Well updates, Well deletion, assignment mutations, and catalog updates require `expectedModifiedUtc`. Well mutations additionally validate assignment IDs, required identity values, catalog references, validity periods, exclusive-category overlap, and Slot/Cluster consistency. Tests compare all non-statistics controller actions with registered MCP tools to prevent REST/MCP drift.
 

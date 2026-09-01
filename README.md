@@ -58,13 +58,15 @@ dotnet run --project WebApp
 - Context pages for Field, Cluster, Rig, projections, geodetic datum, and spheroid data.
 - Cartographic, vertical datum, gravity, and magnetic-field calculators.
 - Per-endpoint usage-statistics dashboard.
-- MCP access to every non-statistics REST operation.
+- 36 advertised MCP tools: every one of the 35 non-statistics REST operations plus `ping`.
 - Bounded, server-side Well search with stable pagination totals and filters for hierarchy, names, identities, features, and modification time.
 - Concurrency-safe APIs for adding, replacing, or removing one identity or feature assignment without resending the complete Well.
 - Concurrency-safe detail and location updates without resending the complete Well; Well deletion is also revision-checked.
 - Read-only single-Well and paged batch audits of external Cluster/Slot references, with dependency outages reported separately from invalid references.
 
 Well mutations and catalog replacement operations use optimistic concurrency: callers send the `LastModificationDate` from their latest read as `expectedModifiedUtc`. Stale updates and deletes return `409` without changing the record. MCP closed-object schemas are also enforced at runtime, including rejection of unknown nested fields.
+
+Lightweight Well discovery is available through ID and metadata listings. `well_search` is the bounded query operation and filters by name, Cluster, Slot, identity definition/value, feature category/option, and modification interval; there is no separate `well_get_all_light` operation.
 
 Cluster and Slot UUIDs are external references owned by the Cluster service. Their UUID shape and Slot-requires-Cluster relationship are validated locally; external existence is never checked inside a Well database transaction. Separate read-only validation endpoints use `ClusterHostURL` and report `Unavailable` when the Cluster service cannot be reached.
 

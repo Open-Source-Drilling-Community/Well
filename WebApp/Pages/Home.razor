@@ -1,83 +1,206 @@
 @page "/Home"
 
-<MudStack Spacing="4" Class="mt-6">
-    <div>
-        <MudText Typo="Typo.h3">Well Management</MudText>
-        <MudText Typo="Typo.subtitle1" Color="Color.Secondary">
-            Manage Wells, their identities and features, portable backups, survey displays, and related drilling context.
-        </MudText>
-    </div>
+<MudText Class="mx-4 px-4 mt-4" Typo="Typo.h2">OSDC Well</MudText>
+<MudDivider Class="mb-4" />
+<MudText Class="mx-6 px-6" Typo="Typo.body1">
+    This microservice manages Well records: their identity assignments, feature assignments, location within a
+    Cluster and Slot, and portable versioned backups. It persists to SQLite, enforces optimistic concurrency on
+    every mutation, and exposes the same operations through a REST API, an MCP server, and a Blazor web
+    application, so a well record created or edited in one interface is immediately visible through the others.
+</MudText>
 
-    <MudGrid>
-        <MudItem xs="12" md="6" lg="4">
-            <MudCard Class="h-100">
-                <MudCardContent>
-                    <MudText Typo="Typo.h5">Wells</MudText>
-                    <MudText Typo="Typo.body2">Browse, create, edit, and remove Well records and their assignments.</MudText>
-                </MudCardContent>
-                <MudCardActions>
-                    <MudButton Href="/Well/webapp/Well" Color="Color.Primary" Variant="Variant.Text">Open Wells</MudButton>
-                </MudCardActions>
-            </MudCard>
-        </MudItem>
+<MudGrid Class="mx-4 px-4 mt-2">
+    <MudItem xs="12" md="6">
+        <MudPaper Class="pa-6 mt-4" Elevation="2">
+            <MudText Typo="Typo.h5" Class="mb-3">What is a Well</MudText>
+            <MudText Typo="Typo.body1" Class="mb-2">
+                A <b>Well</b> is the administrative record for one well: a name, a description, server-owned
+                creation and modification timestamps, an optional location (<code>ClusterID</code> and
+                <code>SlotID</code>), and the identity and feature assignments that describe it. It is the anchor
+                other drilling data — trajectories, survey runs, wellbores — refers back to, without itself carrying
+                trajectory geometry or saying how many subsurface targets it reaches.
+            </MudText>
+            <MudText Typo="Typo.body1">
+                Well UUIDs are caller-generated so that consuming systems can mint and reference an identifier before
+                the record exists on the server, which matters when a well is planned before it is spudded.
+            </MudText>
+        </MudPaper>
+    </MudItem>
+    <MudItem xs="12" md="6">
+        <MudPaper Class="pa-6 mt-4" Elevation="2">
+            <MudText Typo="Typo.h5" Class="mb-3">Wells versus wellbores</MudText>
+            <MudText Typo="Typo.body1" Class="mb-2">
+                A Well is not the same thing as a <b>WellBore</b>. One Well record covers the entire well; a
+                WellBore is one physical drilled path belonging to it, with its own geometry, survey stations, and
+                casing. A well is rarely aimed at a single point — it is more often planned against a
+                <b>target group</b>, several subsurface targets it needs to reach. Targets in the group can be
+                reached <i>in series</i>, drilled through one after another along the same bore, or split across
+                separate branches, as in a sidetracked or multilateral well where each lateral departs from the
+                original hole to reach a different target.
+            </MudText>
+            <MudText Typo="Typo.body1">
+                This is why the two are different microservices: <b>Well</b> owns the location, identity, and
+                feature record for the well as a whole, while the separate <b>WellBore</b> service owns the
+                individual drilled-path definitions — the original hole and any sidetracks — each linking back to
+                its Well through an optional <code>WellID</code>.
+            </MudText>
+        </MudPaper>
+    </MudItem>
+    <MudItem xs="12" md="6">
+        <MudPaper Class="pa-6 mt-4" Elevation="2">
+            <MudText Typo="Typo.h5" Class="mb-3">Single wells and wells in a cluster</MudText>
+            <MudText Typo="Typo.body1" Class="mb-2">
+                A well can stand alone, with no <code>ClusterID</code>, or it can be located at a <b>Slot</b> within
+                a <b>Cluster</b> — a template, platform, or pad shared by several wells. The <code>IsSingleWell</code>
+                flag on the Cluster record distinguishes a genuine multi-slot cluster from a "cluster" that exists
+                only to carry the location of one standalone well, so both cases share the same location model.
+            </MudText>
+            <MudText Typo="Typo.body1">
+                <code>ClusterID</code> and <code>SlotID</code> are external references owned by the Cluster
+                microservice: Well validates their shape and the Slot-requires-Cluster rule locally, and offers
+                read-only <MudLink Href="/Well/webapp/Well">validation and audit</MudLink> against the live Cluster
+                service, but never blocks a Well write on that other service being reachable.
+            </MudText>
+        </MudPaper>
+    </MudItem>
+    <MudItem xs="12" md="6">
+        <MudPaper Class="pa-6 mt-4" Elevation="2">
+            <MudText Typo="Typo.h5" Class="mb-3">Identities and features</MudText>
+            <MudText Typo="Typo.body1" Class="mb-2">
+                Every well can carry any number of user-defined <b>identities</b> — symbolic references such as a
+                UWI, an operator well name, or a regulatory ID — each with a well-specific value, and any number of
+                <b>feature</b> assignments drawn from user-defined categories and options, optionally exclusive
+                within a category and optionally time-bounded.
+            </MudText>
+            <MudText Typo="Typo.body1">
+                The identity and feature <i>catalogs</i> are managed on the
+                <MudLink Href="/Well/webapp/WellIdentities">Well Identities</MudLink> and
+                <MudLink Href="/Well/webapp/WellFeatures">Well Features</MudLink> pages, while a specific well's
+                assignments are added, replaced, or removed one at a time from the <MudLink Href="/Well/webapp/Well">Well</MudLink>
+                page — a definition or option cannot be deleted while a well still references it.
+            </MudText>
+        </MudPaper>
+    </MudItem>
+</MudGrid>
 
-        <MudItem xs="12" md="6" lg="4">
-            <MudCard Class="h-100">
-                <MudCardContent>
-                    <MudText Typo="Typo.h5">Catalogs</MudText>
-                    <MudText Typo="Typo.body2">Maintain Well Identity definitions and Feature Categories with their options.</MudText>
-                </MudCardContent>
-                <MudCardActions>
-                    <MudButton Href="/Well/webapp/WellIdentities" Color="Color.Primary" Variant="Variant.Text">Identities</MudButton>
-                    <MudButton Href="/Well/webapp/WellFeatures" Color="Color.Primary" Variant="Variant.Text">Features</MudButton>
-                </MudCardActions>
-            </MudCard>
-        </MudItem>
+<MudPaper Class="mx-4 px-4 pa-6 mt-4" Elevation="2">
+    <MudText Typo="Typo.h5" Class="mb-3">Contextual data and calculators</MudText>
+    <MudText Typo="Typo.body1" Class="mb-2">
+        The web application's <b>Contextual Data</b> menu gives read access to the records a well's location relies
+        on: <MudLink Href="/Well/webapp/Cluster">Cluster</MudLink>, <MudLink Href="/Well/webapp/Field">Field</MudLink>,
+        and <MudLink Href="/Well/webapp/Rig">Rig</MudLink> — each backed by its own microservice and shown here
+        through reusable Razor components, so a well can be understood in its field and drilling-program context
+        without leaving this application.
+    </MudText>
+    <MudText Typo="Typo.body1">
+        The <b>Calculators</b> menu exposes the same synchronous, stateless evaluations used elsewhere in OSDC —
+        <MudLink Href="/Well/webapp/FieldCartographicConverter">Cartographic Conversion</MudLink>,
+        <MudLink Href="/Well/webapp/EarthVerticalDatumCalculation">Vertical Datum Conversion</MudLink>,
+        <MudLink Href="/Well/webapp/EarthGravityCalculation">Earth Gravity Evaluation</MudLink>, and
+        <MudLink Href="/Well/webapp/EarthMagneticFieldCalculation">Earth Magnetic Field Evaluation</MudLink> —
+        for one-off conversions and lookups while working a well, without switching to another site.
+    </MudText>
+</MudPaper>
 
-        <MudItem xs="12" md="6" lg="4">
-            <MudCard Class="h-100">
-                <MudCardContent>
-                    <MudText Typo="Typo.h5">Backup and Restore</MudText>
-                    <MudText Typo="Typo.body2">Export portable versioned JSON backups and restore them transactionally.</MudText>
-                </MudCardContent>
-                <MudCardActions>
-                    <MudButton Href="/Well/webapp/WellBackupRestore" Color="Color.Primary" Variant="Variant.Text">Open Backup</MudButton>
-                </MudCardActions>
-            </MudCard>
-        </MudItem>
+<MudPaper Class="mx-4 px-4 pa-6 mt-4" Elevation="2">
+    <MudText Typo="Typo.h5" Class="mb-3">Backup and restore</MudText>
+    <MudText Typo="Typo.body1" Class="mb-2">
+        Backups are logical, portable JSON, not a raw database copy. From the
+        <MudLink Href="/Well/webapp/WellBackupRestore">Backup and Restore</MudLink> page, export <b>all</b> wells or
+        an ordered <b>selection</b> into one versioned document that carries the complete wells together with only
+        the identity and feature catalog entries they actually reference — enough to reproduce the wells on another
+        installation without pulling in unrelated catalog clutter.
+    </MudText>
+    <MudText Typo="Typo.body1">
+        Restoring the same document back offers a <b>conflict policy</b> — fail if any well UUID already exists, or
+        replace matching wells while creating the rest — and a <b>catalog policy</b> — map onto existing local
+        identity/feature definitions by UUID or name, or create the missing ones locally. Validation, catalog
+        mapping, and every well write happen inside one SQLite transaction, so a restore of many wells either
+        commits completely or leaves the database untouched.
+    </MudText>
+</MudPaper>
 
-        <MudItem xs="12" md="6" lg="4">
-            <MudCard Class="h-100">
-                <MudCardContent>
-                    <MudText Typo="Typo.h5">Survey Display</MudText>
-                    <MudText Typo="Typo.body2">Inspect Well trajectories and survey runs with consistent depth references.</MudText>
-                </MudCardContent>
-                <MudCardActions>
-                    <MudButton Href="/Well/webapp/WellTrajectories" Color="Color.Primary" Variant="Variant.Text">Trajectories</MudButton>
-                    <MudButton Href="/Well/webapp/WellSurveyRuns" Color="Color.Primary" Variant="Variant.Text">Survey Runs</MudButton>
-                </MudCardActions>
-            </MudCard>
-        </MudItem>
+<MudPaper Class="mx-4 px-4 pa-6 mt-4" Elevation="2">
+    <MudText Typo="Typo.h5" Class="mb-3">Data integrity and monitoring</MudText>
+    <MudText Typo="Typo.body1" Class="mb-2">
+        Well updates, deletes, and individual identity/feature assignment changes use <b>optimistic concurrency</b>:
+        every mutation must echo back the <code>LastModificationDate</code> from the caller's latest read, and a
+        stale request is rejected rather than silently overwriting a concurrent change. Deleting a catalog
+        definition or option still in use by a well is likewise rejected instead of cascading into well data.
+    </MudText>
+    <MudText Typo="Typo.body1">
+        Because <code>ClusterID</code> and <code>SlotID</code> point at another service, Well also offers read-only
+        <b>external-reference validation</b> for one well and a bounded <b>audit</b> across all or selected wells,
+        each reference reported as <code>Valid</code>, <code>Invalid</code>, or <code>Unavailable</code> so a
+        dependency outage is never confused with a genuinely broken reference. The
+        <MudLink Href="/Well/webapp/StatisticsWell">Usage Statistics</MudLink> page reports per-endpoint request
+        counts for this service replica.
+    </MudText>
+</MudPaper>
 
-        <MudItem xs="12" md="6" lg="4">
-            <MudCard Class="h-100">
-                <MudCardContent>
-                    <MudText Typo="Typo.h5">Context and Calculators</MudText>
-                    <MudText Typo="Typo.body2">Access Field, Cluster, Rig, geodetic data, projections, and Earth calculators from the navigation menu.</MudText>
-                </MudCardContent>
-            </MudCard>
-        </MudItem>
+<MudPaper Class="mx-4 px-4 pa-6 mt-4" Elevation="2">
+    <MudText Typo="Typo.h5" Class="mb-3">Using this web application</MudText>
+    <MudText Typo="Typo.body1" Class="mb-2">
+        Open <MudLink Href="/Well/webapp/Well">Well</MudLink> to browse, search, create, edit, and remove wells and
+        their identity and feature assignments. Manage the shared catalogs on
+        <MudLink Href="/Well/webapp/WellIdentities">Well Identities</MudLink> and
+        <MudLink Href="/Well/webapp/WellFeatures">Well Features</MudLink>, and move data between installations on
+        <MudLink Href="/Well/webapp/WellBackupRestore">Backup and Restore</MudLink>.
+    </MudText>
+    <MudText Typo="Typo.body1">
+        The <b>Survey Display</b> menu shows <MudLink Href="/Well/webapp/WellTrajectories">Well Trajectories</MudLink>
+        and <MudLink Href="/Well/webapp/WellSurveyRuns">Well Survey Runs</MudLink> with Rig and mean-sea-level
+        depth-reference integration, and the <b>Contextual Data</b> and <b>Calculators</b> menus give access to the
+        related records and evaluations described above. All numeric fields follow the unit system selected for the
+        page through the OSDC unit-reference system.
+    </MudText>
+</MudPaper>
 
-        <MudItem xs="12" md="6" lg="4">
-            <MudCard Class="h-100">
-                <MudCardContent>
-                    <MudText Typo="Typo.h5">Monitoring</MudText>
-                    <MudText Typo="Typo.body2">Review request totals and per-endpoint Well service usage.</MudText>
-                </MudCardContent>
-                <MudCardActions>
-                    <MudButton Href="/Well/webapp/StatisticsWell" Color="Color.Primary" Variant="Variant.Text">Usage Statistics</MudButton>
-                </MudCardActions>
-            </MudCard>
-        </MudItem>
-    </MudGrid>
-</MudStack>
+<MudPaper Class="mx-4 px-4 pa-6 mt-4 mb-6" Elevation="2">
+    <MudText Typo="Typo.h5" Class="mb-3">Access methods</MudText>
+    <MudText Typo="Typo.body1" Class="mb-3">
+        The same well data is reachable through several interfaces built on the same underlying store, so it can be
+        managed interactively, scripted, embedded in other Blazor applications, or wired into AI agents.
+    </MudText>
+    <MudSimpleTable>
+        <thead>
+            <tr><th>Method</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><b>Web page</b></td>
+                <td>
+                    This site — a server-side Blazor application (this page) for browsing, editing, backing up, and
+                    restoring wells, inspecting contextual data, running calculators, and reviewing usage statistics.
+                </td>
+            </tr>
+            <tr>
+                <td><b>REST API</b></td>
+                <td>
+                    JSON endpoints under <code>/Well/api</code> for well CRUD, bounded search, identity and feature
+                    catalog management, targeted assignment mutations, external-reference validation and audit, and
+                    batch export/restore, documented and explorable through the Swagger UI at
+                    <code>/Well/api/swagger</code>. Suited to scripts, backend integration, and any HTTP client.
+                </td>
+            </tr>
+            <tr>
+                <td><b>MCP</b></td>
+                <td>
+                    A Model Context Protocol server exposed as Streamable HTTP at <code>/Well/api/mcp</code> (and
+                    WebSocket at <code>/Well/api/mcp/ws</code>), publishing 36 tools — every non-statistics REST
+                    operation plus connectivity <code>ping</code> — with strict, closed input/output JSON Schemas, so
+                    AI agents and MCP-aware tooling can query, create, update, and back up wells directly.
+                </td>
+            </tr>
+            <tr>
+                <td><b>Reusable web pages</b></td>
+                <td>
+                    The Razor components behind the Well, catalog, backup/restore, and survey-display pages are
+                    published as the <code>OSDC.Drilling.Well.WebPages</code> NuGet package, so other Blazor
+                    applications — such as the Cluster web app — can embed the same unit-aware controls instead of
+                    re-implementing this UI.
+                </td>
+            </tr>
+        </tbody>
+    </MudSimpleTable>
+</MudPaper>

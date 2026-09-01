@@ -18,6 +18,8 @@ The Model project is the authoritative serializable contract used by the Well se
 
 The service supplies default identity and feature definitions for initial installations, while the definitions remain editable through the catalog APIs and UI.
 
+Well UUIDs are caller-generated. `CreationDate` and `LastModificationDate` are server-owned: write clients need not supply them and cannot override them. Successful Well reads expose both timestamps; legacy records missing either value are normalized without requiring a database migration.
+
 ## Backup and restore contracts
 
 `WellBatchExport.cs` defines the portable format and policies:

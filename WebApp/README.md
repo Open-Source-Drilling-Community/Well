@@ -41,7 +41,7 @@ The left navigation is grouped like Field and Cluster:
 - **Home**: Well-specific landing page and shortcuts to the main workflows.
 - **Well Management**: Well, backup/restore, Well Features, and Well Identities.
 - **Survey Display**: Well Trajectories and Well Survey Runs.
-- **Contextual Data**: Cluster, Field, Rig, cartographic projections, geodetic datum, and spheroid.
+- **Contextual Data**: Cluster, Field, and Rig.
 - **Calculators**: cartographic conversion, vertical datum, gravity, and magnetic field.
 - **Monitoring**: expanded usage statistics.
 
