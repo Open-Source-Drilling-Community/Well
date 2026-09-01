@@ -154,7 +154,8 @@ class Program
                         };
 
                         // Reading locally stored dependencies
-                        IEnumerable<string> files = Directory.EnumerateFiles(jsonInputsDirectory, "*.json");
+                        IEnumerable<string> files = Directory.EnumerateFiles(jsonInputsDirectory, "*.json")
+                            .OrderBy(path => Path.GetFileName(path), StringComparer.OrdinalIgnoreCase);
                         foreach (string file in files)
                         {
                             PrettyPrint(file, "Processing Open Api doc into API client...");
@@ -162,9 +163,16 @@ class Program
                             var doc = new OpenApiStreamReader().Read(stream, out var diagnostic);
 
                             // Merge paths
+                            bool isCurrentServiceDocument = string.Equals(Path.GetFileName(file), "WellFullName.json",
+                                StringComparison.OrdinalIgnoreCase);
                             foreach (var p in doc.Paths)
                             {
-                                document.Paths.TryAdd(p.Key, p.Value);
+                                // The schema generated from this service is authoritative over stale Well routes
+                                // embedded in dependency bundles. Dependency routes retain their first-known shape.
+                                if (isCurrentServiceDocument)
+                                    document.Paths[p.Key] = p.Value;
+                                else
+                                    document.Paths.TryAdd(p.Key, p.Value);
                             }
 
                             // Merge and normalize schemas (centralized in updater)
@@ -193,6 +201,7 @@ class Program
 
                         var settings = new CSharpClientGeneratorSettings
                         {
+                            ParameterDateTimeFormat = "O",
                             CSharpGeneratorSettings =
                             {
                                 Namespace = NAMESPACE,

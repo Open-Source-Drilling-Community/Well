@@ -60,6 +60,8 @@ dotnet run --project WebApp
 - Per-endpoint usage-statistics dashboard.
 - MCP access to every non-statistics REST operation.
 
+Well and catalog replacement operations use optimistic concurrency: callers send the `LastModificationDate` from their latest read as `expectedModifiedUtc`. Stale writes return `409` and do not overwrite the newer record. MCP closed-object schemas are also enforced at runtime, including rejection of unknown nested fields.
+
 ## Data and upgrade safety
 
 The service stores data in `../home/Well.db` relative to its working directory; the container mounts `/home`. Schema version 1 contains `WellTable`, `WellIdentityTable`, and `WellFeatureCategoryTable`.

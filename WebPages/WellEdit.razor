@@ -467,7 +467,7 @@
                             Name = _singleWellCluster.Name,
                             Description = _singleWellCluster.Description,
                             CreationDate = _singleWellCluster.CreationDate,
-                            LastModificationDate = DateTimeOffset.UtcNow,
+                            LastModificationDate = CurrentWell.LastModificationDate,
                             FieldID = _selectedField.MetaInfo.ID,
                             IsSingleWell = true,
                             ReferenceDepth = (singleWellDepthWGS84 == null) ? null : new GaussianDrillingProperty() { GaussianValue = new GaussianDistribution() { Mean = singleWellDepthWGS84, StandardDeviation = (singleWellDepthAccuracy != null) ? singleWellDepthAccuracy : 0.01 } },
@@ -542,7 +542,8 @@
                             WellIdentityAssignments = CloneIdentityAssignments(_wellIdentityAssignments),
                             WellFeatureAssignments = CloneFeatureAssignments(_wellFeatureAssignments),
                         };
-                        await Api.ClientWell.PutWellByIdAsync(CurrentWell.MetaInfo.ID, well);
+                        await Api.ClientWell.PutWellByIdAsync(CurrentWell.MetaInfo.ID,
+                            CurrentWell.LastModificationDate ?? throw new InvalidOperationException("The Well revision is missing."), well);
                     }
                 }
                 else
@@ -558,14 +559,15 @@
                         Name = _name,
                         Description = _descr,
                         CreationDate = CurrentWell.CreationDate,
-                        LastModificationDate = DateTimeOffset.UtcNow,
+                        LastModificationDate = CurrentWell.LastModificationDate,
                         IsSingleWell = _isSingleWell,
                         ClusterID = (_selectedCluster != null && _selectedCluster.MetaInfo != null) ? _selectedCluster.MetaInfo.ID : null,
                         SlotID = (_selectedSlot != null) ? _selectedSlot.ID : null,
                         WellIdentityAssignments = CloneIdentityAssignments(_wellIdentityAssignments),
                         WellFeatureAssignments = CloneFeatureAssignments(_wellFeatureAssignments),
                     };
-                    await Api.ClientWell.PutWellByIdAsync(CurrentWell.MetaInfo.ID, well);
+                    await Api.ClientWell.PutWellByIdAsync(CurrentWell.MetaInfo.ID,
+                        CurrentWell.LastModificationDate ?? throw new InvalidOperationException("The Well revision is missing."), well);
                     logger.LogInformation("Updated the Well successfully");
                     Snackbar.Add("Updated the Well successfully", Severity.Success);
                 }

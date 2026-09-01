@@ -18,6 +18,10 @@ The generator reads every JSON file in `ModelSharedOut/json-schemas`:
 
 Dependency files are deliberately checked in. Refresh them from reviewed service artifacts rather than silently discovering changing schemas at generation time.
 
+Files are processed deterministically by name. For duplicate routes, dependency documents retain their first-known contract, while `WellFullName.json` is authoritative for routes owned by the current Well service. This prevents stale Well routes embedded in downstream merged schemas from replacing the current REST contract.
+
+Generated query timestamps use the round-trip (`O`) format so optimistic-concurrency tokens retain their offset and sub-second precision.
+
 ## Outputs
 
 - `ModelSharedOut/WellMergedModel.cs`: generated DTOs and API clients in `OSDC.Drilling.Well.ModelShared`.

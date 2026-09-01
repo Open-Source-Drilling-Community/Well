@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.Extensions.Logging;
 using OSDC.DotnetLibraries.General.DataManagement;
 using OSDC.Drilling.Well.Service.Managers;
@@ -213,37 +214,14 @@ namespace OSDC.Drilling.Well.Service.Controllers
         /// <param name="well"></param>
         /// <returns>true if the given Well has been added successfully to the microservice database, at the endpoint Well/api/Well</returns>
         [HttpPost(Name = "PostWell")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(WellMutationErrorEnvelope), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(WellMutationErrorEnvelope), StatusCodes.Status409Conflict)]
+        [ProducesResponseType(typeof(WellMutationErrorEnvelope), StatusCodes.Status500InternalServerError)]
         public ActionResult PostWell([FromBody] Model.Well? data)
         {
             UsageStatisticsWell.Instance.IncrementPostWellPerDay();
-            // Check if well exists in the database through ID
-            if (data != null && data.MetaInfo != null && data.MetaInfo.ID != Guid.Empty)
-            {
-                var existingData = _wellManager.GetWellById(data.MetaInfo.ID);
-                if (existingData == null)
-                {   
-                    //  If well was not found, call AddWell, where the well.Calculate()
-                    // method is called. 
-                    if (_wellManager.AddWell(data))
-                    {
-                        return Ok(); // status=OK is used rather than status=Created because NSwag auto-generated controllers use 200 (OK) rather than 201 (Created) as return codes
-                    }
-                    else
-                    {
-                        return StatusCode(StatusCodes.Status500InternalServerError);
-                    }
-                }
-                else
-                {
-                    _logger.LogWarning("The given Well already exists and will not be added");
-                    return StatusCode(StatusCodes.Status409Conflict);
-                }
-            }
-            else
-            {
-                _logger.LogWarning("The given Well is null, badly formed, or its ID is empty");
-                return BadRequest();
-            }
+            return this.ToActionResult(_wellManager.CreateWell(data));
         }
 
         /// <summary>
@@ -252,35 +230,17 @@ namespace OSDC.Drilling.Well.Service.Controllers
         /// <param name="well"></param>
         /// <returns>true if the given Well has been updated successfully to the microservice database, at the endpoint Well/api/Well/id</returns>
         [HttpPut("{id}", Name = "PutWellById")]
-        public ActionResult PutWellById(Guid id, [FromBody] Model.Well? data)
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(WellMutationErrorEnvelope), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(WellMutationErrorEnvelope), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(WellMutationErrorEnvelope), StatusCodes.Status409Conflict)]
+        [ProducesResponseType(typeof(WellMutationErrorEnvelope), StatusCodes.Status500InternalServerError)]
+        public ActionResult PutWellById(Guid id,
+            [FromQuery, BindRequired] DateTimeOffset expectedModifiedUtc,
+            [FromBody] Model.Well? data)
         {
             UsageStatisticsWell.Instance.IncrementPutWellByIdPerDay();
-            // Check if Well is in the data base
-            if (data != null && data.MetaInfo != null && data.MetaInfo.ID.Equals(id))
-            {
-                var existingData = _wellManager.GetWellById(id);
-                if (existingData != null)
-                {
-                    if (_wellManager.UpdateWellById(id, data))
-                    {
-                        return Ok();
-                    }
-                    else
-                    {
-                        return StatusCode(StatusCodes.Status500InternalServerError);
-                    }
-                }
-                else
-                {
-                    _logger.LogWarning("The given Well has not been found in the database");
-                    return NotFound();
-                }
-            }
-            else
-            {
-                _logger.LogWarning("The given Well is null, badly formed, or its does not match the ID to update");
-                return BadRequest();
-            }
+            return this.ToActionResult(_wellManager.UpdateWell(id, expectedModifiedUtc, data));
         }
 
         /// <summary>

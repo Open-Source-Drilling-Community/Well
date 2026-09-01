@@ -44,7 +44,9 @@ Paths below are relative to `/Well/api`.
 | `/WellFeatureCategory/MetaInfo`, `/HeavyData`, `/{id}` | Category metadata, complete listing, get, concurrency-checked replace, and delete. |
 | `/WellUsageStatistics` | Current daily Well endpoint counters. |
 
-Catalog updates require the `expectedModifiedUtc` query parameter and reject stale changes. Deleting a referenced definition, or removing a referenced feature option, returns a structured conflict rather than cascading into Well data.
+Well and catalog updates require the `expectedModifiedUtc` query parameter from the latest read and reject stale changes with a structured `409` response. Well creation and updates use server-owned timestamps and parameterized SQL. Deleting a referenced definition, or removing a referenced feature option, returns a structured conflict rather than cascading into Well data.
+
+Legacy Well rows need no rewrite or schema migration. A missing `LastModificationDate` is exposed as the existing `CreationDate`, or as the Unix epoch when both timestamps are absent; the first successful update persists a current server revision.
 
 Example:
 
@@ -109,7 +111,7 @@ Tool families:
 - `well_identity_*`: complete Identity definition CRUD and discovery.
 - `well_feature_category_*`: complete Feature Category CRUD and discovery.
 
-Every tool publishes a title, detailed description, closed input/output JSON schemas, and read-only/destructive/idempotent/open-world annotations. UUID arguments must be non-empty. Catalog update tools require `expectedModifiedUtc`. Tests compare all non-statistics controller actions with registered MCP tools to prevent REST/MCP drift.
+Every tool publishes a title, detailed description, closed input/output JSON schemas, and read-only/destructive/idempotent/open-world annotations. Closed schemas are enforced at runtime: unknown top-level and nested properties are rejected instead of ignored. UUID arguments must be non-empty. Well and catalog update tools require `expectedModifiedUtc`. Well mutations additionally validate assignment IDs, required identity values, catalog references, validity periods, exclusive-category overlap, and Slot/Cluster consistency. Tests compare all non-statistics controller actions with registered MCP tools to prevent REST/MCP drift.
 
 ## Docker and Helm
 

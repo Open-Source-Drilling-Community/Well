@@ -101,7 +101,8 @@ namespace OSDC.Drilling.Well.Service.Managers
             if (connection != null)
             {
                 var command = connection.CreateCommand();
-                command.CommandText = $"SELECT COUNT(*) FROM WellTable WHERE ID = '{guid}'";
+                command.CommandText = "SELECT COUNT(*) FROM WellTable WHERE ID = $id";
+                command.Parameters.AddWithValue("$id", guid.ToString());
                 try
                 {
                     using SqliteDataReader reader = command.ExecuteReader();
@@ -168,7 +169,8 @@ namespace OSDC.Drilling.Well.Service.Managers
             if (connection != null)
             {
                 var command = connection.CreateCommand();
-                command.CommandText = $"SELECT Well FROM WellTable WHERE ClusterID = '{clusterId}'";                 
+                command.CommandText = "SELECT Well FROM WellTable WHERE ClusterID = $clusterId";
+                command.Parameters.AddWithValue("$clusterId", clusterId.ToString());
                 try
                 {
                     using var reader = command.ExecuteReader();
@@ -176,6 +178,7 @@ namespace OSDC.Drilling.Well.Service.Managers
                     {
                         string data = reader.GetString(0);
                         Model.Well? well = JsonSerializer.Deserialize<Model.Well>(data, JsonSettings.Options);
+                        WellMutationManager.EnsureRevision(well);
                         vals.Add(well);
                     }
                     _logger.LogInformation("Returning the list of existing Well from WellTable");
@@ -205,7 +208,8 @@ namespace OSDC.Drilling.Well.Service.Managers
             if (connection != null)
             {
                 var command = connection.CreateCommand();
-                command.CommandText = $"SELECT Well FROM WellTable WHERE SlotID = '{slotId}'";                 
+                command.CommandText = "SELECT Well FROM WellTable WHERE SlotID = $slotId";
+                command.Parameters.AddWithValue("$slotId", slotId.ToString());
                 try
                 {
                     using var reader = command.ExecuteReader();
@@ -213,6 +217,7 @@ namespace OSDC.Drilling.Well.Service.Managers
                     {
                         string data = reader.GetString(0);
                         Model.Well? well = JsonSerializer.Deserialize<Model.Well>(data, JsonSettings.Options);
+                        WellMutationManager.EnsureRevision(well);
                         vals.Add(well);
                     }
                     _logger.LogInformation("Returning the list of existing Well from WellTable");
@@ -280,7 +285,8 @@ namespace OSDC.Drilling.Well.Service.Managers
                 {
                     Model.Well? well;
                     var command = connection.CreateCommand();
-                    command.CommandText = $"SELECT Well FROM WellTable WHERE ID = '{guid}'";
+                    command.CommandText = "SELECT Well FROM WellTable WHERE ID = $id";
+                    command.Parameters.AddWithValue("$id", guid.ToString());
                     try
                     {
                         using var reader = command.ExecuteReader();
@@ -288,6 +294,7 @@ namespace OSDC.Drilling.Well.Service.Managers
                         {
                             string data = reader.GetString(0);
                             well = JsonSerializer.Deserialize<Model.Well>(data, JsonSettings.Options);
+                            WellMutationManager.EnsureRevision(well);
                             if (well != null && well.MetaInfo != null && !well.MetaInfo.ID.Equals(guid))
                                 throw new SqliteException("SQLite database corrupted: returned Well is null or has been jsonified with the wrong ID.", 1);
                         }
@@ -336,6 +343,7 @@ namespace OSDC.Drilling.Well.Service.Managers
                     {
                         string data = reader.GetString(0);
                         Model.Well? well = JsonSerializer.Deserialize<Model.Well>(data, JsonSettings.Options);
+                        WellMutationManager.EnsureRevision(well);
                         vals.Add(well);
                     }
                     _logger.LogInformation("Returning the list of existing Well from WellTable");
@@ -426,7 +434,8 @@ namespace OSDC.Drilling.Well.Service.Managers
                 if (connection != null)
                 {
                     var command = connection.CreateCommand();
-                    command.CommandText = $"SELECT Well FROM WellTable WHERE ClusterID = '{clusterId}'";
+                    command.CommandText = "SELECT Well FROM WellTable WHERE ClusterID = $clusterId";
+                    command.Parameters.AddWithValue("$clusterId", clusterId.ToString());
                     try
                     {
                         using var reader = command.ExecuteReader();
@@ -434,6 +443,7 @@ namespace OSDC.Drilling.Well.Service.Managers
                         {
                             string data = reader.GetString(0);
                             Model.Well? well = JsonSerializer.Deserialize<Model.Well>(data, JsonSettings.Options);
+                            WellMutationManager.EnsureRevision(well);
                             if (well != null)
                             {
                                 if (well.ClusterID != null && !well.ClusterID.Equals(clusterId))
@@ -470,76 +480,11 @@ namespace OSDC.Drilling.Well.Service.Managers
         /// <returns>true if the given Well has been added successfully to the microservice database</returns>
         public bool AddWell(Model.Well? well)
         {
-            if (well != null && well.MetaInfo != null && well.MetaInfo.ID != Guid.Empty)
-            {
-                //update WellTable
-                var connection = _connectionManager.GetConnection();
-                if (connection != null)
-                {
-                    using SqliteTransaction transaction = connection.BeginTransaction();
-                    bool success = true;
-                    try
-                    {
-                        List<Model.WellMutationError> referenceErrors = WellReferenceIntegrityValidator.ValidateWell(connection, transaction, well);
-                        if (referenceErrors.Count > 0)
-                        {
-                            _logger.LogWarning("The Well contains invalid local identity or feature references: {Errors}",
-                                JsonSerializer.Serialize(referenceErrors, JsonSettings.Options));
-                            transaction.Rollback();
-                            return false;
-                        }
-                        //add the Well to the WellTable
-                        string metaInfo = JsonSerializer.Serialize(well.MetaInfo, JsonSettings.Options);
-                        string data = JsonSerializer.Serialize(well, JsonSettings.Options);
-                        var command = connection.CreateCommand();
-                        command.CommandText = "INSERT INTO WellTable (" +
-                            "ID, " +
-                            "MetaInfo, " +
-                            "ClusterID, " +
-                            "SlotID, " +
-                            "Well" +
-                            ") VALUES (" +
-                            $"'{well.MetaInfo.ID}', " +
-                            $"'{metaInfo}', " +
-                            $"'{(well.ClusterID != null ? well.ClusterID : "")}', " +
-                            $"'{(well.SlotID != null ? well.SlotID : "")}', " +
-                            $"'{data}'" +
-                            ")";
-                        int count = command.ExecuteNonQuery();
-                        if (count != 1)
-                        {
-                            _logger.LogWarning("Impossible to insert the given Well into the WellTable");
-                            success = false;
-                        }
-                    }
-                    catch (SqliteException ex)
-                    {
-                        _logger.LogError(ex, "Impossible to add the given Well into WellTable");
-                        success = false;
-                    }
-                    //finalizing SQL transaction
-                    if (success)
-                    {
-                        transaction.Commit();
-                        _logger.LogInformation("Added the given Well of given ID into the WellTable successfully");
-                    }
-                    else
-                    {
-                        transaction.Rollback();
-                    }
-                    return success;
-                }
-                else
-                {
-                    _logger.LogWarning("Impossible to access the SQLite database");
-                }
-            }
-            else
-            {
-                _logger.LogWarning("The Well ID or the ID of its input are null or empty");
-            }
-            return false;
+            return CreateWell(well).Succeeded;
         }
+
+        internal WellMutationResult CreateWell(Model.Well? well) =>
+            WellMutationManager.Create(_connectionManager, _logger, well);
 
         /// <summary>
         /// Performs calculation on the given Well and updates it in the microservice database
@@ -548,70 +493,12 @@ namespace OSDC.Drilling.Well.Service.Managers
         /// <returns>true if the given Well has been updated successfully</returns>
         public bool UpdateWellById(Guid guid, Model.Well? well)
         {
-            bool success = true;
-            if (guid != Guid.Empty && well != null && well.MetaInfo != null && well.MetaInfo.ID == guid)
-            {
-                //update WellTable
-                var connection = _connectionManager.GetConnection();
-                if (connection != null)
-                {
-                    using SqliteTransaction transaction = connection.BeginTransaction();
-                    //update fields in WellTable
-                    try
-                    {
-                        List<Model.WellMutationError> referenceErrors = WellReferenceIntegrityValidator.ValidateWell(connection, transaction, well);
-                        if (referenceErrors.Count > 0)
-                        {
-                            _logger.LogWarning("The Well contains invalid local identity or feature references: {Errors}",
-                                JsonSerializer.Serialize(referenceErrors, JsonSettings.Options));
-                            transaction.Rollback();
-                            return false;
-                        }
-                        string metaInfo = JsonSerializer.Serialize(well.MetaInfo, JsonSettings.Options);
-                        string data = JsonSerializer.Serialize(well, JsonSettings.Options);
-                        var command = connection.CreateCommand();
-                        command.CommandText = $"UPDATE WellTable SET " +
-                            $"MetaInfo = '{metaInfo}', " +
-                            $"ClusterID = '{(well.ClusterID != null ? well.ClusterID : "")}', " +
-                            $"SlotID = '{(well.SlotID != null ? well.SlotID : "")}', " +
-                            $"Well = '{data}' " +
-                            $"WHERE ID = '{guid}'";
-                        int count = command.ExecuteNonQuery();
-                        if (count != 1)
-                        {
-                            _logger.LogWarning("Impossible to update the Well");
-                            success = false;
-                        }
-                    }
-                    catch (SqliteException ex)
-                    {
-                        _logger.LogError(ex, "Impossible to update the Well");
-                        success = false;
-                    }
-
-                    // Finalizing
-                    if (success)
-                    {
-                        transaction.Commit();
-                        _logger.LogInformation("Updated the given Well successfully");
-                        return true;
-                    }
-                    else
-                    {
-                        transaction.Rollback();
-                    }
-                }
-                else
-                {
-                    _logger.LogWarning("Impossible to access the SQLite database");
-                }
-            }
-            else
-            {
-                _logger.LogWarning("The Well ID or the ID of some of its attributes are null or empty");
-            }
-            return false;
+            Model.Well? stored = GetWellById(guid);
+            return stored != null && UpdateWell(guid, WellMutationManager.RevisionOf(stored), well).Succeeded;
         }
+
+        internal WellMutationResult UpdateWell(Guid guid, DateTimeOffset expectedModifiedUtc, Model.Well? well) =>
+            WellMutationManager.Update(_connectionManager, _logger, guid, expectedModifiedUtc, well);
 
         /// <summary>
         /// Deletes the Well of given ID from the microservice database
@@ -631,7 +518,8 @@ namespace OSDC.Drilling.Well.Service.Managers
                     try
                     {
                         var command = connection.CreateCommand();
-                        command.CommandText = $"DELETE FROM WellTable WHERE ID = '{guid}'";
+                        command.CommandText = "DELETE FROM WellTable WHERE ID = $id";
+                        command.Parameters.AddWithValue("$id", guid.ToString());
                         int count = command.ExecuteNonQuery();
                         if (count < 0)
                         {

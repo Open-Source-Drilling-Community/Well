@@ -30,6 +30,13 @@ internal sealed record WellMutationResult(
             Message = message
         });
 
+    public static WellMutationResult AlreadyExists(string message) =>
+        new(WellMutationFailureKind.Conflict, new WellMutationErrorEnvelope
+        {
+            Error = "already_exists",
+            Message = message
+        });
+
     public static WellMutationResult ConcurrencyConflict(string property, string message) =>
         Failure(WellMutationFailureKind.Conflict, "concurrency_conflict", "The resource was modified by another caller.",
             property, "concurrency_conflict", message);
@@ -47,6 +54,14 @@ internal sealed record WellMutationResult(
         {
             Error = "invalid_reference",
             Message = "One or more Well-owned catalog references are invalid.",
+            Errors = errors
+        });
+
+    public static WellMutationResult InvalidWell(List<WellMutationError> errors) =>
+        new(WellMutationFailureKind.InvalidRequest, new WellMutationErrorEnvelope
+        {
+            Error = "invalid_well",
+            Message = "The Well document violates one or more invariants.",
             Errors = errors
         });
 

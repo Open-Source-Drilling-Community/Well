@@ -175,9 +175,10 @@ public sealed class McpToolRegistrationTests
     public void Update_tool_schema_requires_matching_id_and_well_arguments()
     {
         JsonObject root = RequireObject(_tools["well_update_by_id"].InputSchema);
-        Assert.That(RequiredNames(root), Is.EquivalentTo(new[] { "well", "id" }));
+        Assert.That(RequiredNames(root), Is.EquivalentTo(new[] { "well", "id", "expectedModifiedUtc" }));
         Assert.That(Property(root, "id")["format"]?.GetValue<string>(), Is.EqualTo("uuid"));
         Assert.That(Property(root, "id")["description"]?.GetValue<string>(), Does.Contain("well.MetaInfo.ID"));
+        Assert.That(Property(root, "expectedModifiedUtc")["format"]?.GetValue<string>(), Is.EqualTo("date-time"));
     }
 
     [TestCase("well_identity_update_by_id", "wellIdentity")]
@@ -260,6 +261,41 @@ public sealed class McpToolRegistrationTests
         JsonObject? response = await _tools["well_get_by_id"].InvokeAsync(new JsonObject
         {
             ["id"] = Guid.Empty.ToString()
+        }, CancellationToken.None) as JsonObject;
+        Assert.That(response?["status"]?.GetValue<int>(), Is.EqualTo(400));
+    }
+
+    [Test]
+    public async Task Runtime_contract_rejects_an_unknown_top_level_argument()
+    {
+        JsonObject? response = await _tools["well_get_all_ids"].InvokeAsync(new JsonObject
+        {
+            ["typo"] = true
+        }, CancellationToken.None) as JsonObject;
+        Assert.That(response?["status"]?.GetValue<int>(), Is.EqualTo(400));
+    }
+
+    [Test]
+    public async Task Runtime_contract_rejects_an_unknown_nested_well_property()
+    {
+        JsonObject? response = await _tools["well_create"].InvokeAsync(new JsonObject
+        {
+            ["well"] = new JsonObject
+            {
+                ["MetaInfo"] = new JsonObject { ["ID"] = Guid.NewGuid().ToString() },
+                ["UnexpectedProperty"] = "must not be ignored"
+            }
+        }, CancellationToken.None) as JsonObject;
+        Assert.That(response?["status"]?.GetValue<int>(), Is.EqualTo(400));
+    }
+
+    [Test]
+    public async Task Well_update_tool_requires_concurrency_timestamp_at_runtime()
+    {
+        JsonObject? response = await _tools["well_update_by_id"].InvokeAsync(new JsonObject
+        {
+            ["id"] = Guid.NewGuid().ToString(),
+            ["well"] = new JsonObject()
         }, CancellationToken.None) as JsonObject;
         Assert.That(response?["status"]?.GetValue<int>(), Is.EqualTo(400));
     }

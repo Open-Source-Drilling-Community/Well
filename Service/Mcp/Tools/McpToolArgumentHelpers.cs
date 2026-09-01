@@ -53,6 +53,13 @@ internal static class McpToolArgumentHelpers
                 ["description"] = "Identifier of the stored well to update. It must equal well.MetaInfo.ID."
             };
             required.Add("id");
+            properties["expectedModifiedUtc"] = new JsonObject
+            {
+                ["type"] = "string",
+                ["format"] = "date-time",
+                ["description"] = "LastModificationDate returned by the latest read of this well. The update is rejected if the stored revision has changed."
+            };
+            required.Add("expectedModifiedUtc");
         }
 
         return new JsonObject

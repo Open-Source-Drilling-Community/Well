@@ -3,10 +3,13 @@ using System.Collections.Generic;
 using System.IO;
 using Microsoft.Extensions.Logging;
 using System.Reflection;
+using System.Text.Json;
 using NUnit.Framework;
 using WellModel = OSDC.Drilling.Well.Model.Well;
 using OSDC.Drilling.Well.Service.Controllers;
 using OSDC.Drilling.Well.Service.Managers;
+using OSDC.Drilling.Well.Service;
+using OSDC.Drilling.Well.Model;
 using OSDC.DotnetLibraries.General.DataManagement;
 
 namespace OSDC.Drilling.Well.ServiceTest
@@ -82,9 +85,7 @@ namespace OSDC.Drilling.Well.ServiceTest
 
             // duplicate with same ID should conflict
             var conflict = _controller.PostWell(well);
-            Assert.That(conflict, Is.InstanceOf<Microsoft.AspNetCore.Mvc.StatusCodeResult>());
-            var obj = (Microsoft.AspNetCore.Mvc.StatusCodeResult)conflict;
-            Assert.That(obj.StatusCode, Is.EqualTo(409));
+            Assert.That(conflict, Is.InstanceOf<Microsoft.AspNetCore.Mvc.ConflictObjectResult>());
         }
 
         [Test]
@@ -113,12 +114,90 @@ namespace OSDC.Drilling.Well.ServiceTest
 
             // change name and update
             well.Name = "Updated";
-            var put = _controller.PutWellById(well.MetaInfo!.ID, well);
+            var put = _controller.PutWellById(well.MetaInfo!.ID, well.LastModificationDate!.Value, well);
             Assert.That(put, Is.InstanceOf<Microsoft.AspNetCore.Mvc.OkResult>());
 
             var ok = _controller.GetWellById(well.MetaInfo!.ID);
             var updated = ((Microsoft.AspNetCore.Mvc.OkObjectResult)ok.Result!).Value as WellModel;
             Assert.That(updated!.Name, Is.EqualTo("Updated"));
+        }
+
+        [Test]
+        public void PutWellById_RejectsStaleRevisionWithoutOverwritingFirstUpdate()
+        {
+            var well = NewWell();
+            Assert.That(_controller.PostWell(well), Is.InstanceOf<Microsoft.AspNetCore.Mvc.OkResult>());
+            DateTimeOffset originalRevision = well.LastModificationDate!.Value;
+
+            well.Name = "First writer";
+            Assert.That(_controller.PutWellById(well.MetaInfo!.ID, originalRevision, well),
+                Is.InstanceOf<Microsoft.AspNetCore.Mvc.OkResult>());
+
+            var stale = NewWell(id: well.MetaInfo.ID, clusterId: well.ClusterID, slotId: well.SlotID);
+            stale.Name = "Stale writer";
+            var conflict = _controller.PutWellById(stale.MetaInfo!.ID, originalRevision, stale);
+            Assert.That(conflict, Is.InstanceOf<Microsoft.AspNetCore.Mvc.ConflictObjectResult>());
+
+            var read = _controller.GetWellById(well.MetaInfo.ID);
+            var stored = ((Microsoft.AspNetCore.Mvc.OkObjectResult)read.Result!).Value as WellModel;
+            Assert.That(stored!.Name, Is.EqualTo("First writer"));
+            Assert.That(stored.LastModificationDate, Is.GreaterThan(originalRevision));
+        }
+
+        [Test]
+        public void PostWell_ParameterizesJsonContainingSqlCharacters()
+        {
+            var well = NewWell();
+            well.Name = "O'Brien'; DROP TABLE WellTable; --";
+
+            Assert.That(_controller.PostWell(well), Is.InstanceOf<Microsoft.AspNetCore.Mvc.OkResult>());
+            var read = _controller.GetWellById(well.MetaInfo!.ID);
+            var stored = ((Microsoft.AspNetCore.Mvc.OkObjectResult)read.Result!).Value as WellModel;
+            Assert.That(stored!.Name, Is.EqualTo(well.Name));
+            Assert.That(_controller.GetAllWellId().Result, Is.InstanceOf<Microsoft.AspNetCore.Mvc.OkObjectResult>());
+        }
+
+        [Test]
+        public void PostWell_RejectsSlotWithoutClusterAsStructuredBadRequest()
+        {
+            var well = NewWell();
+            well.ClusterID = null;
+
+            var result = _controller.PostWell(well);
+            Assert.That(result, Is.InstanceOf<Microsoft.AspNetCore.Mvc.BadRequestObjectResult>());
+            var envelope = ((Microsoft.AspNetCore.Mvc.BadRequestObjectResult)result).Value as WellMutationErrorEnvelope;
+            Assert.That(envelope?.Errors, Has.Some.Matches<WellMutationError>(error => error.Code == "cluster_required"));
+        }
+
+        [Test]
+        public void LegacyWellWithoutTimestamps_GetsStableRevisionAndUpdatesWithoutMigration()
+        {
+            var legacy = NewWell();
+            legacy.CreationDate = null;
+            legacy.LastModificationDate = null;
+            using (var connection = _connMgr.GetConnection())
+            using (var command = connection!.CreateCommand())
+            {
+                command.CommandText = "INSERT INTO WellTable (ID,MetaInfo,ClusterID,SlotID,Well) VALUES ($id,$meta,$cluster,$slot,$well)";
+                command.Parameters.AddWithValue("$id", legacy.MetaInfo!.ID.ToString());
+                command.Parameters.AddWithValue("$meta", JsonSerializer.Serialize(legacy.MetaInfo, JsonSettings.Options));
+                command.Parameters.AddWithValue("$cluster", legacy.ClusterID!.Value.ToString());
+                command.Parameters.AddWithValue("$slot", legacy.SlotID!.Value.ToString());
+                command.Parameters.AddWithValue("$well", JsonSerializer.Serialize(legacy, JsonSettings.Options));
+                Assert.That(command.ExecuteNonQuery(), Is.EqualTo(1));
+            }
+
+            var read = _controller.GetWellById(legacy.MetaInfo.ID);
+            var normalized = ((Microsoft.AspNetCore.Mvc.OkObjectResult)read.Result!).Value as WellModel;
+            Assert.That(normalized!.LastModificationDate, Is.EqualTo(DateTimeOffset.UnixEpoch));
+
+            normalized.Name = "Updated legacy Well";
+            Assert.That(_controller.PutWellById(legacy.MetaInfo.ID, DateTimeOffset.UnixEpoch, normalized),
+                Is.InstanceOf<Microsoft.AspNetCore.Mvc.OkResult>());
+            var updatedRead = _controller.GetWellById(legacy.MetaInfo.ID);
+            var updated = ((Microsoft.AspNetCore.Mvc.OkObjectResult)updatedRead.Result!).Value as WellModel;
+            Assert.That(updated!.Name, Is.EqualTo("Updated legacy Well"));
+            Assert.That(updated.LastModificationDate, Is.GreaterThan(DateTimeOffset.UnixEpoch));
         }
 
         [Test]
