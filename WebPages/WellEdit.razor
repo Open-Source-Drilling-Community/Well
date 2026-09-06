@@ -390,12 +390,12 @@
                     _selectedSlot = null;
                     if (_singleWellCluster != null && _singleWellSlot != null && _selectedField != null && _selectedField.MetaInfo != null && _selectedField.MetaInfo.ID != Guid.Empty)
                     {
-                        singleWellLatitudeWGS84 = _singleWellCluster.ReferenceLatitude?.GaussianValue?.Mean;
-                        singleWellLongitudeWGS84 = _singleWellCluster.ReferenceLongitude?.GaussianValue?.Mean;
-                        singleWellDepthWGS84 = _singleWellCluster.ReferenceDepth?.GaussianValue?.Mean;
-                        singleWellDepthAccuracy = _singleWellCluster.ReferenceDepth?.GaussianValue?.StandardDeviation;
-                        singleWellNorthingAccuracy = _singleWellCluster.ReferenceLatitude?.GaussianValue?.StandardDeviation * Api.EarthRadiusWGS84;
-                        singleWellEastingAccuracy = _singleWellCluster.ReferenceLongitude?.GaussianValue?.StandardDeviation * Api.EarthRadiusWGS84;
+                        singleWellLatitudeWGS84 = _singleWellCluster.ReferencePoint?.Latitude;
+                        singleWellLongitudeWGS84 = _singleWellCluster.ReferencePoint?.Longitude;
+                        singleWellDepthWGS84 = _singleWellCluster.ReferencePoint?.TVD;
+                        singleWellDepthAccuracy = null;
+                        singleWellNorthingAccuracy = _singleWellSlot.Latitude?.GaussianValue?.StandardDeviation * Api.EarthRadiusWGS84;
+                        singleWellEastingAccuracy = _singleWellSlot.Longitude?.GaussianValue?.StandardDeviation * Api.EarthRadiusWGS84;
                         singleWellGroundMudLineDepth = _singleWellCluster.GroundMudLineDepth?.GaussianValue?.Mean;
                         singleWellGroundMudLineDepthAccuracy = _singleWellCluster.GroundMudLineDepth?.GaussianValue?.StandardDeviation;
                         singleWellTopWaterDepth = _singleWellCluster.TopWaterDepth?.GaussianValue?.Mean;
@@ -470,9 +470,7 @@
                             LastModificationDate = CurrentWell.LastModificationDate,
                             FieldID = _selectedField.MetaInfo.ID,
                             IsSingleWell = true,
-                            ReferenceDepth = (singleWellDepthWGS84 == null) ? null : new GaussianDrillingProperty() { GaussianValue = new GaussianDistribution() { Mean = singleWellDepthWGS84, StandardDeviation = (singleWellDepthAccuracy != null) ? singleWellDepthAccuracy : 0.01 } },
-                            ReferenceLatitude = (singleWellLatitudeWGS84 == null) ? null : new GaussianDrillingProperty() { GaussianValue = new GaussianDistribution() { Mean = singleWellLatitudeWGS84, StandardDeviation = (singleWellNorthingAccuracy != null) ? singleWellNorthingAccuracy / Api.EarthRadiusWGS84 : 0.01 } },
-                            ReferenceLongitude = (singleWellLongitudeWGS84 == null) ? null : new GaussianDrillingProperty() { GaussianValue = new GaussianDistribution() { Mean = singleWellLongitudeWGS84, StandardDeviation = (singleWellEastingAccuracy != null) ? singleWellEastingAccuracy / Api.EarthRadiusWGS84 : 0.01 } },
+                            ReferencePoint = CreateClusterReferencePoint(),
                             GroundMudLineDepth = (singleWellGroundMudLineDepth == null) ? null : new GaussianDrillingProperty() { GaussianValue = new GaussianDistribution() { Mean = singleWellGroundMudLineDepth, StandardDeviation = (singleWellGroundMudLineDepthAccuracy != null) ? singleWellGroundMudLineDepthAccuracy : 0.01 } },
                             TopWaterDepth = (singleWellTopWaterDepth == null) ? null : new GaussianDrillingProperty() { GaussianValue = new GaussianDistribution() { Mean = singleWellTopWaterDepth, StandardDeviation = (singleWellTopWaterDepthAccuracy != null) ? singleWellTopWaterDepthAccuracy : 0.01 } },
                         };
@@ -484,8 +482,8 @@
                             CreationDate = slot.CreationDate,
                             LastModificationDate = DateTimeOffset.UtcNow,
                             ID = slot.ID,
-                            Latitude = cluster.ReferenceLatitude,
-                            Longitude = cluster.ReferenceLongitude
+                            Latitude = CreateLatitudeProperty(),
+                            Longitude = CreateLongitudeProperty()
                         });
                         DateTimeOffset expectedModifiedUtc = _singleWellCluster.LastModificationDate
                             ?? throw new InvalidOperationException("The cluster does not provide a revision timestamp.");
@@ -506,9 +504,7 @@
                                     LastModificationDate = DateTimeOffset.UtcNow,
                                     FieldID = _selectedField.MetaInfo.ID,
                                     IsSingleWell = true,
-                                    ReferenceDepth = (singleWellDepthWGS84 == null) ? null : new GaussianDrillingProperty() { GaussianValue = new GaussianDistribution() { Mean = singleWellDepthWGS84, StandardDeviation = (singleWellDepthAccuracy != null) ? singleWellDepthAccuracy : 0.01 } },
-                                    ReferenceLatitude = (singleWellLatitudeWGS84 == null) ? null : new GaussianDrillingProperty() { GaussianValue = new GaussianDistribution() { Mean = singleWellLatitudeWGS84, StandardDeviation = (singleWellNorthingAccuracy != null) ? singleWellNorthingAccuracy / Api.EarthRadiusWGS84 : 0.01 } },
-                                    ReferenceLongitude = (singleWellLongitudeWGS84 == null) ? null : new GaussianDrillingProperty() { GaussianValue = new GaussianDistribution() { Mean = singleWellLongitudeWGS84, StandardDeviation = (singleWellEastingAccuracy != null) ? singleWellEastingAccuracy / Api.EarthRadiusWGS84 : 0.01 } },
+                                    ReferencePoint = CreateClusterReferencePoint(),
                                     GroundMudLineDepth = (singleWellGroundMudLineDepth == null) ? null : new GaussianDrillingProperty() { GaussianValue = new GaussianDistribution() { Mean = singleWellGroundMudLineDepth, StandardDeviation = (singleWellGroundMudLineDepthAccuracy != null) ? singleWellGroundMudLineDepthAccuracy : 0.01 } },
                                     TopWaterDepth = (singleWellTopWaterDepth == null) ? null : new GaussianDrillingProperty() { GaussianValue = new GaussianDistribution() { Mean = singleWellTopWaterDepth, StandardDeviation = (singleWellTopWaterDepthAccuracy != null) ? singleWellTopWaterDepthAccuracy : 0.01 } },
                                 };
@@ -521,8 +517,8 @@
                                     CreationDate = DateTimeOffset.UtcNow,
                                     LastModificationDate = DateTimeOffset.UtcNow,
                                     ID = slotID,
-                                    Latitude = cluster.ReferenceLatitude,
-                                    Longitude = cluster.ReferenceLongitude
+                                    Latitude = CreateLatitudeProperty(),
+                                    Longitude = CreateLongitudeProperty()
                                 });
                             await Api.ClientCluster.PostClusterAsync(cluster);
                         }
@@ -848,162 +844,179 @@
         }
     }
 
-    private FieldCartographicConversionSet CalculateFieldCartographicConversionSet(FieldCartographicConversionSet conversionSet)
+    private Point3DGlobalCoordinates CreateClusterReferencePoint()
     {
-        bool posted = false;
-        try
+        var source = new OSDC.DotnetLibraries.General.Math.Point3DGlobalCoordinates
         {
-            Api.ClientField!.PostFieldCartographicConversionSetAsync(conversionSet).Wait();
-            posted = true;
-            return Api.ClientField.GetFieldCartographicConversionSetByIdAsync(conversionSet.MetaInfo.ID).GetAwaiter().GetResult();
-        }
-        finally
+            Latitude = singleWellLatitudeWGS84,
+            Longitude = singleWellLongitudeWGS84,
+            TVD = singleWellDepthWGS84
+        };
+        return new Point3DGlobalCoordinates
         {
-            if (posted)
+            X = source.X,
+            Y = source.Y,
+            Z = source.Z,
+            RiemannianNorth = source.RiemannianNorth,
+            RiemannianEast = source.RiemannianEast,
+            Latitude = source.Latitude,
+            Longitude = source.Longitude,
+            TVD = source.TVD
+        };
+    }
+
+    private GaussianDrillingProperty? CreateLatitudeProperty() => singleWellLatitudeWGS84 == null
+        ? null
+        : new GaussianDrillingProperty
+        {
+            GaussianValue = new GaussianDistribution
             {
-                try
-                {
-                    Api.ClientField!.DeleteFieldCartographicConversionSetByIdAsync(conversionSet.MetaInfo.ID).Wait();
-                }
-                catch
-                {
-                }
+                Mean = singleWellLatitudeWGS84,
+                StandardDeviation = singleWellNorthingAccuracy != null ? singleWellNorthingAccuracy / Api.EarthRadiusWGS84 : 0.01
             }
+        };
+
+    private GaussianDrillingProperty? CreateLongitudeProperty() => singleWellLongitudeWGS84 == null
+        ? null
+        : new GaussianDrillingProperty
+        {
+            GaussianValue = new GaussianDistribution
+            {
+                Mean = singleWellLongitudeWGS84,
+                StandardDeviation = singleWellEastingAccuracy != null ? singleWellEastingAccuracy / Api.EarthRadiusWGS84 : 0.01
+            }
+        };
+
+    private FieldTransformationOptions CreateFieldTransformationOptions() => new()
+    {
+        SelectionPolicy = FieldTransformationSelectionPolicy.FirstAvailable,
+        ApplicabilityPolicy = FieldApplicabilityPolicy.RequireApplicable,
+        DepthPolicy = FieldDepthTransformationPolicy.AllowUntransformedDepthFor2D
+    };
+
+    private FieldCoordinateConversionPositionResult? ForwardFieldCoordinate(
+        FieldGeographicReference sourceReference, double latitude, double longitude, double verticalDepth)
+    {
+        if (Api.ClientField == null || _selectedField?.MetaInfo?.ID is not Guid fieldId || fieldId == Guid.Empty)
+        {
+            return null;
         }
+
+        FieldCoordinateConversionResponse response = Api.ClientField.ForwardFieldCoordinatesAsync(new FieldForwardConversionRequest
+        {
+            FieldID = fieldId,
+            SourceGeographicReference = sourceReference,
+            ProjectionApplicabilityPolicy = FieldApplicabilityPolicy.AllowUnknown,
+            Transformation = CreateFieldTransformationOptions(),
+            Positions =
+            [
+                new FieldForwardConversionPosition
+                {
+                    Latitude = latitude,
+                    Longitude = longitude,
+                    VerticalDepth = verticalDepth
+                }
+            ]
+        }).GetAwaiter().GetResult();
+        return response.Positions?.FirstOrDefault();
+    }
+
+    private FieldCoordinateConversionPositionResult? InverseFieldCoordinate(double northing, double easting, double verticalDepth)
+    {
+        if (Api.ClientField == null || _selectedField?.MetaInfo?.ID is not Guid fieldId || fieldId == Guid.Empty)
+        {
+            return null;
+        }
+
+        FieldCoordinateConversionResponse response = Api.ClientField.InverseFieldCoordinatesAsync(new FieldInverseConversionRequest
+        {
+            FieldID = fieldId,
+            ProjectionApplicabilityPolicy = FieldApplicabilityPolicy.AllowUnknown,
+            Transformation = CreateFieldTransformationOptions(),
+            Positions =
+            [
+                new FieldInverseConversionPosition
+                {
+                    Northing = northing,
+                    Easting = easting,
+                    VerticalDepth = verticalDepth
+                }
+            ]
+        }).GetAwaiter().GetResult();
+        return response.Positions?.FirstOrDefault();
     }
 
     private void CalculateReferenceWGS84()
     {
-        if (singleWellLatitudeWGS84 != null && singleWellLongitudeWGS84 != null && singleWellDepthWGS84 != null && _selectedField != null && _selectedField.MetaInfo != null && _selectedField.MetaInfo.ID != Guid.Empty)
+        if (singleWellLatitudeWGS84 is not double latitude || singleWellLongitudeWGS84 is not double longitude ||
+            singleWellDepthWGS84 is not double depth)
         {
-            try
-            {
-                if (Api.ClientField != null)
-                {
-                    FieldCartographicConversionSet conversionSet = new FieldCartographicConversionSet()
-                    {
-                        MetaInfo = new MetaInfo() { ID = Guid.NewGuid() },
-                        Name = "Calculate Cluster Reference",
-                        Description = "Calculate Cluster Reference",
-                        FieldID = _selectedField.MetaInfo.ID,
-                        CartographicCoordinateList = new List<CartographicCoordinate>() {
-                            new CartographicCoordinate() {
-                                GeodeticCoordinate = new GeodeticCoordinate() {
-                                    LatitudeWGS84 = singleWellLatitudeWGS84 ,
-                                    LongitudeWGS84 = singleWellLongitudeWGS84,
-                                    VerticalDepthWGS84 = singleWellDepthWGS84
-                                }
-                            }
-                        }
-                    };
-                    FieldCartographicConversionSet calculatedConversionSet = CalculateFieldCartographicConversionSet(conversionSet);
-                    if (calculatedConversionSet?.MetaInfo?.ID == conversionSet.MetaInfo.ID &&
-                        calculatedConversionSet.CartographicCoordinateList != null &&
-                        calculatedConversionSet.CartographicCoordinateList.Count > 0 &&
-                        calculatedConversionSet.CartographicCoordinateList.ElementAt(0).GeodeticCoordinate != null)
-                    {
-                        singleWellLatitudeDatum = calculatedConversionSet.CartographicCoordinateList.ElementAt(0).GeodeticCoordinate.LatitudeDatum;
-                        singleWellLongitudeDatum = calculatedConversionSet.CartographicCoordinateList.ElementAt(0).GeodeticCoordinate.LongitudeDatum;
-                        singleWellDepthDatum = calculatedConversionSet.CartographicCoordinateList.ElementAt(0).GeodeticCoordinate.VerticalDepthDatum;
-                        singleWellNorthing = calculatedConversionSet.CartographicCoordinateList.ElementAt(0).Northing;
-                        singleWellEasting = calculatedConversionSet.CartographicCoordinateList.ElementAt(0).Easting;
-                    }
-                }
-            }
-            catch (Exception e)
-            {
+            return;
+        }
 
-            }
+        try
+        {
+            ApplyConvertedReference(ForwardFieldCoordinate(FieldGeographicReference.Wgs84, latitude, longitude, depth));
+        }
+        catch (Exception ex)
+        {
+            logger.LogWarning(ex, "Unable to convert the single-well WGS84 reference");
         }
     }
+
     private void CalculateReferenceDatum()
     {
-        if (singleWellLatitudeDatum != null && singleWellLongitudeDatum != null && singleWellDepthDatum != null && _selectedField != null && _selectedField.MetaInfo != null && _selectedField.MetaInfo.ID != Guid.Empty)
+        if (singleWellLatitudeDatum is not double latitude || singleWellLongitudeDatum is not double longitude ||
+            singleWellDepthDatum is not double depth)
         {
-            try
-            {
-                if (Api.ClientField != null)
-                {
-                    FieldCartographicConversionSet conversionSet = new FieldCartographicConversionSet()
-                    {
-                        MetaInfo = new MetaInfo() { ID = Guid.NewGuid() },
-                        Name = "Calculate Cluster Reference",
-                        Description = "Calculate Cluster Reference",
-                        FieldID = _selectedField.MetaInfo.ID,
-                        CartographicCoordinateList = new List<CartographicCoordinate>() {
-                            new CartographicCoordinate() {
-                                GeodeticCoordinate = new GeodeticCoordinate() {
-                                    LatitudeDatum = singleWellLatitudeDatum,
-                                    LongitudeDatum = singleWellLongitudeDatum,
-                                    VerticalDepthDatum = singleWellDepthDatum
-                                }
-                            }
-                        }
-                    };
-                    FieldCartographicConversionSet calculatedConversionSet = CalculateFieldCartographicConversionSet(conversionSet);
-                    if (calculatedConversionSet?.MetaInfo?.ID == conversionSet.MetaInfo.ID &&
-                        calculatedConversionSet.CartographicCoordinateList != null &&
-                        calculatedConversionSet.CartographicCoordinateList.Count > 0 &&
-                        calculatedConversionSet.CartographicCoordinateList.ElementAt(0).GeodeticCoordinate != null)
-                    {
-                        singleWellLatitudeWGS84 = calculatedConversionSet.CartographicCoordinateList.ElementAt(0).GeodeticCoordinate.LatitudeWGS84;
-                        singleWellLongitudeWGS84 = calculatedConversionSet.CartographicCoordinateList.ElementAt(0).GeodeticCoordinate.LongitudeWGS84;
-                        singleWellDepthWGS84 = calculatedConversionSet.CartographicCoordinateList.ElementAt(0).GeodeticCoordinate.VerticalDepthWGS84;
-                        singleWellNorthing = calculatedConversionSet.CartographicCoordinateList.ElementAt(0).Northing;
-                        singleWellEasting = calculatedConversionSet.CartographicCoordinateList.ElementAt(0).Easting;
-                    }
+            return;
+        }
 
-                }
-            }
-            catch (Exception e)
-            {
-
-            }
+        try
+        {
+            ApplyConvertedReference(ForwardFieldCoordinate(FieldGeographicReference.ProjectionDatum, latitude, longitude, depth));
+        }
+        catch (Exception ex)
+        {
+            logger.LogWarning(ex, "Unable to convert the single-well projection-datum reference");
         }
     }
+
     private void CalculateReferenceCartography()
     {
-        if (singleWellNorthing != null && singleWellEasting != null && singleWellDepthDatum != null && _selectedField != null && _selectedField.MetaInfo != null && _selectedField.MetaInfo.ID != Guid.Empty)
+        if (singleWellNorthing is not double northing || singleWellEasting is not double easting ||
+            singleWellDepthDatum is not double depth)
         {
-            try
-            {
-                if (Api.ClientField != null)
-                {
-                    FieldCartographicConversionSet conversionSet = new FieldCartographicConversionSet()
-                    {
-                        MetaInfo = new MetaInfo() { ID = Guid.NewGuid() },
-                        Name = "Calculate Cluster Reference",
-                        Description = "Calculate Cluster Reference",
-                        FieldID = _selectedField.MetaInfo.ID,
-                        CartographicCoordinateList = new List<CartographicCoordinate>() {
-                            new CartographicCoordinate() {
-                                Northing = singleWellNorthing,
-                                Easting = singleWellEasting,
-                                VerticalDepth = singleWellDepthDatum,
-                            }
-                        }
-                    };
-                    FieldCartographicConversionSet calculatedConversionSet = CalculateFieldCartographicConversionSet(conversionSet);
-                    if (calculatedConversionSet?.MetaInfo?.ID == conversionSet.MetaInfo.ID &&
-                        calculatedConversionSet.CartographicCoordinateList != null &&
-                        calculatedConversionSet.CartographicCoordinateList.Count > 0 &&
-                        calculatedConversionSet.CartographicCoordinateList.ElementAt(0).GeodeticCoordinate != null)
-                    {
-                        singleWellLatitudeWGS84 = calculatedConversionSet.CartographicCoordinateList.ElementAt(0).GeodeticCoordinate.LatitudeWGS84;
-                        singleWellLongitudeWGS84 = calculatedConversionSet.CartographicCoordinateList.ElementAt(0).GeodeticCoordinate.LongitudeWGS84;
-                        singleWellDepthWGS84 = calculatedConversionSet.CartographicCoordinateList.ElementAt(0).GeodeticCoordinate.VerticalDepthWGS84;
-                        singleWellLatitudeDatum = calculatedConversionSet.CartographicCoordinateList.ElementAt(0).GeodeticCoordinate.LatitudeDatum;
-                        singleWellLongitudeDatum = calculatedConversionSet.CartographicCoordinateList.ElementAt(0).GeodeticCoordinate.LongitudeDatum;
-                    }
+            return;
+        }
 
-                }
-            }
-            catch (Exception e)
-            {
-
-            }
+        try
+        {
+            ApplyConvertedReference(InverseFieldCoordinate(northing, easting, depth));
+        }
+        catch (Exception ex)
+        {
+            logger.LogWarning(ex, "Unable to convert the single-well projected reference");
         }
     }
+
+    private void ApplyConvertedReference(FieldCoordinateConversionPositionResult? result)
+    {
+        if (result == null)
+        {
+            return;
+        }
+
+        singleWellLatitudeDatum = result.ProjectionDatumGeographicCoordinate?.Latitude;
+        singleWellLongitudeDatum = result.ProjectionDatumGeographicCoordinate?.Longitude;
+        singleWellDepthDatum = result.ProjectionDatumVerticalDepth;
+        singleWellLatitudeWGS84 = result.Wgs84GeographicCoordinate?.Latitude;
+        singleWellLongitudeWGS84 = result.Wgs84GeographicCoordinate?.Longitude;
+        singleWellDepthWGS84 = result.Wgs84VerticalDepth;
+        singleWellNorthing = result.ProjectedCoordinate?.Northing;
+        singleWellEasting = result.ProjectedCoordinate?.Easting;
+    }
+
     private void ChangeSingleWellGroundMudLineDepth(double? val)
     {
         singleWellGroundMudLineDepth = val;
@@ -1015,6 +1028,7 @@
         }
         InvokeAsync(StateHasChanged);
     }
+
     private void ChangeSingleWellTopWaterDepth(double? val)
     {
         singleWellTopWaterDepth = val;
@@ -1026,234 +1040,60 @@
         }
         InvokeAsync(StateHasChanged);
     }
+
     private void CalculateDepthWGS84(double? depthInput, out double? depthOutput)
     {
         depthOutput = null;
-        if (depthInput != null && singleWellLatitudeWGS84 != null && singleWellLongitudeWGS84 != null && _selectedField != null && _selectedField.MetaInfo != null && _selectedField.MetaInfo.ID != Guid.Empty)
+        if (depthInput == null || singleWellLatitudeWGS84 == null || singleWellLongitudeWGS84 == null)
         {
-            try
-            {
-                if (Api.ClientField != null)
-                {
-                    FieldCartographicConversionSet conversionSet = new FieldCartographicConversionSet()
-                    {
-                        MetaInfo = new MetaInfo() { ID = Guid.NewGuid() },
-                        Name = "Calculate Depth",
-                        Description = "Calculate Depth",
-                        FieldID = _selectedField.MetaInfo.ID,
-                        CartographicCoordinateList = new List<CartographicCoordinate>() {
-                            new CartographicCoordinate() {
-                                GeodeticCoordinate = new GeodeticCoordinate() {
-                                    LatitudeWGS84 = singleWellLatitudeWGS84 ,
-                                    LongitudeWGS84 = singleWellLongitudeWGS84,
-                                    VerticalDepthWGS84 = depthInput
-                                }
-                            }
-                        }
-                    };
-                    FieldCartographicConversionSet calculatedConversionSet = CalculateFieldCartographicConversionSet(conversionSet);
-                    if (calculatedConversionSet?.MetaInfo?.ID == conversionSet.MetaInfo.ID &&
-                        calculatedConversionSet.CartographicCoordinateList != null &&
-                        calculatedConversionSet.CartographicCoordinateList.Count > 0 &&
-                        calculatedConversionSet.CartographicCoordinateList.ElementAt(0).GeodeticCoordinate != null)
-                    {
-                        depthOutput = calculatedConversionSet.CartographicCoordinateList.ElementAt(0).GeodeticCoordinate.VerticalDepthDatum;
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-            }
+            return;
+        }
+
+        try
+        {
+            depthOutput = ForwardFieldCoordinate(
+                FieldGeographicReference.Wgs84,
+                singleWellLatitudeWGS84.Value,
+                singleWellLongitudeWGS84.Value,
+                depthInput.Value)?.ProjectionDatumVerticalDepth;
+        }
+        catch (Exception ex)
+        {
+            logger.LogWarning(ex, "Unable to convert a WGS84 depth to the field projection datum");
         }
     }
+
     private void CalculateDepthDatum(double? depthInput, out double? depthOutput)
     {
         depthOutput = null;
-        if (depthInput != null && singleWellLatitudeDatum != null && singleWellLongitudeDatum != null && _selectedField != null && _selectedField.MetaInfo != null && _selectedField.MetaInfo.ID != Guid.Empty)
+        if (depthInput == null || singleWellLatitudeDatum == null || singleWellLongitudeDatum == null)
         {
-            try
-            {
-                if (Api.ClientField != null)
-                {
-                    FieldCartographicConversionSet conversionSet = new FieldCartographicConversionSet()
-                    {
-                        MetaInfo = new MetaInfo() { ID = Guid.NewGuid() },
-                        Name = "Calculate Depth",
-                        Description = "Calculate Depth",
-                        FieldID = _selectedField.MetaInfo.ID,
-                        CartographicCoordinateList = new List<CartographicCoordinate>() {
-                            new CartographicCoordinate() {
-                                GeodeticCoordinate = new GeodeticCoordinate() {
-                                    LatitudeDatum = singleWellLatitudeDatum ,
-                                    LongitudeDatum = singleWellLongitudeDatum,
-                                    VerticalDepthDatum = depthInput
-                                }
-                            }
-                        }
-                    };
-                    FieldCartographicConversionSet calculatedConversionSet = CalculateFieldCartographicConversionSet(conversionSet);
-                    if (calculatedConversionSet?.MetaInfo?.ID == conversionSet.MetaInfo.ID &&
-                        calculatedConversionSet.CartographicCoordinateList != null &&
-                        calculatedConversionSet.CartographicCoordinateList.Count > 0 &&
-                        calculatedConversionSet.CartographicCoordinateList.ElementAt(0).GeodeticCoordinate != null)
-                    {
-                        depthOutput = calculatedConversionSet.CartographicCoordinateList.ElementAt(0).GeodeticCoordinate.VerticalDepthWGS84;
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-            }
+            return;
+        }
+
+        try
+        {
+            depthOutput = ForwardFieldCoordinate(
+                FieldGeographicReference.ProjectionDatum,
+                singleWellLatitudeDatum.Value,
+                singleWellLongitudeDatum.Value,
+                depthInput.Value)?.Wgs84VerticalDepth;
+        }
+        catch (Exception ex)
+        {
+            logger.LogWarning(ex, "Unable to convert a field projection-datum depth to WGS84");
         }
     }
+
     private void RefreshPlots()
     {
         UpdateDepthPlot();
-        InvokeAsync(() => { StateHasChanged(); }).Wait();
+        InvokeAsync(StateHasChanged).Wait();
     }
 
     private void CalculateWGS84()
     {
-        try
-        {
-            if (Api.ClientField != null && _selectedField != null && _selectedField.MetaInfo != null && _selectedField.MetaInfo.ID != Guid.Empty)
-            {
-                FieldCartographicConversionSet conversionSet = new FieldCartographicConversionSet()
-                {
-                    MetaInfo = new MetaInfo() { ID = Guid.NewGuid() },
-                    Name = "Calculate Single Well Position",
-                    Description = "Calculate Single Well Position",
-                    FieldID = _selectedField.MetaInfo.ID
-                };
-                conversionSet.CartographicCoordinateList ??= new List<CartographicCoordinate>();
-                conversionSet.CartographicCoordinateList.Clear();
-                double defaultLatitudeWGS84 = 0;
-                double defaultLongitudeWGS84 = 0;
-                if (singleWellLatitudeWGS84 != null)
-                {
-                    defaultLatitudeWGS84 = singleWellLatitudeWGS84.Value;
-                }
-                if (singleWellLongitudeWGS84 != null)
-                {
-                    defaultLongitudeWGS84 = singleWellLongitudeWGS84.Value;
-                }
-                List<bool> toBeProcessed = new List<bool>();
-                CartographicCoordinate coordinate;
-                if (singleWellLatitudeWGS84 != null && singleWellLongitudeWGS84 != null && singleWellDepthWGS84 != null)
-                {
-                    coordinate = new CartographicCoordinate()
-                    {
-                        GeodeticCoordinate = new GeodeticCoordinate()
-                        {
-                            LatitudeWGS84 = singleWellLatitudeWGS84,
-                            LongitudeWGS84 = singleWellLongitudeWGS84,
-                            VerticalDepthWGS84 = singleWellDepthWGS84
-                        }
-                    };
-                    toBeProcessed.Add(true);
-                }
-                else
-                {
-                    coordinate = new CartographicCoordinate()
-                    {
-                        GeodeticCoordinate = new GeodeticCoordinate()
-                        {
-                            LatitudeWGS84 = defaultLatitudeWGS84,
-                            LongitudeWGS84 = defaultLongitudeWGS84,
-                            VerticalDepthWGS84 = 0
-                        }
-                    };
-                    toBeProcessed.Add(false);
-                }
-                conversionSet.CartographicCoordinateList.Add(coordinate);
-                if (singleWellLatitudeWGS84 != null && singleWellLongitudeWGS84 != null && singleWellGroundMudLineDepth != null)
-                {
-                    coordinate = new CartographicCoordinate()
-                    {
-                        GeodeticCoordinate = new GeodeticCoordinate()
-                        {
-                            LatitudeWGS84 = singleWellLatitudeWGS84,
-                            LongitudeWGS84 = singleWellLongitudeWGS84,
-                            VerticalDepthWGS84 = singleWellGroundMudLineDepth
-                        }
-                    };
-                    toBeProcessed.Add(true);
-                }
-                else
-                {
-                    coordinate = new CartographicCoordinate()
-                    {
-                        GeodeticCoordinate = new GeodeticCoordinate()
-                        {
-                            LatitudeWGS84 = defaultLatitudeWGS84,
-                            LongitudeWGS84 = defaultLongitudeWGS84,
-                            VerticalDepthWGS84 = 0
-                        }
-                    };
-                    toBeProcessed.Add(false);
-                }
-                conversionSet.CartographicCoordinateList.Add(coordinate);
-                if (singleWellLatitudeWGS84 != null && singleWellLongitudeWGS84 != null && singleWellTopWaterDepth != null)
-                {
-                    coordinate = new CartographicCoordinate()
-                    {
-                        GeodeticCoordinate = new GeodeticCoordinate()
-                        {
-                            LatitudeWGS84 = singleWellLatitudeWGS84,
-                            LongitudeWGS84 = singleWellLongitudeWGS84,
-                            VerticalDepthWGS84 = singleWellTopWaterDepth
-                        }
-                    };
-                    toBeProcessed.Add(true);
-                }
-                else
-                {
-                    coordinate = new CartographicCoordinate()
-                    {
-                        GeodeticCoordinate = new GeodeticCoordinate()
-                        {
-                            LatitudeWGS84 = defaultLatitudeWGS84,
-                            LongitudeWGS84 = defaultLongitudeWGS84,
-                            VerticalDepthWGS84 = 0
-                        }
-                    };
-                    toBeProcessed.Add(false);
-                }
-                conversionSet.CartographicCoordinateList.Add(coordinate);
-                FieldCartographicConversionSet calculatedConversionSet = CalculateFieldCartographicConversionSet(conversionSet);
-                if (calculatedConversionSet?.MetaInfo?.ID == conversionSet.MetaInfo.ID &&
-                    calculatedConversionSet.CartographicCoordinateList != null &&
-                    calculatedConversionSet.CartographicCoordinateList.Count == toBeProcessed.Count &&
-                    calculatedConversionSet.CartographicCoordinateList.Count >= 3)
-                {
-                    CartographicCoordinate calculatedCoordinate = calculatedConversionSet.CartographicCoordinateList.ElementAt<CartographicCoordinate>(0);
-                    if (calculatedCoordinate != null && toBeProcessed[0])
-                    {
-                        if (calculatedCoordinate.GeodeticCoordinate != null)
-                        {
-                            singleWellDepthDatum = calculatedCoordinate.GeodeticCoordinate.VerticalDepthDatum;
-                            singleWellLatitudeDatum = calculatedCoordinate.GeodeticCoordinate.LatitudeDatum;
-                            singleWellLongitudeDatum = calculatedCoordinate.GeodeticCoordinate.LongitudeDatum;
-                        }
-                        singleWellNorthing = calculatedCoordinate.Northing;
-                        singleWellEasting = calculatedCoordinate.Easting;
-                    }
-                    calculatedCoordinate = calculatedConversionSet.CartographicCoordinateList.ElementAt<CartographicCoordinate>(1);
-                    if (calculatedCoordinate != null && toBeProcessed[1])
-                    {
-                        //singleWellGroundMudLineDepthDatum = calculatedCoordinate.GeodeticCoordinate.VerticalDepthDatum;
-                    }
-                    calculatedCoordinate = calculatedConversionSet.CartographicCoordinateList.ElementAt<CartographicCoordinate>(2);
-                    if (calculatedCoordinate != null && toBeProcessed[2] && calculatedCoordinate.GeodeticCoordinate != null)
-                    {
-                        //singleWellTopWaterDepthDatum = calculatedCoordinate.GeodeticCoordinate.VerticalDepthDatum;
-                    }
-                }
-            }
-        }
-        catch (Exception e)
-        {
-        }
+        CalculateReferenceWGS84();
     }
 }
 

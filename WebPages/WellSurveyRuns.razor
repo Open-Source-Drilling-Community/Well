@@ -13,6 +13,12 @@
                               UnitSystemNameChanged="@DataUtils.UpdateUnitSystemName"
                               DepthReferenceName="@DataUtils.UnitAndReferenceParameters.DepthReferenceName"
                               DepthReferenceNameChanged="@DataUtils.UpdateDepthReferenceName"
+                              PositionReferenceName="@DataUtils.UnitAndReferenceParameters.PositionReferenceName"
+                              PositionReferenceNameChanged="@DataUtils.UpdatePositionReferenceName"
+                              WellHeadPositionReferenceSource="@DataUtils.UnitAndReferenceParameters.WellHeadPositionReferenceSource"
+                              ClusterPositionReferenceSource="@DataUtils.UnitAndReferenceParameters.ClusterPositionReferenceSource"
+                              FieldPositionReferenceSource="@DataUtils.UnitAndReferenceParameters.FieldPositionReferenceSource"
+                              CartographicGridPositionReferenceSource="@DataUtils.UnitAndReferenceParameters.CartographicGridPositionReferenceSource"
                               GroundMudLineDepthReferenceSource="@DataUtils.UnitAndReferenceParameters.GroundMudLineDepthReferenceSource"
                               SeaWaterLevelDepthReferenceSource="@DataUtils.UnitAndReferenceParameters.SeaWaterLevelDepthReferenceSource"
                               MeanSeaLevelDepthReferenceSource="@DataUtils.UnitAndReferenceParameters.MeanSeaLevelDepthReferenceSource"
@@ -31,28 +37,24 @@
                         <MudText Typo="Typo.body2">All survey runs for the selected well, shown in 3D and as a horizontal projection.</MudText>
                     </MudItem>
                     <MudItem xs="12" sm="4" md="2">
-                        <MudSelect Label="Field" T="Guid?" Value="@selectedFieldId" ValueChanged="OnFieldChanged" ShrinkLabel Clearable="true">
-                            @foreach (WellModelShared.Field field in AvailableFields)
-                            {
-                                <MudSelectItem T="Guid?" Value="@((Guid?)field.MetaInfo.ID)">@field.Name</MudSelectItem>
-                            }
-                        </MudSelect>
+                        <MudAutocomplete Label="Field" T="Guid?" Value="@selectedFieldId" ValueChanged="OnFieldChanged"
+                                         SearchFunc="SearchFieldsAsync" ToStringFunc="GetFieldName"
+                                         Clearable="true" ResetValueOnEmptyText="true" CoerceText="false"
+                                         MinCharacters="0" MaxItems="@((int?)null)" ShrinkLabel />
                     </MudItem>
                     <MudItem xs="12" sm="4" md="2">
-                        <MudSelect Label="Cluster" T="Guid?" Value="@selectedClusterId" ValueChanged="OnClusterChanged" ShrinkLabel Clearable="true" Disabled="@(selectedFieldId == null || AvailableClusters.Count == 0)">
-                            @foreach (WellModelShared.Cluster cluster in AvailableClusters)
-                            {
-                                <MudSelectItem T="Guid?" Value="@((Guid?)cluster.MetaInfo.ID)">@cluster.Name</MudSelectItem>
-                            }
-                        </MudSelect>
+                        <MudAutocomplete Label="Cluster" T="Guid?" Value="@selectedClusterId" ValueChanged="OnClusterChanged"
+                                         SearchFunc="SearchClustersAsync" ToStringFunc="GetClusterName"
+                                         Clearable="true" ResetValueOnEmptyText="true" CoerceText="false"
+                                         MinCharacters="0" MaxItems="@((int?)null)" ShrinkLabel
+                                         Disabled="@(selectedFieldId == null || AvailableClusters.Count == 0)" />
                     </MudItem>
                     <MudItem xs="12" sm="4" md="3">
-                        <MudSelect Label="Well" T="Guid?" Value="@selectedWellId" ValueChanged="OnWellChanged" ShrinkLabel Clearable="true" Disabled="@(selectedFieldId == null || AvailableWells.Count == 0)">
-                            @foreach (WellModelShared.Well well in AvailableWells)
-                            {
-                                <MudSelectItem T="Guid?" Value="@((Guid?)well.MetaInfo.ID)">@well.Name</MudSelectItem>
-                            }
-                        </MudSelect>
+                        <MudAutocomplete Label="Well" T="Guid?" Value="@selectedWellId" ValueChanged="OnWellChanged"
+                                         SearchFunc="SearchWellsAsync" ToStringFunc="GetWellName"
+                                         Clearable="true" ResetValueOnEmptyText="true" CoerceText="false"
+                                         MinCharacters="0" MaxItems="@((int?)null)" ShrinkLabel
+                                         Disabled="@(selectedFieldId == null || AvailableWells.Count == 0)" />
                     </MudItem>
                     <MudItem xs="12" md="1">
                         <MudButton Variant="Variant.Filled" Color="Color.Primary" FullWidth="true" OnClick="ReloadSelectedWellAsync" Disabled="@(selectedWellId == null)">Reload</MudButton>
@@ -271,6 +273,39 @@
             .OrderBy(well => well.Name)
             .ToList() ?? [];
 
+    private Task<IEnumerable<Guid?>> SearchFieldsAsync(string? value, CancellationToken cancellationToken) =>
+        Task.FromResult(FilterByName(AvailableFields, value, field => field.Name, field => field.MetaInfo.ID));
+
+    private Task<IEnumerable<Guid?>> SearchClustersAsync(string? value, CancellationToken cancellationToken) =>
+        Task.FromResult(FilterByName(AvailableClusters, value, cluster => cluster.Name, cluster => cluster.MetaInfo.ID));
+
+    private Task<IEnumerable<Guid?>> SearchWellsAsync(string? value, CancellationToken cancellationToken) =>
+        Task.FromResult(FilterByName(AvailableWells, value, well => well.Name, well => well.MetaInfo.ID));
+
+    private string GetFieldName(Guid? id) => GetDisplayName(id, fieldList ?? [], field => field.Name, field => field.MetaInfo?.ID);
+    private string GetClusterName(Guid? id) => GetDisplayName(id, clusterList ?? [], cluster => cluster.Name, cluster => cluster.MetaInfo?.ID);
+    private string GetWellName(Guid? id) => GetDisplayName(id, wellList ?? [], well => well.Name, well => well.MetaInfo?.ID);
+
+    private static IEnumerable<Guid?> FilterByName<T>(IEnumerable<T> items, string? value,
+        Func<T, string?> getName, Func<T, Guid> getId)
+    {
+        string? term = value?.Trim();
+        return items
+            .Where(item => string.IsNullOrEmpty(term) ||
+                (getName(item)?.Contains(term, StringComparison.OrdinalIgnoreCase) ?? false) ||
+                getId(item).ToString("D").Contains(term, StringComparison.OrdinalIgnoreCase))
+            .Select(item => (Guid?)getId(item));
+    }
+
+    private static string GetDisplayName<T>(Guid? id, IEnumerable<T> items,
+        Func<T, string?> getName, Func<T, Guid?> getId)
+    {
+        if (id is not Guid value) return string.Empty;
+        T? item = items.FirstOrDefault(candidate => getId(candidate) == value);
+        string? name = item is null ? null : getName(item);
+        return string.IsNullOrWhiteSpace(name) ? value.ToString("D") : name;
+    }
+
     private bool MatchesSelectedField(WellModelShared.Well? well)
     {
         if (selectedFieldId == null || well?.ClusterID == null || clusterList == null)
@@ -348,9 +383,16 @@
     private async Task ApplySelectedWellReferenceValuesAsync(Guid? wellId)
     {
         WellModelShared.Well? selectedWell = wellList?.FirstOrDefault(well => well.MetaInfo?.ID == wellId);
-        DataUtils.ApplyWellReferenceValues(selectedWell, clusterList ?? [], rigList);
+        DataUtils.ApplyWellReferenceValues(selectedWell, clusterList ?? [], rigList, fieldList);
+        await CartographicPositionReferenceUtils.ApplyAsync(Api, ResolveSelectedField(selectedWell), logger);
         DataUtils.UnitAndReferenceParameters.MeanSeaLevelDepthReferenceSource.MeanSeaLevelDepthReference =
             await MslDepthReferenceUtils.ResolveMeanSeaLevelDepthReferenceAsync(Api, selectedWell, clusterList);
+    }
+
+    private WellModelShared.Field? ResolveSelectedField(WellModelShared.Well? well)
+    {
+        WellModelShared.Cluster? cluster = clusterList?.FirstOrDefault(item => item.MetaInfo?.ID == well?.ClusterID);
+        return fieldList?.FirstOrDefault(item => item.MetaInfo?.ID == cluster?.FieldID);
     }
 
 

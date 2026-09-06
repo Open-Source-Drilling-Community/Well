@@ -1,5 +1,7 @@
 # OSDC.Drilling.Well.WebPages
 
+This release targets MudBlazor 9.9.0 and the matching OSDC shared web component packages.
+
 `OSDC.Drilling.Well.WebPages` is a .NET 8 Razor class library containing the reusable UI for the Well microservice. The NuGet package ID is `OSDC.Drilling.Well.WebPages`; its current project version is defined in `WebPages.csproj`.
 
 ## Pages
@@ -16,6 +18,9 @@
 | `StatisticsWell` | `/StatisticsWell` | Refreshable per-endpoint request totals, today's counts, and last-use times. |
 
 The package also contains `ScatterPlot`, `Scatter3DPlot`, `MslDepthReferenceUtils`, API utilities, and `wwwroot/wellBatchBackup.js` for browser-side JSON download.
+
+The Field, Cluster, and Well selectors on both trajectory and survey-run pages show every applicable item when empty and support case-insensitive substring filtering while typing.
+Their shared unit/reference control also converts plotted North/East coordinates between WGS84, the selected Field reference point, the selected Cluster reference point, the selected Well-head slot, and the owning Field's cartographic projection. WGS84 metres remain the canonical wire values.
 
 ## Host requirements
 
@@ -63,9 +68,9 @@ Example routing:
 
 The page calls the typed `BatchExportWellsAsync` and `BatchRestoreWellsAsync` clients. It supports all or selected backup, previews uploaded documents, validates format version and Well UUIDs client-side, requires an explicit collision/catalog policy, asks for confirmation, and displays structured server errors. Server-side validation and transactionality remain authoritative.
 
-## Rig and vertical datum integration
+## Context and reference integration
 
-Well edit, survey-run, and trajectory workflows use Rig data and `MslDepthReferenceUtils` to calculate and display mean-sea-level depth references. The consuming host must configure reachable Rig and Earth Vertical Datum services.
+Well edit, survey-run, and trajectory workflows use current Field, Cluster, Rig, and Earth Vertical Datum contracts to resolve position and depth references. The shared `Rotary table`/`RTE` choice is backed by `Rig.DrillFloorElevation` only when the Well's Cluster is a fixed platform with a valid Rig link. Field coordinate conversion uses the stateless `FieldCoordinateConversion/Forward` and `/Inverse` endpoints. The consuming host must configure reachable dependency services.
 
 ## Generated contracts
 

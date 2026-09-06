@@ -62,6 +62,8 @@ Principal Well routes:
 | Survey runs | `/Well/webapp/WellSurveyRuns` |
 | Usage statistics | `/Well/webapp/StatisticsWell` |
 
+The trajectory and survey-run pages provide searchable Field/Cluster/Well selectors and apply the shared unit system to depth and horizontal position. Position may be displayed relative to WGS84, the owning Field's cartographic projection, the selected Field or Cluster reference point, or the selected Well-head slot.
+
 Earth Geodesy's Geodetic Datum and Spheroid pages, plus the vertical datum, gravity, and magnetic-field calculators, use local wrapper components in `WebApp/Pages`. This exposes only the required pages; registering those complete external Razor assemblies would import foreign or duplicate `/Home` routes and make the Blazor route table incorrect or ambiguous.
 
 ## Related WebPages integrations

@@ -54,7 +54,7 @@ dotnet run --project WebApp
 - User-managed Well Feature Categories, options, and validity-aware assignments.
 - Versioned logical JSON backup of all Wells or an ordered selection.
 - Atomic restore with conflict policies and catalog mapping/creation policies.
-- Survey-run and trajectory displays with Rig and mean-sea-level depth-reference integration.
+- Survey-run and trajectory displays with searchable hierarchy selectors plus WGS84, cartographic, Field, Cluster, Well-head, mean-sea-level, and fixed-platform Rig drill-floor (`RTE`) reference integration.
 - Context pages for Field, Cluster, Rig, projections, geodetic datum, and spheroid data.
 - Cartographic, vertical datum, gravity, and magnetic-field calculators.
 - Per-endpoint usage-statistics dashboard.

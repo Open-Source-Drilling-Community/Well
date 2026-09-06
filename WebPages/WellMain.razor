@@ -329,7 +329,7 @@
 
     private async Task UpdateSelectedClusterDepthReferenceSourceAsync()
     {
-        DataUtils.ApplyWellReferenceValues(currentWell, clusterList, rigList);
+        DataUtils.ApplyWellReferenceValues(currentWell, clusterList, rigList, fieldList);
         DataUtils.UnitAndReferenceParameters.MeanSeaLevelDepthReferenceSource.MeanSeaLevelDepthReference =
             await MslDepthReferenceUtils.ResolveMeanSeaLevelDepthReferenceAsync(Api, currentWell, clusterList);
     }

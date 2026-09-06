@@ -1,656 +1,10 @@
 {
-  "openapi": "3.0.3",
+  "openapi": "3.0.4",
   "info": {
-    "title": "ModelShared (Service)",
-    "description": "Data model containing model dependencies of the clients of the current microservice (WebApp, ServiceTest)",
+    "title": "Service, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null",
     "version": "1.0"
   },
   "paths": {
-    "/Cluster": {
-      "get": {
-        "tags": [
-          "Cluster"
-        ],
-        "operationId": "GetAllClusterId",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "type": "string",
-                    "format": "uuid"
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-      "post": {
-        "tags": [
-          "Cluster"
-        ],
-        "operationId": "PostCluster",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/Cluster"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/Cluster"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/Cluster"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/Cluster/MetaInfo": {
-      "get": {
-        "tags": [
-          "Cluster"
-        ],
-        "operationId": "GetAllClusterMetaInfo",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/MetaInfo"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/Cluster/{id}": {
-      "get": {
-        "tags": [
-          "Cluster"
-        ],
-        "operationId": "GetClusterById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Cluster"
-                }
-              }
-            }
-          }
-        }
-      },
-      "put": {
-        "tags": [
-          "Cluster"
-        ],
-        "operationId": "PutClusterById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/Cluster"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/Cluster"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/Cluster"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      },
-      "delete": {
-        "tags": [
-          "Cluster"
-        ],
-        "operationId": "DeleteClusterById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/Cluster/HeavyData": {
-      "get": {
-        "tags": [
-          "Cluster"
-        ],
-        "operationId": "GetAllCluster",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Cluster"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/ClusterUsageStatistics": {
-      "get": {
-        "tags": [
-          "ClusterUsageStatistics"
-        ],
-        "operationId": "GetClusterUsageStatistics",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UsageStatisticsCluster"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/Field": {
-      "get": {
-        "tags": [
-          "Field"
-        ],
-        "operationId": "GetAllFieldId",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "type": "string",
-                    "format": "uuid"
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-      "post": {
-        "tags": [
-          "Field"
-        ],
-        "operationId": "PostField",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/Field"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/Field"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/Field"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/Field/MetaInfo": {
-      "get": {
-        "tags": [
-          "Field"
-        ],
-        "operationId": "GetAllFieldMetaInfo",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/MetaInfo"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/Field/{id}": {
-      "get": {
-        "tags": [
-          "Field"
-        ],
-        "operationId": "GetFieldById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Field"
-                }
-              }
-            }
-          }
-        }
-      },
-      "put": {
-        "tags": [
-          "Field"
-        ],
-        "operationId": "PutFieldById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/Field"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/Field"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/Field"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      },
-      "delete": {
-        "tags": [
-          "Field"
-        ],
-        "operationId": "DeleteFieldById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/Field/HeavyData": {
-      "get": {
-        "tags": [
-          "Field"
-        ],
-        "operationId": "GetAllField",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Field"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/FieldCartographicConversionSet": {
-      "get": {
-        "tags": [
-          "FieldCartographicConversionSet"
-        ],
-        "operationId": "GetAllFieldCartographicConversionSetId",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "type": "string",
-                    "format": "uuid"
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-      "post": {
-        "tags": [
-          "FieldCartographicConversionSet"
-        ],
-        "operationId": "PostFieldCartographicConversionSet",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/FieldCartographicConversionSet"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/FieldCartographicConversionSet"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/FieldCartographicConversionSet"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/FieldCartographicConversionSet/MetaInfo": {
-      "get": {
-        "tags": [
-          "FieldCartographicConversionSet"
-        ],
-        "operationId": "GetAllFieldCartographicConversionSetMetaInfo",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/MetaInfo"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/FieldCartographicConversionSet/{id}": {
-      "get": {
-        "tags": [
-          "FieldCartographicConversionSet"
-        ],
-        "operationId": "GetFieldCartographicConversionSetById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/FieldCartographicConversionSet"
-                }
-              }
-            }
-          }
-        }
-      },
-      "put": {
-        "tags": [
-          "FieldCartographicConversionSet"
-        ],
-        "operationId": "PutFieldCartographicConversionSetById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/FieldCartographicConversionSet"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/FieldCartographicConversionSet"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/FieldCartographicConversionSet"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      },
-      "delete": {
-        "tags": [
-          "FieldCartographicConversionSet"
-        ],
-        "operationId": "DeleteFieldCartographicConversionSetById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/FieldCartographicConversionSet/LightData": {
-      "get": {
-        "tags": [
-          "FieldCartographicConversionSet"
-        ],
-        "operationId": "GetAllFieldCartographicConversionSetLight",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/FieldCartographicConversionSetLight"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/FieldCartographicConversionSet/HeavyData": {
-      "get": {
-        "tags": [
-          "FieldCartographicConversionSet"
-        ],
-        "operationId": "GetAllFieldCartographicConversionSet",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/FieldCartographicConversionSet"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/FieldUsageStatistics": {
-      "get": {
-        "tags": [
-          "FieldUsageStatistics"
-        ],
-        "operationId": "GetFieldUsageStatistics",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UsageStatisticsField"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/Rig": {
       "get": {
         "tags": [
@@ -685,7 +39,7 @@
               "schema": {
                 "allOf": [
                   {
-                    "$ref": "#/components/schemas/Rig"
+                    "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.Rig"
                   }
                 ]
               }
@@ -694,7 +48,7 @@
               "schema": {
                 "allOf": [
                   {
-                    "$ref": "#/components/schemas/Rig"
+                    "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.Rig"
                   }
                 ]
               }
@@ -703,7 +57,7 @@
               "schema": {
                 "allOf": [
                   {
-                    "$ref": "#/components/schemas/Rig"
+                    "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.Rig"
                   }
                 ]
               }
@@ -719,7 +73,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/RigMutationErrorEnvelope"
+                  "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.RigMutationErrorEnvelope"
                 }
               }
             }
@@ -729,7 +83,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/RigMutationErrorEnvelope"
+                  "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.RigMutationErrorEnvelope"
                 }
               }
             }
@@ -739,7 +93,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/RigMutationErrorEnvelope"
+                  "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.RigMutationErrorEnvelope"
                 }
               }
             }
@@ -761,7 +115,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/MetaInfo"
+                    "$ref": "#/components/schemas/OSDC.DotnetLibraries.General.DataManagement.MetaInfo"
                   }
                 }
               }
@@ -801,7 +155,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/RigReadResponse"
+                  "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.RigReadResponse"
                 }
               }
             }
@@ -839,7 +193,7 @@
               "schema": {
                 "allOf": [
                   {
-                    "$ref": "#/components/schemas/Rig"
+                    "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.Rig"
                   }
                 ]
               }
@@ -848,7 +202,7 @@
               "schema": {
                 "allOf": [
                   {
-                    "$ref": "#/components/schemas/Rig"
+                    "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.Rig"
                   }
                 ]
               }
@@ -857,7 +211,7 @@
               "schema": {
                 "allOf": [
                   {
-                    "$ref": "#/components/schemas/Rig"
+                    "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.Rig"
                   }
                 ]
               }
@@ -870,7 +224,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Rig"
+                  "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.Rig"
                 }
               }
             }
@@ -880,7 +234,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/RigMutationErrorEnvelope"
+                  "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.RigMutationErrorEnvelope"
                 }
               }
             }
@@ -890,7 +244,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/RigMutationErrorEnvelope"
+                  "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.RigMutationErrorEnvelope"
                 }
               }
             }
@@ -900,7 +254,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/RigMutationErrorEnvelope"
+                  "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.RigMutationErrorEnvelope"
                 }
               }
             }
@@ -910,7 +264,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/RigMutationErrorEnvelope"
+                  "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.RigMutationErrorEnvelope"
                 }
               }
             }
@@ -920,7 +274,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/RigMutationErrorEnvelope"
+                  "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.RigMutationErrorEnvelope"
                 }
               }
             }
@@ -964,7 +318,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/RigLight"
+                    "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.RigLight"
                   }
                 }
               }
@@ -997,7 +351,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/RigReadResponse"
+                    "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.RigReadResponse"
                   }
                 }
               }
@@ -1018,7 +372,7 @@
               "schema": {
                 "allOf": [
                   {
-                    "$ref": "#/components/schemas/RigBatchExportRequest"
+                    "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.RigBatchExportRequest"
                   }
                 ]
               }
@@ -1027,7 +381,7 @@
               "schema": {
                 "allOf": [
                   {
-                    "$ref": "#/components/schemas/RigBatchExportRequest"
+                    "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.RigBatchExportRequest"
                   }
                 ]
               }
@@ -1036,7 +390,7 @@
               "schema": {
                 "allOf": [
                   {
-                    "$ref": "#/components/schemas/RigBatchExportRequest"
+                    "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.RigBatchExportRequest"
                   }
                 ]
               }
@@ -1049,7 +403,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/RigBatchExportDocument"
+                  "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.RigBatchExportDocument"
                 }
               }
             }
@@ -1059,7 +413,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/RigBatchErrorEnvelope"
+                  "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.RigBatchErrorEnvelope"
                 }
               }
             }
@@ -1069,7 +423,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/RigBatchErrorEnvelope"
+                  "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.RigBatchErrorEnvelope"
                 }
               }
             }
@@ -1079,7 +433,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/RigBatchErrorEnvelope"
+                  "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.RigBatchErrorEnvelope"
                 }
               }
             }
@@ -1089,7 +443,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/RigBatchErrorEnvelope"
+                  "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.RigBatchErrorEnvelope"
                 }
               }
             }
@@ -1109,7 +463,7 @@
               "schema": {
                 "allOf": [
                   {
-                    "$ref": "#/components/schemas/RigBatchRestoreRequest"
+                    "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.RigBatchRestoreRequest"
                   }
                 ]
               }
@@ -1118,7 +472,7 @@
               "schema": {
                 "allOf": [
                   {
-                    "$ref": "#/components/schemas/RigBatchRestoreRequest"
+                    "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.RigBatchRestoreRequest"
                   }
                 ]
               }
@@ -1127,7 +481,7 @@
               "schema": {
                 "allOf": [
                   {
-                    "$ref": "#/components/schemas/RigBatchRestoreRequest"
+                    "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.RigBatchRestoreRequest"
                   }
                 ]
               }
@@ -1140,7 +494,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/RigBatchRestoreResponse"
+                  "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.RigBatchRestoreResponse"
                 }
               }
             }
@@ -1150,7 +504,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/RigBatchErrorEnvelope"
+                  "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.RigBatchErrorEnvelope"
                 }
               }
             }
@@ -1160,7 +514,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/RigBatchErrorEnvelope"
+                  "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.RigBatchErrorEnvelope"
                 }
               }
             }
@@ -1170,7 +524,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/RigBatchErrorEnvelope"
+                  "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.RigBatchErrorEnvelope"
                 }
               }
             }
@@ -1212,7 +566,7 @@
               "schema": {
                 "allOf": [
                   {
-                    "$ref": "#/components/schemas/RigFeatureCategory"
+                    "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.RigFeatureCategory"
                   }
                 ]
               }
@@ -1221,7 +575,7 @@
               "schema": {
                 "allOf": [
                   {
-                    "$ref": "#/components/schemas/RigFeatureCategory"
+                    "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.RigFeatureCategory"
                   }
                 ]
               }
@@ -1230,7 +584,7 @@
               "schema": {
                 "allOf": [
                   {
-                    "$ref": "#/components/schemas/RigFeatureCategory"
+                    "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.RigFeatureCategory"
                   }
                 ]
               }
@@ -1243,7 +597,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/RigFeatureCategory"
+                  "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.RigFeatureCategory"
                 }
               }
             }
@@ -1265,7 +619,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/MetaInfo"
+                    "$ref": "#/components/schemas/OSDC.DotnetLibraries.General.DataManagement.MetaInfo"
                   }
                 }
               }
@@ -1288,7 +642,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/RigFeatureCategory"
+                    "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.RigFeatureCategory"
                   }
                 }
               }
@@ -1320,7 +674,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/RigFeatureCategory"
+                  "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.RigFeatureCategory"
                 }
               }
             }
@@ -1357,7 +711,7 @@
               "schema": {
                 "allOf": [
                   {
-                    "$ref": "#/components/schemas/RigFeatureCategory"
+                    "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.RigFeatureCategory"
                   }
                 ]
               }
@@ -1366,7 +720,7 @@
               "schema": {
                 "allOf": [
                   {
-                    "$ref": "#/components/schemas/RigFeatureCategory"
+                    "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.RigFeatureCategory"
                   }
                 ]
               }
@@ -1375,7 +729,7 @@
               "schema": {
                 "allOf": [
                   {
-                    "$ref": "#/components/schemas/RigFeatureCategory"
+                    "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.RigFeatureCategory"
                   }
                 ]
               }
@@ -1388,7 +742,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/RigFeatureCategory"
+                  "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.RigFeatureCategory"
                 }
               }
             }
@@ -1442,7 +796,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/RigPhotoMetadata"
+                    "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.RigPhotoMetadata"
                   }
                 }
               },
@@ -1450,7 +804,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/RigPhotoMetadata"
+                    "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.RigPhotoMetadata"
                   }
                 }
               },
@@ -1458,7 +812,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/RigPhotoMetadata"
+                    "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.RigPhotoMetadata"
                   }
                 }
               }
@@ -1558,17 +912,17 @@
             "content": {
               "text/plain": {
                 "schema": {
-                  "$ref": "#/components/schemas/RigPhotoMetadata"
+                  "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.RigPhotoMetadata"
                 }
               },
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/RigPhotoMetadata"
+                  "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.RigPhotoMetadata"
                 }
               },
               "text/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/RigPhotoMetadata"
+                  "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.RigPhotoMetadata"
                 }
               }
             }
@@ -1647,7 +1001,7 @@
               "schema": {
                 "allOf": [
                   {
-                    "$ref": "#/components/schemas/RigPhotoMetadata"
+                    "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.RigPhotoMetadata"
                   }
                 ]
               }
@@ -1656,7 +1010,7 @@
               "schema": {
                 "allOf": [
                   {
-                    "$ref": "#/components/schemas/RigPhotoMetadata"
+                    "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.RigPhotoMetadata"
                   }
                 ]
               }
@@ -1665,7 +1019,7 @@
               "schema": {
                 "allOf": [
                   {
-                    "$ref": "#/components/schemas/RigPhotoMetadata"
+                    "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.RigPhotoMetadata"
                   }
                 ]
               }
@@ -1678,17 +1032,17 @@
             "content": {
               "text/plain": {
                 "schema": {
-                  "$ref": "#/components/schemas/RigPhotoMetadata"
+                  "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.RigPhotoMetadata"
                 }
               },
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/RigPhotoMetadata"
+                  "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.RigPhotoMetadata"
                 }
               },
               "text/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/RigPhotoMetadata"
+                  "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.RigPhotoMetadata"
                 }
               }
             }
@@ -1738,450 +1092,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/UsageStatisticsRig"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/VerticalDatum": {
-      "get": {
-        "tags": [
-          "VerticalDatum"
-        ],
-        "operationId": "GetAllVerticalDatumId",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "type": "string",
-                    "format": "uuid"
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-      "post": {
-        "tags": [
-          "VerticalDatum"
-        ],
-        "operationId": "PostVerticalDatum",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/VerticalDatum"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/VerticalDatum"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/VerticalDatum"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/VerticalDatum/MetaInfo": {
-      "get": {
-        "tags": [
-          "VerticalDatum"
-        ],
-        "operationId": "GetAllVerticalDatumMetaInfo",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/MetaInfo"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/VerticalDatum/{id}": {
-      "get": {
-        "tags": [
-          "VerticalDatum"
-        ],
-        "operationId": "GetVerticalDatumById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/VerticalDatum"
-                }
-              }
-            }
-          }
-        }
-      },
-      "put": {
-        "tags": [
-          "VerticalDatum"
-        ],
-        "operationId": "PutVerticalDatumById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/VerticalDatum"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/VerticalDatum"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/VerticalDatum"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      },
-      "delete": {
-        "tags": [
-          "VerticalDatum"
-        ],
-        "operationId": "DeleteVerticalDatumById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/VerticalDatum/HeavyData": {
-      "get": {
-        "tags": [
-          "VerticalDatum"
-        ],
-        "operationId": "GetAllVerticalDatum",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/VerticalDatum"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/VerticalDatum/CompletedVerticalDatum": {
-      "get": {
-        "tags": [
-          "VerticalDatum"
-        ],
-        "operationId": "GetAllCompletedVerticalDatum",
-        "parameters": [
-          {
-            "name": "isCompleted",
-            "in": "query",
-            "schema": {
-              "type": "boolean"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/VerticalDatum"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/VerticalDatumOrder": {
-      "get": {
-        "tags": [
-          "VerticalDatumOrder"
-        ],
-        "operationId": "GetAllVerticalDatumOrderId",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "type": "string",
-                    "format": "uuid"
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-      "post": {
-        "tags": [
-          "VerticalDatumOrder"
-        ],
-        "operationId": "PostVerticalDatumOrder",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/VerticalDatumOrder"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/VerticalDatumOrder"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/VerticalDatumOrder"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/VerticalDatumOrder/MetaInfo": {
-      "get": {
-        "tags": [
-          "VerticalDatumOrder"
-        ],
-        "operationId": "GetAllVerticalDatumOrderMetaInfo",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/MetaInfo"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/VerticalDatumOrder/{id}": {
-      "get": {
-        "tags": [
-          "VerticalDatumOrder"
-        ],
-        "operationId": "GetVerticalDatumOrderById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/VerticalDatumOrder"
-                }
-              }
-            }
-          }
-        }
-      },
-      "put": {
-        "tags": [
-          "VerticalDatumOrder"
-        ],
-        "operationId": "PutVerticalDatumOrderById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/VerticalDatumOrder"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/VerticalDatumOrder"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/VerticalDatumOrder"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      },
-      "delete": {
-        "tags": [
-          "VerticalDatumOrder"
-        ],
-        "operationId": "DeleteVerticalDatumOrderById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/VerticalDatumOrder/LightData": {
-      "get": {
-        "tags": [
-          "VerticalDatumOrder"
-        ],
-        "operationId": "GetAllVerticalDatumOrderLight",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/VerticalDatumOrderLight"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/VerticalDatumOrder/HeavyData": {
-      "get": {
-        "tags": [
-          "VerticalDatumOrder"
-        ],
-        "operationId": "GetAllVerticalDatumOrder",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/VerticalDatumOrder"
-                  }
+                  "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.UsageStatisticsRig"
                 }
               }
             }
@@ -2192,171 +1103,7 @@
   },
   "components": {
     "schemas": {
-      "Cluster": {
-        "type": "object",
-        "properties": {
-          "MetaInfo": {
-            "$ref": "#/components/schemas/MetaInfo"
-          },
-          "Name": {
-            "type": "string",
-            "nullable": true
-          },
-          "Description": {
-            "type": "string",
-            "nullable": true
-          },
-          "CreationDate": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "LastModificationDate": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "FieldID": {
-            "type": "string",
-            "format": "uuid",
-            "nullable": true
-          },
-          "IsSingleWell": {
-            "type": "boolean"
-          },
-          "RigID": {
-            "type": "string",
-            "format": "uuid",
-            "nullable": true
-          },
-          "IsFixedPlatform": {
-            "type": "boolean"
-          },
-          "ReferenceLatitude": {
-            "$ref": "#/components/schemas/GaussianDrillingProperty"
-          },
-          "ReferenceLongitude": {
-            "$ref": "#/components/schemas/GaussianDrillingProperty"
-          },
-          "ReferenceDepth": {
-            "$ref": "#/components/schemas/GaussianDrillingProperty"
-          },
-          "GroundMudLineDepth": {
-            "$ref": "#/components/schemas/GaussianDrillingProperty"
-          },
-          "TopWaterDepth": {
-            "$ref": "#/components/schemas/GaussianDrillingProperty"
-          },
-          "Slots": {
-            "type": "object",
-            "additionalProperties": {
-              "$ref": "#/components/schemas/Slot"
-            },
-            "nullable": true
-          }
-        }
-      },
-      "CountPerDay": {
-        "type": "object",
-        "properties": {
-          "Date": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "Count": {
-            "type": "integer",
-            "format": "int64"
-          }
-        }
-      },
-      "History": {
-        "type": "object",
-        "properties": {
-          "Data": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/CountPerDay"
-            },
-            "nullable": true
-          }
-        }
-      },
-      "Slot": {
-        "type": "object",
-        "properties": {
-          "ID": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "Name": {
-            "type": "string",
-            "nullable": true
-          },
-          "Description": {
-            "type": "string",
-            "nullable": true
-          },
-          "CreationDate": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "LastModificationDate": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "Latitude": {
-            "$ref": "#/components/schemas/GaussianDrillingProperty"
-          },
-          "Longitude": {
-            "$ref": "#/components/schemas/GaussianDrillingProperty"
-          }
-        }
-      },
-      "UsageStatisticsCluster": {
-        "type": "object",
-        "properties": {
-          "LastSaved": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "BackUpInterval": {
-            "type": "string",
-            "format": "date-span"
-          },
-          "GetAllClusterIdPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "GetAllClusterMetaInfoPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "GetClusterByIdPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "GetAllClusterPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "PostClusterPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "PutClusterByIdPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "DeleteClusterByIdPerDay": {
-            "$ref": "#/components/schemas/History"
-          }
-        }
-      },
-      "GaussianDrillingProperty": {
-        "type": "object",
-        "properties": {
-          "GaussianValue": {
-            "$ref": "#/components/schemas/GaussianDistribution"
-          }
-        }
-      },
-      "MetaInfo": {
+      "OSDC.DotnetLibraries.General.DataManagement.MetaInfo": {
         "type": "object",
         "properties": {
           "ID": {
@@ -2375,286 +1122,10 @@
             "type": "string",
             "nullable": true
           }
-        }
-      },
-      "GaussianDistribution": {
-        "type": "object",
-        "properties": {
-          "MinValue": {
-            "type": "number",
-            "format": "double"
-          },
-          "MaxValue": {
-            "type": "number",
-            "format": "double"
-          },
-          "Mean": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "StandardDeviation": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          }
-        }
-      },
-      "Field": {
-        "type": "object",
-        "properties": {
-          "MetaInfo": {
-            "$ref": "#/components/schemas/MetaInfo"
-          },
-          "Name": {
-            "type": "string",
-            "nullable": true
-          },
-          "Description": {
-            "type": "string",
-            "nullable": true
-          },
-          "CreationDate": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "LastModificationDate": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "CartographicProjectionID": {
-            "type": "string",
-            "format": "uuid",
-            "nullable": true
-          }
-        }
-      },
-      "FieldCartographicConversionSet": {
-        "type": "object",
-        "properties": {
-          "MetaInfo": {
-            "$ref": "#/components/schemas/MetaInfo"
-          },
-          "Name": {
-            "type": "string",
-            "nullable": true
-          },
-          "Description": {
-            "type": "string",
-            "nullable": true
-          },
-          "CreationDate": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "LastModificationDate": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "FieldID": {
-            "type": "string",
-            "format": "uuid",
-            "nullable": true
-          },
-          "CartographicCoordinateList": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/CartographicCoordinate"
-            },
-            "nullable": true
-          }
-        }
-      },
-      "FieldCartographicConversionSetLight": {
-        "type": "object",
-        "properties": {
-          "MetaInfo": {
-            "$ref": "#/components/schemas/MetaInfo"
-          },
-          "Name": {
-            "type": "string",
-            "nullable": true
-          },
-          "Description": {
-            "type": "string",
-            "nullable": true
-          },
-          "CreationDate": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "LastModificationDate": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "FieldName": {
-            "type": "string",
-            "nullable": true
-          },
-          "FieldDescription": {
-            "type": "string",
-            "nullable": true
-          }
-        }
-      },
-      "UsageStatisticsField": {
-        "type": "object",
-        "properties": {
-          "LastSaved": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "BackUpInterval": {
-            "type": "string",
-            "format": "date-span"
-          },
-          "GetAllFieldIdPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "GetAllFieldMetaInfoPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "GetFieldByIdPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "GetAllFieldLightPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "GetAllFieldPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "PostFieldPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "PutFieldByIdPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "DeleteFieldByIdPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "GetAllFieldCartographicConversionSetIdPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "GetAllFieldCartographicConversionSetMetaInfoPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "GetFieldCartographicConversionSetByIdPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "GetAllFieldCartographicConversionSetLightPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "GetAllFieldCartographicConversionSetPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "PostFieldCartographicConversionSetPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "PutFieldCartographicConversionSetByIdPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "DeleteFieldCartographicConversionSetByIdPerDay": {
-            "$ref": "#/components/schemas/History"
-          }
-        }
-      },
-      "CartographicCoordinate": {
-        "type": "object",
-        "properties": {
-          "Northing": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "Easting": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "VerticalDepth": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "GeodeticCoordinate": {
-            "$ref": "#/components/schemas/GeodeticCoordinate"
-          },
-          "GridConvergenceDatum": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          }
         },
-        "additionalProperties": { }
+        "additionalProperties": false
       },
-      "GeodeticCoordinate": {
-        "type": "object",
-        "properties": {
-          "LatitudeWGS84": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "LongitudeWGS84": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "VerticalDepthWGS84": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "LatitudeDatum": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "LongitudeDatum": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "VerticalDepthDatum": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "OctreeDepth": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "OctreeCode": {
-            "$ref": "#/components/schemas/OctreeCodeLong"
-          }
-        },
-        "additionalProperties": { }
-      },
-      "OctreeCodeLong": {
-        "type": "object",
-        "properties": {
-          "Depth": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "CodeHigh": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "CodeLow": {
-            "type": "integer",
-            "format": "int64"
-          }
-        },
-        "additionalProperties": { }
-      },
-      "Accumulator": {
+      "OSDC.Drilling.Rig.Model.Accumulator": {
         "type": "object",
         "properties": {
           "ID": {
@@ -2703,7 +1174,7 @@
           "LifecycleStatus": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/EquipmentLifecycleStatus"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.EquipmentLifecycleStatus"
               }
             ],
             "nullable": true
@@ -2718,14 +1189,14 @@
           "MeasurementCapabilities": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/EquipmentMeasurementCapability"
+              "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.EquipmentMeasurementCapability"
             },
             "nullable": true
           },
           "AccumulatorClass": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/AccumulatorClass"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.AccumulatorClass"
               }
             ],
             "nullable": true
@@ -2745,9 +1216,10 @@
             "format": "double",
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "AccumulatorClass": {
+      "OSDC.Drilling.Rig.Model.AccumulatorClass": {
         "enum": [
           "Bladder",
           "Diaphragm",
@@ -2757,7 +1229,7 @@
         ],
         "type": "string"
       },
-      "AutoDriller": {
+      "OSDC.Drilling.Rig.Model.AutoDriller": {
         "type": "object",
         "properties": {
           "ID": {
@@ -2806,7 +1278,7 @@
           "LifecycleStatus": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/EquipmentLifecycleStatus"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.EquipmentLifecycleStatus"
               }
             ],
             "nullable": true
@@ -2821,14 +1293,14 @@
           "MeasurementCapabilities": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/EquipmentMeasurementCapability"
+              "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.EquipmentMeasurementCapability"
             },
             "nullable": true
           },
           "ControlMode": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/AutodrillerControlMode"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.AutodrillerControlMode"
               }
             ],
             "nullable": true
@@ -2873,9 +1345,10 @@
             "format": "double",
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "AutodrillerControlMode": {
+      "OSDC.Drilling.Rig.Model.AutodrillerControlMode": {
         "enum": [
           "Rop",
           "Diffp",
@@ -2885,7 +1358,7 @@
         ],
         "type": "string"
       },
-      "AuxSolidsControl": {
+      "OSDC.Drilling.Rig.Model.AuxSolidsControl": {
         "type": "object",
         "properties": {
           "ID": {
@@ -2934,7 +1407,7 @@
           "LifecycleStatus": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/EquipmentLifecycleStatus"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.EquipmentLifecycleStatus"
               }
             ],
             "nullable": true
@@ -2949,21 +1422,22 @@
           "MeasurementCapabilities": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/EquipmentMeasurementCapability"
+              "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.EquipmentMeasurementCapability"
             },
             "nullable": true
           },
           "SolidsControlClass": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/SolidsControlClass"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.SolidsControlClass"
               }
             ],
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "BopComponentClass": {
+      "OSDC.Drilling.Rig.Model.BopComponentClass": {
         "enum": [
           "AnnularPreventer",
           "BlindRam",
@@ -2976,7 +1450,7 @@
         ],
         "type": "string"
       },
-      "BopLineClass": {
+      "OSDC.Drilling.Rig.Model.BopLineClass": {
         "enum": [
           "ChokeLine",
           "KillLine",
@@ -2986,13 +1460,13 @@
         ],
         "type": "string"
       },
-      "BopLineDefinition": {
+      "OSDC.Drilling.Rig.Model.BopLineDefinition": {
         "type": "object",
         "properties": {
           "BopLinesClass": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/BopLineClass"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.BopLineClass"
               }
             ],
             "nullable": true
@@ -3012,9 +1486,10 @@
             "format": "double",
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "BopStack": {
+      "OSDC.Drilling.Rig.Model.BopStack": {
         "type": "object",
         "properties": {
           "ID": {
@@ -3063,7 +1538,7 @@
           "LifecycleStatus": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/EquipmentLifecycleStatus"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.EquipmentLifecycleStatus"
               }
             ],
             "nullable": true
@@ -3078,14 +1553,14 @@
           "MeasurementCapabilities": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/EquipmentMeasurementCapability"
+              "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.EquipmentMeasurementCapability"
             },
             "nullable": true
           },
           "BopStackClass": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/BopStackClass"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.BopStackClass"
               }
             ],
             "nullable": true
@@ -3100,7 +1575,7 @@
           "BopControlType": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/ControllerType"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.ControllerType"
               }
             ],
             "nullable": true
@@ -3123,14 +1598,14 @@
           "BopComponents": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/BopStackComponentDefinition"
+              "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.BopStackComponentDefinition"
             },
             "nullable": true
           },
           "BopLines": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/BopLineDefinition"
+              "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.BopLineDefinition"
             },
             "nullable": true
           },
@@ -3159,9 +1634,10 @@
             "format": "double",
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "BopStackClass": {
+      "OSDC.Drilling.Rig.Model.BopStackClass": {
         "enum": [
           "LandBop",
           "MarineSurfaceBop",
@@ -3170,13 +1646,13 @@
         ],
         "type": "string"
       },
-      "BopStackComponentDefinition": {
+      "OSDC.Drilling.Rig.Model.BopStackComponentDefinition": {
         "type": "object",
         "properties": {
           "BopStackComponentClass": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/BopComponentClass"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.BopComponentClass"
               }
             ],
             "nullable": true
@@ -3191,9 +1667,10 @@
             "format": "double",
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "CasingDriveClass": {
+      "OSDC.Drilling.Rig.Model.CasingDriveClass": {
         "enum": [
           "Internal",
           "External",
@@ -3201,7 +1678,7 @@
         ],
         "type": "string"
       },
-      "CasingDriveSystem": {
+      "OSDC.Drilling.Rig.Model.CasingDriveSystem": {
         "type": "object",
         "properties": {
           "ID": {
@@ -3250,7 +1727,7 @@
           "LifecycleStatus": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/EquipmentLifecycleStatus"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.EquipmentLifecycleStatus"
               }
             ],
             "nullable": true
@@ -3265,14 +1742,14 @@
           "MeasurementCapabilities": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/EquipmentMeasurementCapability"
+              "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.EquipmentMeasurementCapability"
             },
             "nullable": true
           },
           "CsgDrvClass": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/CasingDriveClass"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.CasingDriveClass"
               }
             ],
             "nullable": true
@@ -3322,9 +1799,10 @@
             "format": "double",
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "CasingRunningTool": {
+      "OSDC.Drilling.Rig.Model.CasingRunningTool": {
         "type": "object",
         "properties": {
           "ID": {
@@ -3340,9 +1818,10 @@
             "type": "string",
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "CasingTongs": {
+      "OSDC.Drilling.Rig.Model.CasingTongs": {
         "type": "object",
         "properties": {
           "ID": {
@@ -3358,9 +1837,10 @@
             "type": "string",
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "CatWalk": {
+      "OSDC.Drilling.Rig.Model.CatWalk": {
         "type": "object",
         "properties": {
           "ID": {
@@ -3376,9 +1856,10 @@
             "type": "string",
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "CementPump": {
+      "OSDC.Drilling.Rig.Model.CementPump": {
         "type": "object",
         "properties": {
           "ID": {
@@ -3427,7 +1908,7 @@
           "LifecycleStatus": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/EquipmentLifecycleStatus"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.EquipmentLifecycleStatus"
               }
             ],
             "nullable": true
@@ -3442,14 +1923,14 @@
           "MeasurementCapabilities": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/EquipmentMeasurementCapability"
+              "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.EquipmentMeasurementCapability"
             },
             "nullable": true
           },
           "PumpClass": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/PumpClass"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.PumpClass"
               }
             ],
             "nullable": true
@@ -3467,7 +1948,7 @@
           "CementPumpDisplacement": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/CementPumpDisplacementPoint"
+              "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.CementPumpDisplacementPoint"
             },
             "nullable": true
           },
@@ -3481,9 +1962,10 @@
             "format": "double",
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "CementPumpDisplacementPoint": {
+      "OSDC.Drilling.Rig.Model.CementPumpDisplacementPoint": {
         "type": "object",
         "properties": {
           "StrokeRate": {
@@ -3501,9 +1983,10 @@
             "format": "double",
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "CementUnit": {
+      "OSDC.Drilling.Rig.Model.CementUnit": {
         "type": "object",
         "properties": {
           "ID": {
@@ -3552,7 +2035,7 @@
           "LifecycleStatus": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/EquipmentLifecycleStatus"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.EquipmentLifecycleStatus"
               }
             ],
             "nullable": true
@@ -3567,14 +2050,14 @@
           "MeasurementCapabilities": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/EquipmentMeasurementCapability"
+              "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.EquipmentMeasurementCapability"
             },
             "nullable": true
           },
           "Mounting": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/MountingType"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.MountingType"
               }
             ],
             "nullable": true
@@ -3591,9 +2074,10 @@
             "format": "int32",
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "Centrifuge": {
+      "OSDC.Drilling.Rig.Model.Centrifuge": {
         "type": "object",
         "properties": {
           "ID": {
@@ -3609,9 +2093,10 @@
             "type": "string",
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "ChokeCvCurvePoint": {
+      "OSDC.Drilling.Rig.Model.ChokeCvCurvePoint": {
         "type": "object",
         "properties": {
           "Pressure": {
@@ -3624,16 +2109,17 @@
             "format": "double",
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "ChokeFunction": {
+      "OSDC.Drilling.Rig.Model.ChokeFunction": {
         "enum": [
           "PressureControl",
           "Safety"
         ],
         "type": "string"
       },
-      "ChokeManifold": {
+      "OSDC.Drilling.Rig.Model.ChokeManifold": {
         "type": "object",
         "properties": {
           "ID": {
@@ -3682,7 +2168,7 @@
           "LifecycleStatus": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/EquipmentLifecycleStatus"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.EquipmentLifecycleStatus"
               }
             ],
             "nullable": true
@@ -3697,14 +2183,14 @@
           "MeasurementCapabilities": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/EquipmentMeasurementCapability"
+              "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.EquipmentMeasurementCapability"
             },
             "nullable": true
           },
           "ChokeControlClass": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/ControlClass"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.ControlClass"
               }
             ],
             "nullable": true
@@ -3739,9 +2225,10 @@
             "format": "double",
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "ChokeNumber": {
+      "OSDC.Drilling.Rig.Model.ChokeNumber": {
         "enum": [
           "Single",
           "Dual",
@@ -3749,7 +2236,7 @@
         ],
         "type": "string"
       },
-      "CoilDriveSystem": {
+      "OSDC.Drilling.Rig.Model.CoilDriveSystem": {
         "type": "object",
         "properties": {
           "ID": {
@@ -3798,7 +2285,7 @@
           "LifecycleStatus": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/EquipmentLifecycleStatus"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.EquipmentLifecycleStatus"
               }
             ],
             "nullable": true
@@ -3813,14 +2300,14 @@
           "MeasurementCapabilities": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/EquipmentMeasurementCapability"
+              "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.EquipmentMeasurementCapability"
             },
             "nullable": true
           },
           "CoilDrvClass": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/MountingType"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.MountingType"
               }
             ],
             "nullable": true
@@ -3870,9 +2357,10 @@
             "format": "double",
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "ContinuousCirculationDevice": {
+      "OSDC.Drilling.Rig.Model.ContinuousCirculationDevice": {
         "type": "object",
         "properties": {
           "ID": {
@@ -3921,7 +2409,7 @@
           "LifecycleStatus": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/EquipmentLifecycleStatus"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.EquipmentLifecycleStatus"
               }
             ],
             "nullable": true
@@ -3936,14 +2424,14 @@
           "MeasurementCapabilities": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/EquipmentMeasurementCapability"
+              "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.EquipmentMeasurementCapability"
             },
             "nullable": true
           },
           "CcdControlClass": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/ControlClass"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.ControlClass"
               }
             ],
             "nullable": true
@@ -3993,9 +2481,10 @@
             "format": "double",
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "ControlClass": {
+      "OSDC.Drilling.Rig.Model.ControlClass": {
         "enum": [
           "Manual",
           "Automatic",
@@ -4003,7 +2492,7 @@
         ],
         "type": "string"
       },
-      "ControllerType": {
+      "OSDC.Drilling.Rig.Model.ControllerType": {
         "enum": [
           "Hydraulic",
           "Electrical",
@@ -4013,7 +2502,21 @@
         ],
         "type": "string"
       },
-      "CrownBlock": {
+      "OSDC.Drilling.Rig.Model.CountPerDay": {
+        "type": "object",
+        "properties": {
+          "Date": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "Count": {
+            "type": "integer",
+            "format": "int64"
+          }
+        },
+        "additionalProperties": false
+      },
+      "OSDC.Drilling.Rig.Model.CrownBlock": {
         "type": "object",
         "properties": {
           "ID": {
@@ -4062,7 +2565,7 @@
           "LifecycleStatus": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/EquipmentLifecycleStatus"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.EquipmentLifecycleStatus"
               }
             ],
             "nullable": true
@@ -4077,7 +2580,7 @@
           "MeasurementCapabilities": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/EquipmentMeasurementCapability"
+              "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.EquipmentMeasurementCapability"
             },
             "nullable": true
           },
@@ -4111,9 +2614,10 @@
             "format": "double",
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "CuttingsDryer": {
+      "OSDC.Drilling.Rig.Model.CuttingsDryer": {
         "type": "object",
         "properties": {
           "ID": {
@@ -4129,9 +2633,10 @@
             "type": "string",
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "CuttingsTransportSystem": {
+      "OSDC.Drilling.Rig.Model.CuttingsTransportSystem": {
         "type": "object",
         "properties": {
           "ID": {
@@ -4147,9 +2652,10 @@
             "type": "string",
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "Degasser": {
+      "OSDC.Drilling.Rig.Model.Degasser": {
         "type": "object",
         "properties": {
           "ID": {
@@ -4165,9 +2671,10 @@
             "type": "string",
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "Derrick": {
+      "OSDC.Drilling.Rig.Model.Derrick": {
         "type": "object",
         "properties": {
           "ID": {
@@ -4216,7 +2723,7 @@
           "LifecycleStatus": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/EquipmentLifecycleStatus"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.EquipmentLifecycleStatus"
               }
             ],
             "nullable": true
@@ -4231,14 +2738,14 @@
           "MeasurementCapabilities": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/EquipmentMeasurementCapability"
+              "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.EquipmentMeasurementCapability"
             },
             "nullable": true
           },
           "DerrickClass": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/DerrickClass"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.DerrickClass"
               }
             ],
             "nullable": true
@@ -4268,9 +2775,10 @@
             "format": "double",
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "DerrickClass": {
+      "OSDC.Drilling.Rig.Model.DerrickClass": {
         "enum": [
           "Conventional",
           "Slant",
@@ -4278,7 +2786,7 @@
         ],
         "type": "string"
       },
-      "Desander": {
+      "OSDC.Drilling.Rig.Model.Desander": {
         "type": "object",
         "properties": {
           "ID": {
@@ -4294,9 +2802,10 @@
             "type": "string",
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "Desilter": {
+      "OSDC.Drilling.Rig.Model.Desilter": {
         "type": "object",
         "properties": {
           "ID": {
@@ -4312,9 +2821,10 @@
             "type": "string",
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "Drawworks": {
+      "OSDC.Drilling.Rig.Model.Drawworks": {
         "type": "object",
         "properties": {
           "ID": {
@@ -4363,7 +2873,7 @@
           "LifecycleStatus": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/EquipmentLifecycleStatus"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.EquipmentLifecycleStatus"
               }
             ],
             "nullable": true
@@ -4378,14 +2888,14 @@
           "MeasurementCapabilities": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/EquipmentMeasurementCapability"
+              "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.EquipmentMeasurementCapability"
             },
             "nullable": true
           },
           "DrawworksClass": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/DrawworksClass"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.DrawworksClass"
               }
             ],
             "nullable": true
@@ -4410,9 +2920,10 @@
             "format": "double",
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "DrawworksClass": {
+      "OSDC.Drilling.Rig.Model.DrawworksClass": {
         "enum": [
           "DirectDrive",
           "SingleSpeedGearDriven",
@@ -4423,7 +2934,7 @@
         ],
         "type": "string"
       },
-      "DrillLine": {
+      "OSDC.Drilling.Rig.Model.DrillLine": {
         "type": "object",
         "properties": {
           "ID": {
@@ -4472,7 +2983,7 @@
           "LifecycleStatus": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/EquipmentLifecycleStatus"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.EquipmentLifecycleStatus"
               }
             ],
             "nullable": true
@@ -4487,7 +2998,7 @@
           "MeasurementCapabilities": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/EquipmentMeasurementCapability"
+              "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.EquipmentMeasurementCapability"
             },
             "nullable": true
           },
@@ -4516,9 +3027,10 @@
             "format": "double",
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "DrillingChokeManifold": {
+      "OSDC.Drilling.Rig.Model.DrillingChokeManifold": {
         "type": "object",
         "properties": {
           "ID": {
@@ -4567,7 +3079,7 @@
           "LifecycleStatus": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/EquipmentLifecycleStatus"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.EquipmentLifecycleStatus"
               }
             ],
             "nullable": true
@@ -4582,14 +3094,14 @@
           "MeasurementCapabilities": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/EquipmentMeasurementCapability"
+              "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.EquipmentMeasurementCapability"
             },
             "nullable": true
           },
           "ManifoldType": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/ManifoldClass"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.ManifoldClass"
               }
             ],
             "nullable": true
@@ -4635,7 +3147,7 @@
           "ChokeNumber": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/ChokeNumber"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.ChokeNumber"
               }
             ],
             "nullable": true
@@ -4643,7 +3155,7 @@
           "ChokeFunction": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/ChokeFunction"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.ChokeFunction"
               }
             ],
             "nullable": true
@@ -4651,7 +3163,7 @@
           "ChokeCvCurves": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/ChokeCvCurvePoint"
+              "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.ChokeCvCurvePoint"
             },
             "nullable": true
           },
@@ -4695,9 +3207,10 @@
             "format": "double",
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "DrillingFluidClass": {
+      "OSDC.Drilling.Rig.Model.DrillingFluidClass": {
         "enum": [
           "OilBased",
           "WaterBased",
@@ -4705,7 +3218,7 @@
         ],
         "type": "string"
       },
-      "DrillingFluidType": {
+      "OSDC.Drilling.Rig.Model.DrillingFluidType": {
         "enum": [
           "AeratedMud",
           "Air",
@@ -4750,7 +3263,7 @@
         ],
         "type": "string"
       },
-      "DrillingFluidTypeDescriptor": {
+      "OSDC.Drilling.Rig.Model.DrillingFluidTypeDescriptor": {
         "type": "object",
         "properties": {
           "ID": {
@@ -4769,7 +3282,7 @@
           "DrillingFluidClass": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/DrillingFluidClass"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.DrillingFluidClass"
               }
             ],
             "nullable": true
@@ -4777,14 +3290,15 @@
           "DrillingFluidType": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/DrillingFluidType"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.DrillingFluidType"
               }
             ],
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "DrillingMarineRiser": {
+      "OSDC.Drilling.Rig.Model.DrillingMarineRiser": {
         "type": "object",
         "properties": {
           "ID": {
@@ -4833,7 +3347,7 @@
           "LifecycleStatus": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/EquipmentLifecycleStatus"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.EquipmentLifecycleStatus"
               }
             ],
             "nullable": true
@@ -4848,14 +3362,14 @@
           "MeasurementCapabilities": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/EquipmentMeasurementCapability"
+              "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.EquipmentMeasurementCapability"
             },
             "nullable": true
           },
           "RiserClass": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/RiserClass"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.RiserClass"
               }
             ],
             "nullable": true
@@ -4930,9 +3444,10 @@
             "format": "double",
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "DrillstringHeaveCompensator": {
+      "OSDC.Drilling.Rig.Model.DrillstringHeaveCompensator": {
         "type": "object",
         "properties": {
           "ID": {
@@ -4981,7 +3496,7 @@
           "LifecycleStatus": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/EquipmentLifecycleStatus"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.EquipmentLifecycleStatus"
               }
             ],
             "nullable": true
@@ -4996,14 +3511,14 @@
           "MeasurementCapabilities": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/EquipmentMeasurementCapability"
+              "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.EquipmentMeasurementCapability"
             },
             "nullable": true
           },
           "HeaveCompClass": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/HeaveCompensatorClass"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.HeaveCompensatorClass"
               }
             ],
             "nullable": true
@@ -5018,9 +3533,10 @@
             "format": "double",
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "DriveMode": {
+      "OSDC.Drilling.Rig.Model.DriveMode": {
         "type": "object",
         "properties": {
           "ID": {
@@ -5069,7 +3585,7 @@
           "LifecycleStatus": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/EquipmentLifecycleStatus"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.EquipmentLifecycleStatus"
               }
             ],
             "nullable": true
@@ -5084,21 +3600,22 @@
           "MeasurementCapabilities": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/EquipmentMeasurementCapability"
+              "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.EquipmentMeasurementCapability"
             },
             "nullable": true
           },
           "DriveModeClass": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/DriveModeClass"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.DriveModeClass"
               }
             ],
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "DriveModeClass": {
+      "OSDC.Drilling.Rig.Model.DriveModeClass": {
         "enum": [
           "Mechanical",
           "ElectricalDcScr",
@@ -5108,7 +3625,7 @@
         ],
         "type": "string"
       },
-      "DynamicPositioningClass": {
+      "OSDC.Drilling.Rig.Model.DynamicPositioningClass": {
         "enum": [
           "None",
           "DP1",
@@ -5117,14 +3634,14 @@
         ],
         "type": "string"
       },
-      "EngineModelType": {
+      "OSDC.Drilling.Rig.Model.EngineModelType": {
         "enum": [
           "Reciprocating",
           "Turbine"
         ],
         "type": "string"
       },
-      "EquipmentLifecycleStatus": {
+      "OSDC.Drilling.Rig.Model.EquipmentLifecycleStatus": {
         "enum": [
           "Unknown",
           "Planned",
@@ -5136,7 +3653,7 @@
         ],
         "type": "string"
       },
-      "EquipmentMeasurementCapability": {
+      "OSDC.Drilling.Rig.Model.EquipmentMeasurementCapability": {
         "type": "object",
         "properties": {
           "ID": {
@@ -5163,7 +3680,7 @@
           "SourceKind": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/MeasurementSourceKind"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.MeasurementSourceKind"
               }
             ],
             "nullable": true
@@ -5218,9 +3735,10 @@
             "format": "double",
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "FloatValve": {
+      "OSDC.Drilling.Rig.Model.FloatValve": {
         "type": "object",
         "properties": {
           "ID": {
@@ -5269,7 +3787,7 @@
           "LifecycleStatus": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/EquipmentLifecycleStatus"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.EquipmentLifecycleStatus"
               }
             ],
             "nullable": true
@@ -5284,14 +3802,14 @@
           "MeasurementCapabilities": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/EquipmentMeasurementCapability"
+              "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.EquipmentMeasurementCapability"
             },
             "nullable": true
           },
           "FloatValveClass": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/FloatValveClass"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.FloatValveClass"
               }
             ],
             "nullable": true
@@ -5316,9 +3834,10 @@
             "format": "double",
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "FloatValveClass": {
+      "OSDC.Drilling.Rig.Model.FloatValveClass": {
         "enum": [
           "PlungerFloatValve",
           "PortedPlungerValve",
@@ -5327,7 +3846,7 @@
         ],
         "type": "string"
       },
-      "FlowRoutingManifold": {
+      "OSDC.Drilling.Rig.Model.FlowRoutingManifold": {
         "type": "object",
         "properties": {
           "ID": {
@@ -5376,7 +3895,7 @@
           "LifecycleStatus": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/EquipmentLifecycleStatus"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.EquipmentLifecycleStatus"
               }
             ],
             "nullable": true
@@ -5391,14 +3910,14 @@
           "MeasurementCapabilities": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/EquipmentMeasurementCapability"
+              "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.EquipmentMeasurementCapability"
             },
             "nullable": true
           },
           "ManifoldType": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/ManifoldClass"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.ManifoldClass"
               }
             ],
             "nullable": true
@@ -5426,7 +3945,7 @@
           "ManifoldFlowPath": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/ManifoldFlowPath"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.ManifoldFlowPath"
               }
             ],
             "nullable": true
@@ -5434,7 +3953,7 @@
           "ManifoldFlowcurves": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/RoutingManifoldCurvePoint"
+              "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.RoutingManifoldCurvePoint"
             },
             "nullable": true
           },
@@ -5463,9 +3982,10 @@
             "format": "double",
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "FlowSensor": {
+      "OSDC.Drilling.Rig.Model.FlowSensor": {
         "type": "object",
         "properties": {
           "ID": {
@@ -5514,7 +4034,7 @@
           "LifecycleStatus": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/EquipmentLifecycleStatus"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.EquipmentLifecycleStatus"
               }
             ],
             "nullable": true
@@ -5529,14 +4049,14 @@
           "MeasurementCapabilities": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/EquipmentMeasurementCapability"
+              "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.EquipmentMeasurementCapability"
             },
             "nullable": true
           },
           "FlowTransducer": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/FlowSensorType"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.FlowSensorType"
               }
             ],
             "nullable": true
@@ -5545,9 +4065,10 @@
             "type": "boolean",
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "FlowSensorType": {
+      "OSDC.Drilling.Rig.Model.FlowSensorType": {
         "enum": [
           "Coriollis",
           "Paddle",
@@ -5555,7 +4076,7 @@
         ],
         "type": "string"
       },
-      "Generator": {
+      "OSDC.Drilling.Rig.Model.Generator": {
         "type": "object",
         "properties": {
           "ID": {
@@ -5604,7 +4125,7 @@
           "LifecycleStatus": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/EquipmentLifecycleStatus"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.EquipmentLifecycleStatus"
               }
             ],
             "nullable": true
@@ -5619,14 +4140,14 @@
           "MeasurementCapabilities": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/EquipmentMeasurementCapability"
+              "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.EquipmentMeasurementCapability"
             },
             "nullable": true
           },
           "GeneratorClass": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/GeneratorClass"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.GeneratorClass"
               }
             ],
             "nullable": true
@@ -5654,7 +4175,7 @@
           "SpeedMode": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/SpeedMode"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.SpeedMode"
               }
             ],
             "nullable": true
@@ -5662,7 +4183,7 @@
           "EngineModel": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/EngineModelType"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.EngineModelType"
               }
             ],
             "nullable": true
@@ -5690,7 +4211,7 @@
           "CoolingMedium": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/GeneratorCooling"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.GeneratorCooling"
               }
             ],
             "nullable": true
@@ -5698,7 +4219,7 @@
           "Phases": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/GeneratorPhases"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.GeneratorPhases"
               }
             ],
             "nullable": true
@@ -5743,9 +4264,10 @@
             "format": "double",
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "GeneratorClass": {
+      "OSDC.Drilling.Rig.Model.GeneratorClass": {
         "enum": [
           "Diesel",
           "Gas",
@@ -5759,7 +4281,7 @@
         ],
         "type": "string"
       },
-      "GeneratorCooling": {
+      "OSDC.Drilling.Rig.Model.GeneratorCooling": {
         "enum": [
           "Air",
           "Water",
@@ -5767,7 +4289,7 @@
         ],
         "type": "string"
       },
-      "GeneratorPhases": {
+      "OSDC.Drilling.Rig.Model.GeneratorPhases": {
         "enum": [
           "SinglePhase",
           "TwoPhase",
@@ -5775,7 +4297,7 @@
         ],
         "type": "string"
       },
-      "HeaveCompensatorClass": {
+      "OSDC.Drilling.Rig.Model.HeaveCompensatorClass": {
         "enum": [
           "PassiveCrownMounted",
           "ActiveCrownMounted",
@@ -5786,7 +4308,20 @@
         ],
         "type": "string"
       },
-      "HoistingSystem": {
+      "OSDC.Drilling.Rig.Model.History": {
+        "type": "object",
+        "properties": {
+          "Data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.CountPerDay"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "OSDC.Drilling.Rig.Model.HoistingSystem": {
         "type": "object",
         "properties": {
           "ID": {
@@ -5805,7 +4340,7 @@
           "HoistingSystemType": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/HoistingSystemType"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.HoistingSystemType"
               }
             ],
             "nullable": true
@@ -5813,7 +4348,7 @@
           "Drawworks": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/Drawworks"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.Drawworks"
               }
             ],
             "nullable": true
@@ -5821,7 +4356,7 @@
           "CrownBlock": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/CrownBlock"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.CrownBlock"
               }
             ],
             "nullable": true
@@ -5829,7 +4364,7 @@
           "TravellingBlock": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/TravellingBlock"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.TravellingBlock"
               }
             ],
             "nullable": true
@@ -5837,14 +4372,15 @@
           "DrillLine": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/DrillLine"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.DrillLine"
               }
             ],
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "HoistingSystemType": {
+      "OSDC.Drilling.Rig.Model.HoistingSystemType": {
         "enum": [
           "Drawworks",
           "RamRig",
@@ -5852,7 +4388,7 @@
         ],
         "type": "string"
       },
-      "IronRoughneck": {
+      "OSDC.Drilling.Rig.Model.IronRoughneck": {
         "type": "object",
         "properties": {
           "ID": {
@@ -5868,9 +4404,10 @@
             "type": "string",
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "JackUpProfile": {
+      "OSDC.Drilling.Rig.Model.JackUpProfile": {
         "type": "object",
         "properties": {
           "LegLength": {
@@ -5908,9 +4445,10 @@
             "format": "double",
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "Kelly": {
+      "OSDC.Drilling.Rig.Model.Kelly": {
         "type": "object",
         "properties": {
           "ID": {
@@ -5959,7 +4497,7 @@
           "LifecycleStatus": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/EquipmentLifecycleStatus"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.EquipmentLifecycleStatus"
               }
             ],
             "nullable": true
@@ -5974,14 +4512,14 @@
           "MeasurementCapabilities": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/EquipmentMeasurementCapability"
+              "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.EquipmentMeasurementCapability"
             },
             "nullable": true
           },
           "KellyClass": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/KellyClass"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.KellyClass"
               }
             ],
             "nullable": true
@@ -6016,9 +4554,10 @@
             "format": "double",
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "KellyClass": {
+      "OSDC.Drilling.Rig.Model.KellyClass": {
         "enum": [
           "Hexagonal",
           "Square",
@@ -6026,14 +4565,14 @@
         ],
         "type": "string"
       },
-      "ManifoldClass": {
+      "OSDC.Drilling.Rig.Model.ManifoldClass": {
         "enum": [
           "Standalone",
           "Integrated"
         ],
         "type": "string"
       },
-      "ManifoldFlowPath": {
+      "OSDC.Drilling.Rig.Model.ManifoldFlowPath": {
         "enum": [
           "One",
           "Two",
@@ -6041,7 +4580,7 @@
         ],
         "type": "string"
       },
-      "MarineMpdClass": {
+      "OSDC.Drilling.Rig.Model.MarineMpdClass": {
         "enum": [
           "RiserGasHandlingSystem",
           "IntegratedRiserJoint",
@@ -6049,7 +4588,7 @@
         ],
         "type": "string"
       },
-      "MarineMpdEquipment": {
+      "OSDC.Drilling.Rig.Model.MarineMpdEquipment": {
         "type": "object",
         "properties": {
           "ID": {
@@ -6098,7 +4637,7 @@
           "LifecycleStatus": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/EquipmentLifecycleStatus"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.EquipmentLifecycleStatus"
               }
             ],
             "nullable": true
@@ -6113,14 +4652,14 @@
           "MeasurementCapabilities": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/EquipmentMeasurementCapability"
+              "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.EquipmentMeasurementCapability"
             },
             "nullable": true
           },
           "MarineMpdClass": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/MarineMpdClass"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.MarineMpdClass"
               }
             ],
             "nullable": true
@@ -6143,7 +4682,7 @@
           "ControlMeans": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/ControllerType"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.ControllerType"
               }
             ],
             "nullable": true
@@ -6175,9 +4714,10 @@
             "format": "double",
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "MarineUnitProfile": {
+      "OSDC.Drilling.Rig.Model.MarineUnitProfile": {
         "type": "object",
         "properties": {
           "HullLength": {
@@ -6234,9 +4774,10 @@
             "format": "int32",
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "MeasurementAfm": {
+      "OSDC.Drilling.Rig.Model.MeasurementAfm": {
         "type": "object",
         "properties": {
           "ID": {
@@ -6285,7 +4826,7 @@
           "LifecycleStatus": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/EquipmentLifecycleStatus"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.EquipmentLifecycleStatus"
               }
             ],
             "nullable": true
@@ -6300,7 +4841,7 @@
           "MeasurementCapabilities": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/EquipmentMeasurementCapability"
+              "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.EquipmentMeasurementCapability"
             },
             "nullable": true
           },
@@ -6309,9 +4850,10 @@
             "format": "double",
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "MeasurementSourceKind": {
+      "OSDC.Drilling.Rig.Model.MeasurementSourceKind": {
         "enum": [
           "Sensor",
           "Calculated",
@@ -6320,7 +4862,7 @@
         ],
         "type": "string"
       },
-      "MountingType": {
+      "OSDC.Drilling.Rig.Model.MountingType": {
         "enum": [
           "TruckMounted",
           "SkidMounted",
@@ -6330,7 +4872,7 @@
         ],
         "type": "string"
       },
-      "MpdControlDevice": {
+      "OSDC.Drilling.Rig.Model.MpdControlDevice": {
         "type": "object",
         "properties": {
           "ID": {
@@ -6379,7 +4921,7 @@
           "LifecycleStatus": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/EquipmentLifecycleStatus"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.EquipmentLifecycleStatus"
               }
             ],
             "nullable": true
@@ -6394,14 +4936,14 @@
           "MeasurementCapabilities": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/EquipmentMeasurementCapability"
+              "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.EquipmentMeasurementCapability"
             },
             "nullable": true
           },
           "MpdControlDeviceClass": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/MpdControlDeviceClass"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.MpdControlDeviceClass"
               }
             ],
             "nullable": true
@@ -6445,16 +4987,17 @@
             "format": "double",
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "MpdControlDeviceClass": {
+      "OSDC.Drilling.Rig.Model.MpdControlDeviceClass": {
         "enum": [
           "Rotating",
           "NonRotating"
         ],
         "type": "string"
       },
-      "MpdController": {
+      "OSDC.Drilling.Rig.Model.MpdController": {
         "type": "object",
         "properties": {
           "ID": {
@@ -6503,7 +5046,7 @@
           "LifecycleStatus": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/EquipmentLifecycleStatus"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.EquipmentLifecycleStatus"
               }
             ],
             "nullable": true
@@ -6518,14 +5061,14 @@
           "MeasurementCapabilities": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/EquipmentMeasurementCapability"
+              "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.EquipmentMeasurementCapability"
             },
             "nullable": true
           },
           "MpdGradientMode": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/MpdGradientMode"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.MpdGradientMode"
               }
             ],
             "nullable": true
@@ -6550,9 +5093,10 @@
             "format": "double",
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "MpdGradientMode": {
+      "OSDC.Drilling.Rig.Model.MpdGradientMode": {
         "enum": [
           "Single",
           "Dual",
@@ -6561,7 +5105,7 @@
         ],
         "type": "string"
       },
-      "MudGasSeparator": {
+      "OSDC.Drilling.Rig.Model.MudGasSeparator": {
         "type": "object",
         "properties": {
           "ID": {
@@ -6577,9 +5121,10 @@
             "type": "string",
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "MudPump": {
+      "OSDC.Drilling.Rig.Model.MudPump": {
         "type": "object",
         "properties": {
           "ID": {
@@ -6628,7 +5173,7 @@
           "LifecycleStatus": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/EquipmentLifecycleStatus"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.EquipmentLifecycleStatus"
               }
             ],
             "nullable": true
@@ -6643,21 +5188,21 @@
           "MeasurementCapabilities": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/EquipmentMeasurementCapability"
+              "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.EquipmentMeasurementCapability"
             },
             "nullable": true
           },
           "Type": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/MudPumpType"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.MudPumpType"
               }
             ]
           },
           "PumpClass": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/PumpClass"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.PumpClass"
               }
             ],
             "nullable": true
@@ -6680,7 +5225,7 @@
           "LinerConfigurations": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/MudPumpLinerConfiguration"
+              "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.MudPumpLinerConfiguration"
             },
             "nullable": true
           },
@@ -6709,9 +5254,10 @@
             "format": "double",
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "MudPumpLinerConfiguration": {
+      "OSDC.Drilling.Rig.Model.MudPumpLinerConfiguration": {
         "type": "object",
         "properties": {
           "LinerInnerDiameter": {
@@ -6734,16 +5280,17 @@
             "format": "double",
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "MudPumpType": {
+      "OSDC.Drilling.Rig.Model.MudPumpType": {
         "enum": [
           "Variant1",
           "Variant2"
         ],
         "type": "string"
       },
-      "MudTank": {
+      "OSDC.Drilling.Rig.Model.MudTank": {
         "type": "object",
         "properties": {
           "ID": {
@@ -6792,7 +5339,7 @@
           "LifecycleStatus": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/EquipmentLifecycleStatus"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.EquipmentLifecycleStatus"
               }
             ],
             "nullable": true
@@ -6807,14 +5354,14 @@
           "MeasurementCapabilities": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/EquipmentMeasurementCapability"
+              "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.EquipmentMeasurementCapability"
             },
             "nullable": true
           },
           "TankClass": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/TankClass"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.TankClass"
               }
             ],
             "nullable": true
@@ -6822,7 +5369,7 @@
           "TankFluidType": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/TankFluidType"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.TankFluidType"
               }
             ],
             "nullable": true
@@ -6832,9 +5379,10 @@
             "format": "double",
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "MultiPhaseSeparator": {
+      "OSDC.Drilling.Rig.Model.MultiPhaseSeparator": {
         "type": "object",
         "properties": {
           "ID": {
@@ -6883,7 +5431,7 @@
           "LifecycleStatus": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/EquipmentLifecycleStatus"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.EquipmentLifecycleStatus"
               }
             ],
             "nullable": true
@@ -6898,14 +5446,14 @@
           "MeasurementCapabilities": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/EquipmentMeasurementCapability"
+              "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.EquipmentMeasurementCapability"
             },
             "nullable": true
           },
           "SeparatorClass": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/SeparatorPhaseClass"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.SeparatorPhaseClass"
               }
             ],
             "nullable": true
@@ -6928,7 +5476,7 @@
           "SeparatorMedium": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/SeparatorMedium"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.SeparatorMedium"
               }
             ],
             "nullable": true
@@ -6958,9 +5506,10 @@
             "format": "double",
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "PipeDeck": {
+      "OSDC.Drilling.Rig.Model.PipeDeck": {
         "type": "object",
         "properties": {
           "ID": {
@@ -6976,9 +5525,10 @@
             "type": "string",
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "PipeRack": {
+      "OSDC.Drilling.Rig.Model.PipeRack": {
         "type": "object",
         "properties": {
           "ID": {
@@ -6994,9 +5544,10 @@
             "type": "string",
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "PumpClass": {
+      "OSDC.Drilling.Rig.Model.PumpClass": {
         "enum": [
           "DuplexPump",
           "TriplexPump",
@@ -7006,7 +5557,7 @@
         ],
         "type": "string"
       },
-      "ReturnFlowLine": {
+      "OSDC.Drilling.Rig.Model.ReturnFlowLine": {
         "type": "object",
         "properties": {
           "ID": {
@@ -7022,15 +5573,16 @@
             "type": "string",
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "Rig": {
+      "OSDC.Drilling.Rig.Model.Rig": {
         "type": "object",
         "properties": {
           "MetaInfo": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/MetaInfo"
+                "$ref": "#/components/schemas/OSDC.DotnetLibraries.General.DataManagement.MetaInfo"
               }
             ],
             "nullable": true
@@ -7056,7 +5608,7 @@
           "Identification": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/RigIdentification"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.RigIdentification"
               }
             ],
             "nullable": true
@@ -7064,7 +5616,7 @@
           "RigType": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/RigType"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.RigType"
               }
             ],
             "nullable": true
@@ -7072,7 +5624,7 @@
           "OperatingEnvironment": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/RigEnvironment"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.RigEnvironment"
               }
             ],
             "nullable": true
@@ -7080,7 +5632,7 @@
           "MobilityType": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/RigMobilityType"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.RigMobilityType"
               }
             ],
             "nullable": true
@@ -7088,7 +5640,7 @@
           "OperatingEnvelope": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/RigOperatingEnvelope"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.RigOperatingEnvelope"
               }
             ],
             "nullable": true
@@ -7096,7 +5648,7 @@
           "MarineUnitProfile": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/MarineUnitProfile"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.MarineUnitProfile"
               }
             ],
             "nullable": true
@@ -7104,7 +5656,7 @@
           "JackUpProfile": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/JackUpProfile"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.JackUpProfile"
               }
             ],
             "nullable": true
@@ -7112,7 +5664,7 @@
           "StationKeepingSystem": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/StationKeepingSystem"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.StationKeepingSystem"
               }
             ],
             "nullable": true
@@ -7120,35 +5672,35 @@
           "StorageCapacities": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/RigStorageCapacity"
+              "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.RigStorageCapacity"
             },
             "nullable": true
           },
           "FeatureAssignments": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/RigFeatureAssignment"
+              "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.RigFeatureAssignment"
             },
             "nullable": true
           },
           "MudPumpList": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/MudPump"
+              "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.MudPump"
             },
             "nullable": true
           },
           "CementPumpList": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/CementPump"
+              "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.CementPump"
             },
             "nullable": true
           },
           "CementUnit": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/CementUnit"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.CementUnit"
               }
             ],
             "nullable": true
@@ -7156,7 +5708,7 @@
           "DriveMode": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/DriveMode"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.DriveMode"
               }
             ],
             "nullable": true
@@ -7164,7 +5716,7 @@
           "MainRigMast": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/RigMast"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.RigMast"
               }
             ],
             "nullable": true
@@ -7172,7 +5724,7 @@
           "AuxiliaryRigMast": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/RigMast"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.RigMast"
               }
             ],
             "nullable": true
@@ -7180,28 +5732,28 @@
           "MudTankList": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/MudTank"
+              "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.MudTank"
             },
             "nullable": true
           },
           "GeneratorList": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/Generator"
+              "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.Generator"
             },
             "nullable": true
           },
           "ShaleShakerList": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/ShaleShaker"
+              "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.ShaleShaker"
             },
             "nullable": true
           },
           "AuxSolidsControl": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/AuxSolidsControl"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.AuxSolidsControl"
               }
             ],
             "nullable": true
@@ -7209,7 +5761,7 @@
           "DrillingFluidType": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/DrillingFluidTypeDescriptor"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.DrillingFluidTypeDescriptor"
               }
             ],
             "nullable": true
@@ -7217,7 +5769,7 @@
           "FlowSensor": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/FlowSensor"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.FlowSensor"
               }
             ],
             "nullable": true
@@ -7225,7 +5777,7 @@
           "MeasurementAfm": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/MeasurementAfm"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.MeasurementAfm"
               }
             ],
             "nullable": true
@@ -7233,7 +5785,7 @@
           "ReturnFlowLine": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/ReturnFlowLine"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.ReturnFlowLine"
               }
             ],
             "nullable": true
@@ -7241,42 +5793,42 @@
           "MudGasSeparatorList": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/MudGasSeparator"
+              "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.MudGasSeparator"
             },
             "nullable": true
           },
           "DesanderList": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/Desander"
+              "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.Desander"
             },
             "nullable": true
           },
           "DesilterList": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/Desilter"
+              "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.Desilter"
             },
             "nullable": true
           },
           "CentrifugeList": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/Centrifuge"
+              "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.Centrifuge"
             },
             "nullable": true
           },
           "DegasserList": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/Degasser"
+              "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.Degasser"
             },
             "nullable": true
           },
           "CuttingsTransportSystem": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/CuttingsTransportSystem"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.CuttingsTransportSystem"
               }
             ],
             "nullable": true
@@ -7284,14 +5836,14 @@
           "CuttingsDryerList": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/CuttingsDryer"
+              "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.CuttingsDryer"
             },
             "nullable": true
           },
           "PipeDeck": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/PipeDeck"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.PipeDeck"
               }
             ],
             "nullable": true
@@ -7299,7 +5851,7 @@
           "Accumulator": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/Accumulator"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.Accumulator"
               }
             ],
             "nullable": true
@@ -7307,7 +5859,7 @@
           "BopStack": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/BopStack"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.BopStack"
               }
             ],
             "nullable": true
@@ -7315,7 +5867,7 @@
           "FloatValve": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/FloatValve"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.FloatValve"
               }
             ],
             "nullable": true
@@ -7323,7 +5875,7 @@
           "AutoDriller": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/AutoDriller"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.AutoDriller"
               }
             ],
             "nullable": true
@@ -7331,7 +5883,7 @@
           "MpdController": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/MpdController"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.MpdController"
               }
             ],
             "nullable": true
@@ -7339,7 +5891,7 @@
           "MpdControlDevice": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/MpdControlDevice"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.MpdControlDevice"
               }
             ],
             "nullable": true
@@ -7347,7 +5899,7 @@
           "ContinuousCirculationDevice": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/ContinuousCirculationDevice"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.ContinuousCirculationDevice"
               }
             ],
             "nullable": true
@@ -7355,7 +5907,7 @@
           "DrillingChokeManifold": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/DrillingChokeManifold"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.DrillingChokeManifold"
               }
             ],
             "nullable": true
@@ -7363,7 +5915,7 @@
           "SurfaceMpdEquipment": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/SurfaceMpdEquipment"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.SurfaceMpdEquipment"
               }
             ],
             "nullable": true
@@ -7371,7 +5923,7 @@
           "MarineMpdEquipment": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/MarineMpdEquipment"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.MarineMpdEquipment"
               }
             ],
             "nullable": true
@@ -7379,7 +5931,7 @@
           "MultiPhaseSeparator": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/MultiPhaseSeparator"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.MultiPhaseSeparator"
               }
             ],
             "nullable": true
@@ -7387,7 +5939,7 @@
           "FlowRoutingManifold": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/FlowRoutingManifold"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.FlowRoutingManifold"
               }
             ],
             "nullable": true
@@ -7395,7 +5947,7 @@
           "DrillstringHeaveCompensator": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/DrillstringHeaveCompensator"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.DrillstringHeaveCompensator"
               }
             ],
             "nullable": true
@@ -7403,7 +5955,7 @@
           "DrillingMarineRiser": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/DrillingMarineRiser"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.DrillingMarineRiser"
               }
             ],
             "nullable": true
@@ -7411,7 +5963,7 @@
           "RiserHeaveCompensator": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/RiserHeaveCompensator"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.RiserHeaveCompensator"
               }
             ],
             "nullable": true
@@ -7429,21 +5981,23 @@
             "format": "uuid",
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "RigBatchCatalogDependencies": {
+      "OSDC.Drilling.Rig.Model.RigBatchCatalogDependencies": {
         "type": "object",
         "properties": {
           "FeatureCategories": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/RigFeatureCategory"
+              "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.RigFeatureCategory"
             },
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "RigBatchCatalogMapping": {
+      "OSDC.Drilling.Rig.Model.RigBatchCatalogMapping": {
         "type": "object",
         "properties": {
           "Name": {
@@ -7462,9 +6016,10 @@
             "type": "string",
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "RigBatchCatalogRestorePolicy": {
+      "OSDC.Drilling.Rig.Model.RigBatchCatalogRestorePolicy": {
         "enum": [
           "Unspecified",
           "MapExisting",
@@ -7472,7 +6027,7 @@
         ],
         "type": "string"
       },
-      "RigBatchError": {
+      "OSDC.Drilling.Rig.Model.RigBatchError": {
         "type": "object",
         "properties": {
           "PositionIndex": {
@@ -7492,9 +6047,10 @@
             "type": "string",
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "RigBatchErrorEnvelope": {
+      "OSDC.Drilling.Rig.Model.RigBatchErrorEnvelope": {
         "type": "object",
         "properties": {
           "Error": {
@@ -7508,13 +6064,14 @@
           "Errors": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/RigBatchError"
+              "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.RigBatchError"
             },
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "RigBatchExportDocument": {
+      "OSDC.Drilling.Rig.Model.RigBatchExportDocument": {
         "type": "object",
         "properties": {
           "FormatIdentifier": {
@@ -7532,7 +6089,7 @@
           "CatalogDependencies": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/RigBatchCatalogDependencies"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.RigBatchCatalogDependencies"
               }
             ],
             "nullable": true
@@ -7540,7 +6097,7 @@
           "ExternalReferences": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/RigBatchExternalReferences"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.RigBatchExternalReferences"
               }
             ],
             "nullable": true
@@ -7548,26 +6105,27 @@
           "Rigs": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/Rig"
+              "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.Rig"
             },
             "nullable": true
           },
           "Photos": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/RigBatchPhoto"
+              "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.RigBatchPhoto"
             },
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "RigBatchExportRequest": {
+      "OSDC.Drilling.Rig.Model.RigBatchExportRequest": {
         "type": "object",
         "properties": {
           "Scope": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/RigBatchExportScope"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.RigBatchExportScope"
               }
             ]
           },
@@ -7579,9 +6137,10 @@
             },
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "RigBatchExportScope": {
+      "OSDC.Drilling.Rig.Model.RigBatchExportScope": {
         "enum": [
           "Unspecified",
           "All",
@@ -7589,7 +6148,7 @@
         ],
         "type": "string"
       },
-      "RigBatchExternalReference": {
+      "OSDC.Drilling.Rig.Model.RigBatchExternalReference": {
         "type": "object",
         "properties": {
           "SourceID": {
@@ -7600,9 +6159,10 @@
             "type": "string",
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "RigBatchExternalReferenceMapping": {
+      "OSDC.Drilling.Rig.Model.RigBatchExternalReferenceMapping": {
         "type": "object",
         "properties": {
           "Resource": {
@@ -7625,27 +6185,29 @@
             "type": "string",
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "RigBatchExternalReferences": {
+      "OSDC.Drilling.Rig.Model.RigBatchExternalReferences": {
         "type": "object",
         "properties": {
           "Clusters": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/RigBatchExternalReference"
+              "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.RigBatchExternalReference"
             },
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "RigBatchPhoto": {
+      "OSDC.Drilling.Rig.Model.RigBatchPhoto": {
         "type": "object",
         "properties": {
           "Metadata": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/RigPhotoMetadata"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.RigPhotoMetadata"
               }
             ],
             "nullable": true
@@ -7654,9 +6216,10 @@
             "type": "string",
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "RigBatchRestoreConflictPolicy": {
+      "OSDC.Drilling.Rig.Model.RigBatchRestoreConflictPolicy": {
         "enum": [
           "Unspecified",
           "FailIfExists",
@@ -7664,34 +6227,35 @@
         ],
         "type": "string"
       },
-      "RigBatchRestoreRequest": {
+      "OSDC.Drilling.Rig.Model.RigBatchRestoreRequest": {
         "type": "object",
         "properties": {
           "ConflictPolicy": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/RigBatchRestoreConflictPolicy"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.RigBatchRestoreConflictPolicy"
               }
             ]
           },
           "CatalogPolicy": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/RigBatchCatalogRestorePolicy"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.RigBatchCatalogRestorePolicy"
               }
             ]
           },
           "Document": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/RigBatchExportDocument"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.RigBatchExportDocument"
               }
             ],
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "RigBatchRestoreResponse": {
+      "OSDC.Drilling.Rig.Model.RigBatchRestoreResponse": {
         "type": "object",
         "properties": {
           "RestoredAtUtc": {
@@ -7721,14 +6285,14 @@
           "CatalogMappings": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/RigBatchCatalogMapping"
+              "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.RigBatchCatalogMapping"
             },
             "nullable": true
           },
           "ExternalReferenceMappings": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/RigBatchExternalReferenceMapping"
+              "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.RigBatchExternalReferenceMapping"
             },
             "nullable": true
           },
@@ -7740,9 +6304,10 @@
             },
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "RigChoke": {
+      "OSDC.Drilling.Rig.Model.RigChoke": {
         "type": "object",
         "properties": {
           "ID": {
@@ -7758,9 +6323,10 @@
             "type": "string",
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "RigEnvironment": {
+      "OSDC.Drilling.Rig.Model.RigEnvironment": {
         "enum": [
           "Unknown",
           "Onshore",
@@ -7769,7 +6335,7 @@
         ],
         "type": "string"
       },
-      "RigExternalIdentifier": {
+      "OSDC.Drilling.Rig.Model.RigExternalIdentifier": {
         "type": "object",
         "properties": {
           "Authority": {
@@ -7780,9 +6346,10 @@
             "type": "string",
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "RigFeatureAssignment": {
+      "OSDC.Drilling.Rig.Model.RigFeatureAssignment": {
         "type": "object",
         "properties": {
           "ID": {
@@ -7815,15 +6382,16 @@
             "type": "string",
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "RigFeatureCategory": {
+      "OSDC.Drilling.Rig.Model.RigFeatureCategory": {
         "type": "object",
         "properties": {
           "MetaInfo": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/MetaInfo"
+                "$ref": "#/components/schemas/OSDC.DotnetLibraries.General.DataManagement.MetaInfo"
               }
             ],
             "nullable": true
@@ -7855,7 +6423,7 @@
           "Options": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/RigFeatureOption"
+              "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.RigFeatureOption"
             },
             "nullable": true
           },
@@ -7869,9 +6437,10 @@
             "format": "date-time",
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "RigFeatureOption": {
+      "OSDC.Drilling.Rig.Model.RigFeatureOption": {
         "type": "object",
         "properties": {
           "ID": {
@@ -7896,9 +6465,10 @@
           "IsDeprecated": {
             "type": "boolean"
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "RigIdentification": {
+      "OSDC.Drilling.Rig.Model.RigIdentification": {
         "type": "object",
         "properties": {
           "Owner": {
@@ -7960,26 +6530,27 @@
           "ExternalIdentifiers": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/RigExternalIdentifier"
+              "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.RigExternalIdentifier"
             },
             "nullable": true
           },
           "MajorModifications": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/RigModification"
+              "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.RigModification"
             },
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "RigLight": {
+      "OSDC.Drilling.Rig.Model.RigLight": {
         "type": "object",
         "properties": {
           "MetaInfo": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/MetaInfo"
+                "$ref": "#/components/schemas/OSDC.DotnetLibraries.General.DataManagement.MetaInfo"
               }
             ],
             "nullable": true
@@ -8013,7 +6584,7 @@
           "RigType": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/RigType"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.RigType"
               }
             ],
             "nullable": true
@@ -8021,7 +6592,7 @@
           "OperatingEnvironment": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/RigEnvironment"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.RigEnvironment"
               }
             ],
             "nullable": true
@@ -8029,14 +6600,15 @@
           "MobilityType": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/RigMobilityType"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.RigMobilityType"
               }
             ],
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "RigMast": {
+      "OSDC.Drilling.Rig.Model.RigMast": {
         "type": "object",
         "properties": {
           "ID": {
@@ -8055,7 +6627,7 @@
           "HoistingSystem": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/HoistingSystem"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.HoistingSystem"
               }
             ],
             "nullable": true
@@ -8063,7 +6635,7 @@
           "CatWalk": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/CatWalk"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.CatWalk"
               }
             ],
             "nullable": true
@@ -8071,7 +6643,7 @@
           "PipeRack": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/PipeRack"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.PipeRack"
               }
             ],
             "nullable": true
@@ -8079,7 +6651,7 @@
           "CasingDriveSystem": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/CasingDriveSystem"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.CasingDriveSystem"
               }
             ],
             "nullable": true
@@ -8087,7 +6659,7 @@
           "CoilDriveSystem": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/CoilDriveSystem"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.CoilDriveSystem"
               }
             ],
             "nullable": true
@@ -8095,7 +6667,7 @@
           "Derrick": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/Derrick"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.Derrick"
               }
             ],
             "nullable": true
@@ -8103,7 +6675,7 @@
           "TorqueTurnSub": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/TorqueTurnSub"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.TorqueTurnSub"
               }
             ],
             "nullable": true
@@ -8111,7 +6683,7 @@
           "RotaryTable": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/RotaryTable"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.RotaryTable"
               }
             ],
             "nullable": true
@@ -8119,7 +6691,7 @@
           "TopDrive": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/TopDrive"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.TopDrive"
               }
             ],
             "nullable": true
@@ -8127,7 +6699,7 @@
           "Kelly": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/Kelly"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.Kelly"
               }
             ],
             "nullable": true
@@ -8135,7 +6707,7 @@
           "IronRoughneck": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/IronRoughneck"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.IronRoughneck"
               }
             ],
             "nullable": true
@@ -8143,7 +6715,7 @@
           "CasingTongs": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/CasingTongs"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.CasingTongs"
               }
             ],
             "nullable": true
@@ -8151,7 +6723,7 @@
           "CasingRunningTool": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/CasingRunningTool"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.CasingRunningTool"
               }
             ],
             "nullable": true
@@ -8159,7 +6731,7 @@
           "StandPipe": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/StandPipe"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.StandPipe"
               }
             ],
             "nullable": true
@@ -8167,7 +6739,7 @@
           "StandPipeManifold": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/StandPipeManifold"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.StandPipeManifold"
               }
             ],
             "nullable": true
@@ -8175,7 +6747,7 @@
           "RotaryHose": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/RotaryHose"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.RotaryHose"
               }
             ],
             "nullable": true
@@ -8183,7 +6755,7 @@
           "ChokeManifold": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/ChokeManifold"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.ChokeManifold"
               }
             ],
             "nullable": true
@@ -8191,21 +6763,22 @@
           "RigChokeList": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/RigChoke"
+              "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.RigChoke"
             },
             "nullable": true
           },
           "Slips": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/Slips"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.Slips"
               }
             ],
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "RigMobilityType": {
+      "OSDC.Drilling.Rig.Model.RigMobilityType": {
         "enum": [
           "Unknown",
           "Fixed",
@@ -8215,7 +6788,7 @@
         ],
         "type": "string"
       },
-      "RigModification": {
+      "OSDC.Drilling.Rig.Model.RigModification": {
         "type": "object",
         "properties": {
           "Date": {
@@ -8227,9 +6800,10 @@
             "type": "string",
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "RigMutationError": {
+      "OSDC.Drilling.Rig.Model.RigMutationError": {
         "type": "object",
         "properties": {
           "Property": {
@@ -8244,9 +6818,10 @@
             "type": "string",
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "RigMutationErrorEnvelope": {
+      "OSDC.Drilling.Rig.Model.RigMutationErrorEnvelope": {
         "type": "object",
         "properties": {
           "Error": {
@@ -8260,13 +6835,14 @@
           "Errors": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/RigMutationError"
+              "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.RigMutationError"
             },
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "RigOperatingEnvelope": {
+      "OSDC.Drilling.Rig.Model.RigOperatingEnvelope": {
         "type": "object",
         "properties": {
           "MaximumDrillingDepth": {
@@ -8319,15 +6895,16 @@
             "format": "double",
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "RigPhotoMetadata": {
+      "OSDC.Drilling.Rig.Model.RigPhotoMetadata": {
         "type": "object",
         "properties": {
           "MetaInfo": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/MetaInfo"
+                "$ref": "#/components/schemas/OSDC.DotnetLibraries.General.DataManagement.MetaInfo"
               }
             ],
             "nullable": true
@@ -8393,15 +6970,16 @@
             "format": "date-time",
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "RigReadResponse": {
+      "OSDC.Drilling.Rig.Model.RigReadResponse": {
         "type": "object",
         "properties": {
           "MetaInfo": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/MetaInfo"
+                "$ref": "#/components/schemas/OSDC.DotnetLibraries.General.DataManagement.MetaInfo"
               }
             ],
             "nullable": true
@@ -8427,7 +7005,7 @@
           "Identification": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/RigIdentification"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.RigIdentification"
               }
             ],
             "nullable": true
@@ -8435,7 +7013,7 @@
           "RigType": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/RigType"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.RigType"
               }
             ],
             "nullable": true
@@ -8443,7 +7021,7 @@
           "OperatingEnvironment": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/RigEnvironment"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.RigEnvironment"
               }
             ],
             "nullable": true
@@ -8451,7 +7029,7 @@
           "MobilityType": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/RigMobilityType"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.RigMobilityType"
               }
             ],
             "nullable": true
@@ -8459,7 +7037,7 @@
           "OperatingEnvelope": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/RigOperatingEnvelope"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.RigOperatingEnvelope"
               }
             ],
             "nullable": true
@@ -8467,7 +7045,7 @@
           "MarineUnitProfile": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/MarineUnitProfile"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.MarineUnitProfile"
               }
             ],
             "nullable": true
@@ -8475,7 +7053,7 @@
           "JackUpProfile": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/JackUpProfile"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.JackUpProfile"
               }
             ],
             "nullable": true
@@ -8483,7 +7061,7 @@
           "StationKeepingSystem": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/StationKeepingSystem"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.StationKeepingSystem"
               }
             ],
             "nullable": true
@@ -8491,35 +7069,35 @@
           "StorageCapacities": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/RigStorageCapacity"
+              "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.RigStorageCapacity"
             },
             "nullable": true
           },
           "FeatureAssignments": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/RigFeatureAssignment"
+              "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.RigFeatureAssignment"
             },
             "nullable": true
           },
           "MudPumpList": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/MudPump"
+              "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.MudPump"
             },
             "nullable": true
           },
           "CementPumpList": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/CementPump"
+              "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.CementPump"
             },
             "nullable": true
           },
           "CementUnit": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/CementUnit"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.CementUnit"
               }
             ],
             "nullable": true
@@ -8527,7 +7105,7 @@
           "DriveMode": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/DriveMode"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.DriveMode"
               }
             ],
             "nullable": true
@@ -8535,7 +7113,7 @@
           "MainRigMast": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/RigMast"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.RigMast"
               }
             ],
             "nullable": true
@@ -8543,7 +7121,7 @@
           "AuxiliaryRigMast": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/RigMast"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.RigMast"
               }
             ],
             "nullable": true
@@ -8551,28 +7129,28 @@
           "MudTankList": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/MudTank"
+              "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.MudTank"
             },
             "nullable": true
           },
           "GeneratorList": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/Generator"
+              "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.Generator"
             },
             "nullable": true
           },
           "ShaleShakerList": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/ShaleShaker"
+              "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.ShaleShaker"
             },
             "nullable": true
           },
           "AuxSolidsControl": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/AuxSolidsControl"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.AuxSolidsControl"
               }
             ],
             "nullable": true
@@ -8580,7 +7158,7 @@
           "DrillingFluidType": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/DrillingFluidTypeDescriptor"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.DrillingFluidTypeDescriptor"
               }
             ],
             "nullable": true
@@ -8588,7 +7166,7 @@
           "FlowSensor": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/FlowSensor"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.FlowSensor"
               }
             ],
             "nullable": true
@@ -8596,7 +7174,7 @@
           "MeasurementAfm": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/MeasurementAfm"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.MeasurementAfm"
               }
             ],
             "nullable": true
@@ -8604,7 +7182,7 @@
           "ReturnFlowLine": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/ReturnFlowLine"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.ReturnFlowLine"
               }
             ],
             "nullable": true
@@ -8612,42 +7190,42 @@
           "MudGasSeparatorList": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/MudGasSeparator"
+              "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.MudGasSeparator"
             },
             "nullable": true
           },
           "DesanderList": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/Desander"
+              "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.Desander"
             },
             "nullable": true
           },
           "DesilterList": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/Desilter"
+              "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.Desilter"
             },
             "nullable": true
           },
           "CentrifugeList": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/Centrifuge"
+              "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.Centrifuge"
             },
             "nullable": true
           },
           "DegasserList": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/Degasser"
+              "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.Degasser"
             },
             "nullable": true
           },
           "CuttingsTransportSystem": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/CuttingsTransportSystem"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.CuttingsTransportSystem"
               }
             ],
             "nullable": true
@@ -8655,14 +7233,14 @@
           "CuttingsDryerList": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/CuttingsDryer"
+              "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.CuttingsDryer"
             },
             "nullable": true
           },
           "PipeDeck": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/PipeDeck"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.PipeDeck"
               }
             ],
             "nullable": true
@@ -8670,7 +7248,7 @@
           "Accumulator": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/Accumulator"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.Accumulator"
               }
             ],
             "nullable": true
@@ -8678,7 +7256,7 @@
           "BopStack": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/BopStack"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.BopStack"
               }
             ],
             "nullable": true
@@ -8686,7 +7264,7 @@
           "FloatValve": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/FloatValve"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.FloatValve"
               }
             ],
             "nullable": true
@@ -8694,7 +7272,7 @@
           "AutoDriller": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/AutoDriller"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.AutoDriller"
               }
             ],
             "nullable": true
@@ -8702,7 +7280,7 @@
           "MpdController": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/MpdController"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.MpdController"
               }
             ],
             "nullable": true
@@ -8710,7 +7288,7 @@
           "MpdControlDevice": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/MpdControlDevice"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.MpdControlDevice"
               }
             ],
             "nullable": true
@@ -8718,7 +7296,7 @@
           "ContinuousCirculationDevice": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/ContinuousCirculationDevice"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.ContinuousCirculationDevice"
               }
             ],
             "nullable": true
@@ -8726,7 +7304,7 @@
           "DrillingChokeManifold": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/DrillingChokeManifold"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.DrillingChokeManifold"
               }
             ],
             "nullable": true
@@ -8734,7 +7312,7 @@
           "SurfaceMpdEquipment": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/SurfaceMpdEquipment"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.SurfaceMpdEquipment"
               }
             ],
             "nullable": true
@@ -8742,7 +7320,7 @@
           "MarineMpdEquipment": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/MarineMpdEquipment"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.MarineMpdEquipment"
               }
             ],
             "nullable": true
@@ -8750,7 +7328,7 @@
           "MultiPhaseSeparator": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/MultiPhaseSeparator"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.MultiPhaseSeparator"
               }
             ],
             "nullable": true
@@ -8758,7 +7336,7 @@
           "FlowRoutingManifold": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/FlowRoutingManifold"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.FlowRoutingManifold"
               }
             ],
             "nullable": true
@@ -8766,7 +7344,7 @@
           "DrillstringHeaveCompensator": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/DrillstringHeaveCompensator"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.DrillstringHeaveCompensator"
               }
             ],
             "nullable": true
@@ -8774,7 +7352,7 @@
           "DrillingMarineRiser": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/DrillingMarineRiser"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.DrillingMarineRiser"
               }
             ],
             "nullable": true
@@ -8782,7 +7360,7 @@
           "RiserHeaveCompensator": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/RiserHeaveCompensator"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.RiserHeaveCompensator"
               }
             ],
             "nullable": true
@@ -8803,19 +7381,20 @@
           "Photos": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/RigPhotoMetadata"
+              "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.RigPhotoMetadata"
             },
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "RigStorageCapacity": {
+      "OSDC.Drilling.Rig.Model.RigStorageCapacity": {
         "type": "object",
         "properties": {
           "StorageType": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/RigStorageType"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.RigStorageType"
               }
             ]
           },
@@ -8833,9 +7412,10 @@
             "format": "double",
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "RigStorageType": {
+      "OSDC.Drilling.Rig.Model.RigStorageType": {
         "enum": [
           "Other",
           "DieselFuel",
@@ -8852,7 +7432,7 @@
         ],
         "type": "string"
       },
-      "RigType": {
+      "OSDC.Drilling.Rig.Model.RigType": {
         "enum": [
           "Unknown",
           "ConventionalLandRig",
@@ -8866,7 +7446,7 @@
         ],
         "type": "string"
       },
-      "RiserClass": {
+      "OSDC.Drilling.Rig.Model.RiserClass": {
         "enum": [
           "MarineDrillingRiser",
           "TieBackDrillingRiser",
@@ -8875,14 +7455,14 @@
         ],
         "type": "string"
       },
-      "RiserCompensatorClass": {
+      "OSDC.Drilling.Rig.Model.RiserCompensatorClass": {
         "enum": [
           "PassiveRiserTensioner",
           "Other"
         ],
         "type": "string"
       },
-      "RiserHeaveCompensator": {
+      "OSDC.Drilling.Rig.Model.RiserHeaveCompensator": {
         "type": "object",
         "properties": {
           "ID": {
@@ -8931,7 +7511,7 @@
           "LifecycleStatus": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/EquipmentLifecycleStatus"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.EquipmentLifecycleStatus"
               }
             ],
             "nullable": true
@@ -8946,14 +7526,14 @@
           "MeasurementCapabilities": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/EquipmentMeasurementCapability"
+              "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.EquipmentMeasurementCapability"
             },
             "nullable": true
           },
           "RiserCompensatorClass": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/RiserCompensatorClass"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.RiserCompensatorClass"
               }
             ],
             "nullable": true
@@ -8968,9 +7548,10 @@
             "format": "double",
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "RotaryHose": {
+      "OSDC.Drilling.Rig.Model.RotaryHose": {
         "type": "object",
         "properties": {
           "ID": {
@@ -8986,9 +7567,10 @@
             "type": "string",
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "RotaryTable": {
+      "OSDC.Drilling.Rig.Model.RotaryTable": {
         "type": "object",
         "properties": {
           "ID": {
@@ -9037,7 +7619,7 @@
           "LifecycleStatus": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/EquipmentLifecycleStatus"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.EquipmentLifecycleStatus"
               }
             ],
             "nullable": true
@@ -9052,14 +7634,14 @@
           "MeasurementCapabilities": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/EquipmentMeasurementCapability"
+              "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.EquipmentMeasurementCapability"
             },
             "nullable": true
           },
           "RotaryTableType": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/RotaryTableType"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.RotaryTableType"
               }
             ],
             "nullable": true
@@ -9072,7 +7654,7 @@
           "BushingType": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/RotaryTableBushingType"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.RotaryTableBushingType"
               }
             ],
             "nullable": true
@@ -9132,9 +7714,10 @@
             "format": "double",
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "RotaryTableBushingType": {
+      "OSDC.Drilling.Rig.Model.RotaryTableBushingType": {
         "enum": [
           "Master",
           "Kelly",
@@ -9142,7 +7725,7 @@
         ],
         "type": "string"
       },
-      "RotaryTableType": {
+      "OSDC.Drilling.Rig.Model.RotaryTableType": {
         "enum": [
           "DcDrive",
           "AcDrive",
@@ -9151,7 +7734,7 @@
         ],
         "type": "string"
       },
-      "RoutingManifoldCurvePoint": {
+      "OSDC.Drilling.Rig.Model.RoutingManifoldCurvePoint": {
         "type": "object",
         "properties": {
           "Pressure": {
@@ -9164,16 +7747,17 @@
             "format": "double",
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "SeparatorMedium": {
+      "OSDC.Drilling.Rig.Model.SeparatorMedium": {
         "enum": [
           "Mud",
           "WellboreFluid"
         ],
         "type": "string"
       },
-      "SeparatorPhaseClass": {
+      "OSDC.Drilling.Rig.Model.SeparatorPhaseClass": {
         "enum": [
           "TwoPhases",
           "ThreePhases",
@@ -9181,7 +7765,7 @@
         ],
         "type": "string"
       },
-      "ShakerClass": {
+      "OSDC.Drilling.Rig.Model.ShakerClass": {
         "enum": [
           "Linear",
           "Elliptical",
@@ -9190,7 +7774,7 @@
         ],
         "type": "string"
       },
-      "ShakerScreenDefinition": {
+      "OSDC.Drilling.Rig.Model.ShakerScreenDefinition": {
         "type": "object",
         "properties": {
           "ScreenDeck": {
@@ -9202,9 +7786,10 @@
             "type": "string",
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "ShaleShaker": {
+      "OSDC.Drilling.Rig.Model.ShaleShaker": {
         "type": "object",
         "properties": {
           "ID": {
@@ -9253,7 +7838,7 @@
           "LifecycleStatus": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/EquipmentLifecycleStatus"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.EquipmentLifecycleStatus"
               }
             ],
             "nullable": true
@@ -9268,14 +7853,14 @@
           "MeasurementCapabilities": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/EquipmentMeasurementCapability"
+              "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.EquipmentMeasurementCapability"
             },
             "nullable": true
           },
           "ShakerClass": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/ShakerClass"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.ShakerClass"
               }
             ],
             "nullable": true
@@ -9283,7 +7868,7 @@
           "ShakerScreens": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/ShakerScreenDefinition"
+              "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.ShakerScreenDefinition"
             },
             "nullable": true
           },
@@ -9292,9 +7877,10 @@
             "format": "double",
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "Slips": {
+      "OSDC.Drilling.Rig.Model.Slips": {
         "type": "object",
         "properties": {
           "ID": {
@@ -9310,9 +7896,10 @@
             "type": "string",
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "SolidsControlClass": {
+      "OSDC.Drilling.Rig.Model.SolidsControlClass": {
         "enum": [
           "Desander",
           "Desilter",
@@ -9322,14 +7909,14 @@
         ],
         "type": "string"
       },
-      "SpeedMode": {
+      "OSDC.Drilling.Rig.Model.SpeedMode": {
         "enum": [
           "ConstantSpeed",
           "VariableSpeed"
         ],
         "type": "string"
       },
-      "StandPipe": {
+      "OSDC.Drilling.Rig.Model.StandPipe": {
         "type": "object",
         "properties": {
           "ID": {
@@ -9355,9 +7942,10 @@
             "format": "double",
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "StandPipeManifold": {
+      "OSDC.Drilling.Rig.Model.StandPipeManifold": {
         "type": "object",
         "properties": {
           "ID": {
@@ -9406,7 +7994,7 @@
           "LifecycleStatus": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/EquipmentLifecycleStatus"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.EquipmentLifecycleStatus"
               }
             ],
             "nullable": true
@@ -9421,7 +8009,7 @@
           "MeasurementCapabilities": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/EquipmentMeasurementCapability"
+              "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.EquipmentMeasurementCapability"
             },
             "nullable": true
           },
@@ -9433,7 +8021,7 @@
           "StandpipeSpecLevel": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/StandpipeSpecLevel"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.StandpipeSpecLevel"
               }
             ],
             "nullable": true
@@ -9458,9 +8046,10 @@
             "format": "double",
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "StandpipeSpecLevel": {
+      "OSDC.Drilling.Rig.Model.StandpipeSpecLevel": {
         "enum": [
           "Psl1LowPressureRating",
           "Psl2ModeratePressureRating",
@@ -9468,7 +8057,7 @@
         ],
         "type": "string"
       },
-      "StationKeepingMode": {
+      "OSDC.Drilling.Rig.Model.StationKeepingMode": {
         "enum": [
           "Unknown",
           "Fixed",
@@ -9478,20 +8067,20 @@
         ],
         "type": "string"
       },
-      "StationKeepingSystem": {
+      "OSDC.Drilling.Rig.Model.StationKeepingSystem": {
         "type": "object",
         "properties": {
           "Modes": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/StationKeepingMode"
+              "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.StationKeepingMode"
             },
             "nullable": true
           },
           "DynamicPositioningClass": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/DynamicPositioningClass"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.DynamicPositioningClass"
               }
             ],
             "nullable": true
@@ -9511,16 +8100,17 @@
             "format": "double",
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "SurfaceMpdClass": {
+      "OSDC.Drilling.Rig.Model.SurfaceMpdClass": {
         "enum": [
           "BackPressurePump",
           "Other"
         ],
         "type": "string"
       },
-      "SurfaceMpdEquipment": {
+      "OSDC.Drilling.Rig.Model.SurfaceMpdEquipment": {
         "type": "object",
         "properties": {
           "ID": {
@@ -9569,7 +8159,7 @@
           "LifecycleStatus": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/EquipmentLifecycleStatus"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.EquipmentLifecycleStatus"
               }
             ],
             "nullable": true
@@ -9584,14 +8174,14 @@
           "MeasurementCapabilities": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/EquipmentMeasurementCapability"
+              "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.EquipmentMeasurementCapability"
             },
             "nullable": true
           },
           "SurfaceMpdClass": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/SurfaceMpdClass"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.SurfaceMpdClass"
               }
             ],
             "nullable": true
@@ -9646,9 +8236,10 @@
             "format": "double",
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "TankClass": {
+      "OSDC.Drilling.Rig.Model.TankClass": {
         "enum": [
           "Active",
           "Reserve",
@@ -9659,7 +8250,7 @@
         ],
         "type": "string"
       },
-      "TankFluidType": {
+      "OSDC.Drilling.Rig.Model.TankFluidType": {
         "enum": [
           "DrillingMud",
           "Brine",
@@ -9668,7 +8259,7 @@
         ],
         "type": "string"
       },
-      "TopDrive": {
+      "OSDC.Drilling.Rig.Model.TopDrive": {
         "type": "object",
         "properties": {
           "ID": {
@@ -9717,7 +8308,7 @@
           "LifecycleStatus": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/EquipmentLifecycleStatus"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.EquipmentLifecycleStatus"
               }
             ],
             "nullable": true
@@ -9732,14 +8323,14 @@
           "MeasurementCapabilities": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/EquipmentMeasurementCapability"
+              "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.EquipmentMeasurementCapability"
             },
             "nullable": true
           },
           "TopDriveClass": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/TopDriveClass"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.TopDriveClass"
               }
             ],
             "nullable": true
@@ -9747,7 +8338,7 @@
           "TopDriveControllerType": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/TopDriveControllerType"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.TopDriveControllerType"
               }
             ],
             "nullable": true
@@ -9888,9 +8479,10 @@
             "format": "double",
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "TopDriveClass": {
+      "OSDC.Drilling.Rig.Model.TopDriveClass": {
         "enum": [
           "AcTopDrive",
           "HydraulicTopDrive",
@@ -9898,7 +8490,7 @@
         ],
         "type": "string"
       },
-      "TopDriveControllerType": {
+      "OSDC.Drilling.Rig.Model.TopDriveControllerType": {
         "enum": [
           "Unknown",
           "StiffPIController",
@@ -9907,7 +8499,7 @@
         ],
         "type": "string"
       },
-      "TorqueTurnSub": {
+      "OSDC.Drilling.Rig.Model.TorqueTurnSub": {
         "type": "object",
         "properties": {
           "ID": {
@@ -9956,7 +8548,7 @@
           "LifecycleStatus": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/EquipmentLifecycleStatus"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.EquipmentLifecycleStatus"
               }
             ],
             "nullable": true
@@ -9971,7 +8563,7 @@
           "MeasurementCapabilities": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/EquipmentMeasurementCapability"
+              "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.EquipmentMeasurementCapability"
             },
             "nullable": true
           },
@@ -10040,9 +8632,10 @@
             "format": "double",
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "TravellingBlock": {
+      "OSDC.Drilling.Rig.Model.TravellingBlock": {
         "type": "object",
         "properties": {
           "ID": {
@@ -10091,7 +8684,7 @@
           "LifecycleStatus": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/EquipmentLifecycleStatus"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.EquipmentLifecycleStatus"
               }
             ],
             "nullable": true
@@ -10106,7 +8699,7 @@
           "MeasurementCapabilities": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/EquipmentMeasurementCapability"
+              "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.EquipmentMeasurementCapability"
             },
             "nullable": true
           },
@@ -10140,9 +8733,10 @@
             "format": "double",
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "UsageStatisticsRig": {
+      "OSDC.Drilling.Rig.Model.UsageStatisticsRig": {
         "type": "object",
         "properties": {
           "LastSaved": {
@@ -10156,7 +8750,7 @@
           "GetAllRigIdPerDay": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/History"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.History"
               }
             ],
             "nullable": true
@@ -10164,7 +8758,7 @@
           "GetAllRigMetaInfoPerDay": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/History"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.History"
               }
             ],
             "nullable": true
@@ -10172,7 +8766,7 @@
           "GetRigByIdPerDay": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/History"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.History"
               }
             ],
             "nullable": true
@@ -10180,7 +8774,7 @@
           "GetAllRigLightPerDay": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/History"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.History"
               }
             ],
             "nullable": true
@@ -10188,7 +8782,7 @@
           "GetAllRigPerDay": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/History"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.History"
               }
             ],
             "nullable": true
@@ -10196,7 +8790,7 @@
           "PostRigPerDay": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/History"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.History"
               }
             ],
             "nullable": true
@@ -10204,7 +8798,7 @@
           "PutRigByIdPerDay": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/History"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.History"
               }
             ],
             "nullable": true
@@ -10212,7 +8806,7 @@
           "DeleteRigByIdPerDay": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/History"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.History"
               }
             ],
             "nullable": true
@@ -10220,7 +8814,7 @@
           "BatchExportRigsPerDay": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/History"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.History"
               }
             ],
             "nullable": true
@@ -10228,147 +8822,13 @@
           "BatchRestoreRigsPerDay": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/History"
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.History"
               }
             ],
             "nullable": true
           }
-        }
-      },
-      "VerticalDatum": {
-        "type": "object",
-        "properties": {
-          "MetaInfo": {
-            "$ref": "#/components/schemas/MetaInfo"
-          },
-          "Name": {
-            "type": "string",
-            "nullable": true
-          },
-          "Description": {
-            "type": "string",
-            "nullable": true
-          },
-          "CreationDate": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "LastModificationDate": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "DatumSet": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/VerticalDatumSet"
-            },
-            "nullable": true
-          },
-          "ConversionFrom": {
-            "$ref": "#/components/schemas/VerticalDatumConversion"
-          },
-          "Type": {
-            "$ref": "#/components/schemas/VerticalDatumType"
-          }
-        }
-      },
-      "VerticalDatumConversion": {
-        "enum": [
-          "FromMeanSeaLevel",
-          "FromMeanHighWater",
-          "FromMeanLowWater",
-          "LowestAstronimalTide",
-          "HighestAstronimalTide",
-          "MeanHigherHighWater",
-          "MeanLowerLowWater"
-        ],
-        "type": "string"
-      },
-      "VerticalDatumOrder": {
-        "type": "object",
-        "properties": {
-          "MetaInfo": {
-            "$ref": "#/components/schemas/MetaInfo"
-          },
-          "Name": {
-            "type": "string",
-            "nullable": true
-          },
-          "Description": {
-            "type": "string",
-            "nullable": true
-          },
-          "CreationDate": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "LastModificationDate": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "VerticalDatum": {
-            "$ref": "#/components/schemas/VerticalDatum"
-          }
-        }
-      },
-      "VerticalDatumOrderLight": {
-        "type": "object",
-        "properties": {
-          "MetaInfo": {
-            "$ref": "#/components/schemas/MetaInfo"
-          },
-          "Name": {
-            "type": "string",
-            "nullable": true
-          },
-          "Description": {
-            "type": "string",
-            "nullable": true
-          },
-          "CreationDate": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "LastModificationDate": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          }
-        }
-      },
-      "VerticalDatumSet": {
-        "type": "object",
-        "properties": {
-          "Latitude": {
-            "type": "number",
-            "format": "double"
-          },
-          "Longitude": {
-            "type": "number",
-            "format": "double"
-          },
-          "VerticalDatumWGS64": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "GenericVerticalDatum": {
-            "type": "number",
-            "format": "double"
-          }
-        }
-      },
-      "VerticalDatumType": {
-        "enum": [
-          "Completed",
-          "Raw"
-        ],
-        "type": "string"
+        },
+        "additionalProperties": false
       }
     }
   }
