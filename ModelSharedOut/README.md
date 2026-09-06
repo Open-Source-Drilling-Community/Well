@@ -13,7 +13,7 @@ The generator reads every JSON file in `ModelSharedOut/json-schemas`:
 | `FieldModel.json` | Field merged service schema. |
 | `RigModel.json` | Rig merged service schema. |
 | `VerticalDatumModel.json` | Earth Vertical Datum merged service schema. |
-| `TrajectoryModel.json` | Trajectory merged service schema. |
+| `TrajectoryModel.json` | Trajectory service-owned schema from `Trajectory/ModelSharedOut/json-schemas/TrajectoryFullName.json`; the served transitive aggregate is intentionally not used. |
 | `WellBoreModel.json` | WellBore merged service schema. |
 
 Dependency files are deliberately checked in. Refresh them from reviewed service artifacts rather than silently discovering changing schemas at generation time.

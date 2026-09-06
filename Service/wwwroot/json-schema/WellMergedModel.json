@@ -9712,6 +9712,1160 @@
         }
       }
     },
+    "/GlobalAntiCollisions/{id}/Status": {
+      "get": {
+        "tags": [
+          "GlobalAntiCollisions"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GlobalAntiCollisionCalculationStatus"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/Octrees/{id}/Status": {
+      "get": {
+        "tags": [
+          "Octrees"
+        ],
+        "operationId": "GetOctreeIndexStatus",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OctreeIndexStatus"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/Octrees/SearchJobs": {
+      "post": {
+        "tags": [
+          "Octrees"
+        ],
+        "operationId": "QueueOctreeSearch",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OctreeSearchJobRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OctreeSearchJobRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/OctreeSearchJobRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OctreeSearchJobStatus"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/Octrees/SearchJobs/{jobId}/Status": {
+      "get": {
+        "tags": [
+          "Octrees"
+        ],
+        "operationId": "GetOctreeSearchStatus",
+        "parameters": [
+          {
+            "name": "jobId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OctreeSearchJobStatus"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/Octrees/SearchJobs/{jobId}/Result": {
+      "get": {
+        "tags": [
+          "Octrees"
+        ],
+        "operationId": "GetOctreeSearchResult",
+        "parameters": [
+          {
+            "name": "jobId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OctreeSearchJobResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/Octrees/SearchJobs/{jobId}": {
+      "delete": {
+        "tags": [
+          "Octrees"
+        ],
+        "operationId": "DeleteOctreeSearch",
+        "parameters": [
+          {
+            "name": "jobId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/SurveyRun/Search": {
+      "get": {
+        "tags": [
+          "SurveyRun"
+        ],
+        "operationId": "SearchSurveyRun",
+        "parameters": [
+          {
+            "name": "query",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "fieldId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "clusterId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "wellId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "wellBoreId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "surveyInstrumentId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "surveyRunType",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/SurveyRunType"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 100
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SurveyRunSearchResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/SurveyRun/{id}/ExternalReferences": {
+      "get": {
+        "tags": [
+          "SurveyRun"
+        ],
+        "operationId": "ValidateSurveyRunExternalReferences",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SurveyRunExternalReferenceValidation"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/SurveyRun/ExternalReferenceAudit": {
+      "post": {
+        "tags": [
+          "SurveyRun"
+        ],
+        "operationId": "AuditSurveyRunExternalReferences",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SurveyRunExternalReferenceAuditRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SurveyRunExternalReferenceAuditRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/SurveyRunExternalReferenceAuditRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SurveyRunExternalReferenceAuditResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/Trajectory/BatchExport": {
+      "post": {
+        "tags": [
+          "Trajectory"
+        ],
+        "operationId": "BatchExportTrajectoryData",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TrajectoryBatchExportRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TrajectoryBatchExportRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/TrajectoryBatchExportRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TrajectoryBatchExportDocument"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TrajectoryBatchErrorEnvelope"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TrajectoryBatchErrorEnvelope"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TrajectoryBatchErrorEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/Trajectory/BatchRestore": {
+      "post": {
+        "tags": [
+          "Trajectory"
+        ],
+        "operationId": "BatchRestoreTrajectoryData",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TrajectoryBatchRestoreRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TrajectoryBatchRestoreRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/TrajectoryBatchRestoreRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TrajectoryBatchRestoreResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TrajectoryBatchErrorEnvelope"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TrajectoryBatchErrorEnvelope"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TrajectoryBatchErrorEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/Trajectory/Search": {
+      "get": {
+        "tags": [
+          "Trajectory"
+        ],
+        "operationId": "SearchTrajectory",
+        "parameters": [
+          {
+            "name": "query",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "fieldId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "clusterId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "wellId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "wellBoreId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "trajectoryType",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/TrajectoryType"
+            }
+          },
+          {
+            "name": "isDefinitive",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 100
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TrajectorySearchResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/Trajectory/{id}/ExternalReferences": {
+      "get": {
+        "tags": [
+          "Trajectory"
+        ],
+        "operationId": "ValidateTrajectoryExternalReferences",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TrajectoryExternalReferenceValidation"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/Trajectory/ExternalReferenceAudit": {
+      "post": {
+        "tags": [
+          "Trajectory"
+        ],
+        "operationId": "AuditTrajectoryExternalReferences",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TrajectoryExternalReferenceAuditRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TrajectoryExternalReferenceAuditRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/TrajectoryExternalReferenceAuditRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TrajectoryExternalReferenceAuditResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/TrajectoryFeatureCategory": {
+      "get": {
+        "tags": [
+          "TrajectoryFeatureCategory"
+        ],
+        "operationId": "GetAllTrajectoryFeatureCategoryId",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "format": "uuid"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "TrajectoryFeatureCategory"
+        ],
+        "operationId": "PostTrajectoryFeatureCategory",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TrajectoryFeatureCategory"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TrajectoryFeatureCategory"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/TrajectoryFeatureCategory"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/TrajectoryFeatureCategory/MetaInfo": {
+      "get": {
+        "tags": [
+          "TrajectoryFeatureCategory"
+        ],
+        "operationId": "GetAllTrajectoryFeatureCategoryMetaInfo",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/MetaInfo"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/TrajectoryFeatureCategory/HeavyData": {
+      "get": {
+        "tags": [
+          "TrajectoryFeatureCategory"
+        ],
+        "operationId": "GetAllTrajectoryFeatureCategory",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TrajectoryFeatureCategory"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/TrajectoryFeatureCategory/{id}": {
+      "get": {
+        "tags": [
+          "TrajectoryFeatureCategory"
+        ],
+        "operationId": "GetTrajectoryFeatureCategoryById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TrajectoryFeatureCategory"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "TrajectoryFeatureCategory"
+        ],
+        "operationId": "PutTrajectoryFeatureCategoryById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "expectedModifiedUtc",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TrajectoryFeatureCategory"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TrajectoryFeatureCategory"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/TrajectoryFeatureCategory"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "TrajectoryFeatureCategory"
+        ],
+        "operationId": "DeleteTrajectoryFeatureCategoryById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "expectedModifiedUtc",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/TrajectoryIdentity": {
+      "get": {
+        "tags": [
+          "TrajectoryIdentity"
+        ],
+        "operationId": "GetAllTrajectoryIdentityId",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "format": "uuid"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "TrajectoryIdentity"
+        ],
+        "operationId": "PostTrajectoryIdentity",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TrajectoryIdentity"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TrajectoryIdentity"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/TrajectoryIdentity"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/TrajectoryIdentity/MetaInfo": {
+      "get": {
+        "tags": [
+          "TrajectoryIdentity"
+        ],
+        "operationId": "GetAllTrajectoryIdentityMetaInfo",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/MetaInfo"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/TrajectoryIdentity/HeavyData": {
+      "get": {
+        "tags": [
+          "TrajectoryIdentity"
+        ],
+        "operationId": "GetAllTrajectoryIdentity",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TrajectoryIdentity"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/TrajectoryIdentity/{id}": {
+      "get": {
+        "tags": [
+          "TrajectoryIdentity"
+        ],
+        "operationId": "GetTrajectoryIdentityById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TrajectoryIdentity"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "TrajectoryIdentity"
+        ],
+        "operationId": "PutTrajectoryIdentityById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "expectedModifiedUtc",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TrajectoryIdentity"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TrajectoryIdentity"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/TrajectoryIdentity"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "TrajectoryIdentity"
+        ],
+        "operationId": "DeleteTrajectoryIdentityById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "expectedModifiedUtc",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/CartographicConversionSet": {
       "get": {
         "tags": [
@@ -28623,6 +29777,895 @@
           "Raw"
         ],
         "type": "string"
+      },
+      "ProblemDetails": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "nullable": true
+          },
+          "title": {
+            "type": "string",
+            "nullable": true
+          },
+          "status": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "detail": {
+            "type": "string",
+            "nullable": true
+          },
+          "instance": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": { }
+      },
+      "GlobalAntiCollisionCalculationState": {
+        "enum": [
+          "Completed",
+          "Queued",
+          "Running",
+          "Failed"
+        ],
+        "type": "string"
+      },
+      "GlobalAntiCollisionCalculationStatus": {
+        "type": "object",
+        "properties": {
+          "ID": {
+            "type": "string",
+            "nullable": true
+          },
+          "CalculationState": {
+            "$ref": "#/components/schemas/GlobalAntiCollisionCalculationState"
+          },
+          "CalculationProgress": {
+            "type": "number",
+            "format": "double"
+          },
+          "CalculationMessage": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "ExternalReferenceAuditScope": {
+        "enum": [
+          "All",
+          "Selected"
+        ],
+        "type": "string"
+      },
+      "ExternalReferenceIssue": {
+        "type": "object",
+        "properties": {
+          "Property": {
+            "type": "string",
+            "nullable": true
+          },
+          "Code": {
+            "type": "string",
+            "nullable": true
+          },
+          "Message": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "ExternalReferenceValidationStatus": {
+        "enum": [
+          "Valid",
+          "Invalid",
+          "Unavailable"
+        ],
+        "type": "string"
+      },
+      "OctreeIndexState": {
+        "enum": [
+          "Missing",
+          "NotIndexable",
+          "Stale",
+          "Current"
+        ],
+        "type": "string"
+      },
+      "OctreeIndexStatus": {
+        "type": "object",
+        "properties": {
+          "TrajectoryID": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "State": {
+            "$ref": "#/components/schemas/OctreeIndexState"
+          },
+          "HasIndex": {
+            "type": "boolean"
+          },
+          "IsCurrent": {
+            "type": "boolean"
+          },
+          "TrajectoryType": {
+            "$ref": "#/components/schemas/TrajectoryType"
+          },
+          "IsDefinitive": {
+            "type": "boolean"
+          },
+          "SurveyStationCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "BucketCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "OctreeCodeCount": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "SourceLastModificationDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "IndexSchemaVersion": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "ConfidenceFactor": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "CalculationParametersHash": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "OctreeSearchJobRequest": {
+        "type": "object",
+        "properties": {
+          "ReferenceTrajectoryID": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "IncludePlanned": {
+            "type": "boolean"
+          },
+          "IncludeActual": {
+            "type": "boolean"
+          },
+          "DefinitiveOnly": {
+            "type": "boolean"
+          }
+        }
+      },
+      "OctreeSearchJobResult": {
+        "type": "object",
+        "properties": {
+          "JobID": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "ReferenceTrajectoryID": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "CandidateTrajectoryIDs": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "nullable": true
+          }
+        }
+      },
+      "OctreeSearchJobStatus": {
+        "type": "object",
+        "properties": {
+          "JobID": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "ReferenceTrajectoryID": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "CalculationState": {
+            "$ref": "#/components/schemas/CalculationState"
+          },
+          "CalculationProgress": {
+            "type": "number",
+            "format": "double"
+          },
+          "CalculationMessage": {
+            "type": "string",
+            "nullable": true
+          },
+          "CandidateCount": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "CreatedUtc": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "CompletedUtc": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          }
+        }
+      },
+      "SurveyRunExternalReferenceAuditRequest": {
+        "required": [
+          "Scope"
+        ],
+        "type": "object",
+        "properties": {
+          "Scope": {
+            "$ref": "#/components/schemas/ExternalReferenceAuditScope"
+          },
+          "SurveyRunIDs": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "nullable": true
+          },
+          "Offset": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "Limit": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "SurveyRunExternalReferenceAuditResult": {
+        "type": "object",
+        "properties": {
+          "CheckedAtUtc": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "Total": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "Offset": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "Limit": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "ValidCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "InvalidCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "UnavailableCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "Items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SurveyRunExternalReferenceValidation"
+            },
+            "nullable": true
+          }
+        }
+      },
+      "SurveyRunExternalReferenceValidation": {
+        "type": "object",
+        "properties": {
+          "SurveyRunID": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "FieldID": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "ClusterID": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "WellID": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "WellBoreID": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "SurveyInstrumentID": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "FieldExists": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "ClusterExists": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "WellExists": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "WellBoreExists": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "SurveyInstrumentExists": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "Status": {
+            "$ref": "#/components/schemas/ExternalReferenceValidationStatus"
+          },
+          "CheckedAtUtc": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "Issues": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ExternalReferenceIssue"
+            },
+            "nullable": true
+          }
+        }
+      },
+      "SurveyRunSearchResult": {
+        "type": "object",
+        "properties": {
+          "Offset": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "Limit": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "TotalCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "Items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SurveyRunLight"
+            },
+            "nullable": true
+          }
+        }
+      },
+      "TrajectoryBatchCatalogDependencies": {
+        "type": "object",
+        "properties": {
+          "Identities": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TrajectoryIdentity"
+            },
+            "nullable": true
+          },
+          "FeatureCategories": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TrajectoryFeatureCategory"
+            },
+            "nullable": true
+          }
+        }
+      },
+      "TrajectoryBatchCatalogMapping": {
+        "type": "object",
+        "properties": {
+          "Catalog": {
+            "type": "string",
+            "nullable": true
+          },
+          "Name": {
+            "type": "string",
+            "nullable": true
+          },
+          "SourceID": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "LocalID": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "Resolution": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "TrajectoryBatchCatalogRestorePolicy": {
+        "enum": [
+          "Unspecified",
+          "MapExisting",
+          "MapOrCreateMissing"
+        ],
+        "type": "string"
+      },
+      "TrajectoryBatchError": {
+        "type": "object",
+        "properties": {
+          "PositionIndex": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "Property": {
+            "type": "string",
+            "nullable": true
+          },
+          "Code": {
+            "type": "string",
+            "nullable": true
+          },
+          "Message": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "TrajectoryBatchErrorEnvelope": {
+        "type": "object",
+        "properties": {
+          "Error": {
+            "type": "string",
+            "nullable": true
+          },
+          "Message": {
+            "type": "string",
+            "nullable": true
+          },
+          "Errors": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TrajectoryBatchError"
+            },
+            "nullable": true
+          }
+        }
+      },
+      "TrajectoryBatchExportDocument": {
+        "type": "object",
+        "properties": {
+          "FormatIdentifier": {
+            "type": "string",
+            "nullable": true
+          },
+          "SchemaVersion": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "ExportedAtUtc": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "CatalogDependencies": {
+            "$ref": "#/components/schemas/TrajectoryBatchCatalogDependencies"
+          },
+          "SurveyRuns": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SurveyRun"
+            },
+            "nullable": true
+          },
+          "Trajectories": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Trajectory"
+            },
+            "nullable": true
+          }
+        }
+      },
+      "TrajectoryBatchExportRequest": {
+        "type": "object",
+        "properties": {
+          "Scope": {
+            "$ref": "#/components/schemas/TrajectoryBatchExportScope"
+          },
+          "SurveyRunIDs": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "nullable": true
+          },
+          "TrajectoryIDs": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "nullable": true
+          }
+        }
+      },
+      "TrajectoryBatchExportScope": {
+        "enum": [
+          "Unspecified",
+          "All",
+          "Selected"
+        ],
+        "type": "string"
+      },
+      "TrajectoryBatchRestoreConflictPolicy": {
+        "enum": [
+          "Unspecified",
+          "FailIfExists",
+          "ReplaceExisting"
+        ],
+        "type": "string"
+      },
+      "TrajectoryBatchRestoreRequest": {
+        "type": "object",
+        "properties": {
+          "ConflictPolicy": {
+            "$ref": "#/components/schemas/TrajectoryBatchRestoreConflictPolicy"
+          },
+          "CatalogPolicy": {
+            "$ref": "#/components/schemas/TrajectoryBatchCatalogRestorePolicy"
+          },
+          "AllowNormalizedNameMapping": {
+            "type": "boolean"
+          },
+          "Document": {
+            "$ref": "#/components/schemas/TrajectoryBatchExportDocument"
+          }
+        }
+      },
+      "TrajectoryBatchRestoreResponse": {
+        "type": "object",
+        "properties": {
+          "RestoredAtUtc": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "CreatedSurveyRunCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "ReplacedSurveyRunCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "CreatedTrajectoryCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "ReplacedTrajectoryCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "CreatedCatalogDefinitionCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "CatalogMappings": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TrajectoryBatchCatalogMapping"
+            },
+            "nullable": true
+          },
+          "SurveyRunIDs": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "nullable": true
+          },
+          "TrajectoryIDs": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "nullable": true
+          }
+        }
+      },
+      "TrajectoryExternalReferenceAuditRequest": {
+        "required": [
+          "Scope"
+        ],
+        "type": "object",
+        "properties": {
+          "Scope": {
+            "$ref": "#/components/schemas/ExternalReferenceAuditScope"
+          },
+          "TrajectoryIDs": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "nullable": true
+          },
+          "Offset": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "Limit": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "TrajectoryExternalReferenceAuditResult": {
+        "type": "object",
+        "properties": {
+          "CheckedAtUtc": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "Total": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "Offset": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "Limit": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "ValidCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "InvalidCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "UnavailableCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "Items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TrajectoryExternalReferenceValidation"
+            },
+            "nullable": true
+          }
+        }
+      },
+      "TrajectoryExternalReferenceValidation": {
+        "type": "object",
+        "properties": {
+          "TrajectoryID": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "FieldID": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "ClusterID": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "WellID": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "WellBoreID": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "FieldExists": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "ClusterExists": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "WellExists": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "WellBoreExists": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "Status": {
+            "$ref": "#/components/schemas/ExternalReferenceValidationStatus"
+          },
+          "CheckedAtUtc": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "Issues": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ExternalReferenceIssue"
+            },
+            "nullable": true
+          }
+        }
+      },
+      "TrajectoryFeatureAssignment": {
+        "type": "object",
+        "properties": {
+          "ID": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "FeatureCategoryID": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "FeatureOptionID": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "FromDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "ToDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          }
+        }
+      },
+      "TrajectoryFeatureCategory": {
+        "type": "object",
+        "properties": {
+          "MetaInfo": {
+            "$ref": "#/components/schemas/MetaInfo"
+          },
+          "Name": {
+            "type": "string",
+            "nullable": true
+          },
+          "IsExclusive": {
+            "type": "boolean"
+          },
+          "HasValidityPeriod": {
+            "type": "boolean"
+          },
+          "Options": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TrajectoryFeatureOption"
+            },
+            "nullable": true
+          },
+          "CreationDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "LastModificationDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          }
+        }
+      },
+      "TrajectoryFeatureOption": {
+        "type": "object",
+        "properties": {
+          "ID": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "Name": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "TrajectoryIdentity": {
+        "type": "object",
+        "properties": {
+          "MetaInfo": {
+            "$ref": "#/components/schemas/MetaInfo"
+          },
+          "Name": {
+            "type": "string",
+            "nullable": true
+          },
+          "CreationDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "LastModificationDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          }
+        }
+      },
+      "TrajectoryIdentityAssignment": {
+        "type": "object",
+        "properties": {
+          "ID": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "IdentityID": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "Value": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "TrajectorySearchResult": {
+        "type": "object",
+        "properties": {
+          "Offset": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "Limit": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "TotalCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "Items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TrajectoryLight"
+            },
+            "nullable": true
+          }
+        }
       },
       "UsageStatisticsCartographicProjection": {
         "type": "object",

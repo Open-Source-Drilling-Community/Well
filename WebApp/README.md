@@ -25,6 +25,10 @@ The host reads these keys from appsettings or environment variables:
 - `FieldHostURL`
 - `RigHostURL`
 - `TrajectoryHostURL`
+
+For Kubernetes production, `TrajectoryHostURL` is
+`http://osdcdrillingtrajectoryservice/`; the reusable pages append
+`Trajectory/api/`.
 - `EarthCartographicProjectionHostURL`
 - `EarthGeodesyHostURL`
 - `EarthGravityHostURL`
