@@ -18608,7 +18608,7 @@ namespace OSDC.Drilling.Well.ModelShared
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>
-        /// Returns in-memory usage counters for this service replica. This operation is intentionally not exposed as an MCP tool.
+        /// Returns cumulative usage counters retained across service restarts. This operation is intentionally not exposed as an MCP tool.
         /// </summary>
         /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
