@@ -43,7 +43,8 @@ Development settings point to the shared development host. Production settings u
 The left navigation is grouped like Field and Cluster:
 
 - **Home**: Well-specific landing page and shortcuts to the main workflows.
-- **Well Management**: Well, backup/restore, Well Features, and Well Identities.
+- **Well Management**: Well, Well Features, and Well Identities.
+- **Import/Export**: collapsed group containing Backup / Restore.
 - **Survey Display**: Well Trajectories and Well Survey Runs.
 - **Contextual Data**: Cluster, Field, and Rig.
 - **Calculators**: cartographic conversion, vertical datum, gravity, and magnetic field.

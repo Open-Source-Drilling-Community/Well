@@ -7,7 +7,7 @@ namespace OSDC.Drilling.Well.Service.Mcp;
 
 internal static class McpActionResultConverter
 {
-    private static readonly JsonSerializerOptions SerializerOptions = new(JsonSerializerDefaults.Web);
+    private static readonly JsonSerializerOptions SerializerOptions = JsonSettings.Options;
 
     public static JsonObject FromActionResult<T>(ActionResult<T> actionResult)
     {
