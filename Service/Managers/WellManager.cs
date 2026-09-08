@@ -37,7 +37,7 @@ namespace OSDC.Drilling.Well.Service.Managers
             get
             {
                 int count = 0;
-                var connection = _connectionManager.GetConnection();
+                using var connection = _connectionManager.GetConnection();
                 if (connection != null)
                 {
                     var command = connection.CreateCommand();
@@ -65,7 +65,7 @@ namespace OSDC.Drilling.Well.Service.Managers
 
         public bool Clear()
         {
-            var connection = _connectionManager.GetConnection();
+            using var connection = _connectionManager.GetConnection();
             if (connection != null)
             {
                 bool success = false;
@@ -97,7 +97,7 @@ namespace OSDC.Drilling.Well.Service.Managers
         public bool Contains(Guid guid)
         {
             int count = 0;
-            var connection = _connectionManager.GetConnection();
+            using var connection = _connectionManager.GetConnection();
             if (connection != null)
             {
                 var command = connection.CreateCommand();
@@ -130,7 +130,7 @@ namespace OSDC.Drilling.Well.Service.Managers
         public List<Guid>? GetAllWellId()
         {
             List<Guid> ids = [];
-            var connection = _connectionManager.GetConnection();
+            using var connection = _connectionManager.GetConnection();
             if (connection != null)
             {
                 var command = connection.CreateCommand();
@@ -164,7 +164,7 @@ namespace OSDC.Drilling.Well.Service.Managers
         public List<MetaInfo?>? GetAllWellMetaInfo()
         {
             List<MetaInfo?> metaInfos = [];
-            var connection = _connectionManager.GetConnection();
+            using var connection = _connectionManager.GetConnection();
             if (connection != null)
             {
                 var command = connection.CreateCommand();
@@ -202,7 +202,7 @@ namespace OSDC.Drilling.Well.Service.Managers
         {
             if (!guid.Equals(Guid.Empty))
             {
-                var connection = _connectionManager.GetConnection();
+                using var connection = _connectionManager.GetConnection();
                 if (connection != null)
                 {
                     Model.Well? well;
@@ -253,7 +253,7 @@ namespace OSDC.Drilling.Well.Service.Managers
         public List<Model.Well?>? GetAllWell()
         {
             List<Model.Well?> vals = [];
-            var connection = _connectionManager.GetConnection();
+            using var connection = _connectionManager.GetConnection();
             if (connection != null)
             {
                 var command = connection.CreateCommand();
@@ -397,7 +397,7 @@ namespace OSDC.Drilling.Well.Service.Managers
             if (!clusterId.Equals(Guid.Empty))
             {
                 List<Guid> slotIDs = [];
-                var connection = _connectionManager.GetConnection();
+                using var connection = _connectionManager.GetConnection();
                 if (connection != null)
                 {
                     var command = connection.CreateCommand();
