@@ -54,6 +54,6 @@ public static class MslDepthReferenceUtils
         };
         ModelShared.MeanSeaLevelToWgs84Response response =
             await api.ClientEarthVerticalDatum.ConvertMeanSeaLevelToWgs84Async(request);
-        return response.Samples?.FirstOrDefault()?.Wgs84EllipsoidalDepth;
+        return -response.Samples?.FirstOrDefault()?.Wgs84EllipsoidalDepth;
     }
 }
