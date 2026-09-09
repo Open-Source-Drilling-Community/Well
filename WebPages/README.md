@@ -70,7 +70,7 @@ The page calls the typed `BatchExportWellsAsync` and `BatchRestoreWellsAsync` cl
 
 ## Context and reference integration
 
-Well edit, survey-run, and trajectory workflows use current Field, Cluster, Rig, and Earth Vertical Datum contracts to resolve position and depth references. The shared `Rotary table`/`RTE` choice is backed by `Rig.DrillFloorElevation` only when the Well's Cluster is a fixed platform with a valid Rig link. Field coordinate conversion uses the stateless `FieldCoordinateConversion/Forward` and `/Inverse` endpoints. The consuming host must configure reachable dependency services.
+Well edit, survey-run, and trajectory workflows use current Field, Cluster, Rig, and Earth Vertical Datum contracts to resolve position and depth references. The shared `Rotary table`/`RTE` choice is backed by the mean of `Rig.FixedPlatformProperties.DrillFloorDepth` only when the Well's Cluster is a fixed platform with a valid platform-Rig link. Field coordinate conversion uses the stateless `FieldCoordinateConversion/Forward` and `/Inverse` endpoints. The consuming host must configure reachable dependency services.
 
 ## Generated contracts
 

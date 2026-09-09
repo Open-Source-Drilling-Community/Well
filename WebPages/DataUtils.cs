@@ -65,7 +65,7 @@ public static class DataUtils
             if (cluster?.IsFixedPlatform == true && cluster.RigID is Guid rigId && rigId != Guid.Empty && rigs != null)
             {
                 RigReadResponse? rig = rigs.FirstOrDefault(item => item?.MetaInfo?.ID == rigId);
-                ApplyRotaryTableDepthWGS84(rig?.DrillFloorElevation);
+                ApplyRotaryTableDepthWGS84(rig?.FixedPlatformProperties?.DrillFloorDepth?.GaussianValue?.Mean);
             }
 
             UnitAndReferenceParameters.ClusterPositionReferenceSource.ClusterNorthPositionReference = -cluster?.ReferencePoint?.RiemannianNorth;
