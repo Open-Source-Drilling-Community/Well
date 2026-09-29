@@ -113,3 +113,7 @@ dotnet build WebApp\WebApp.csproj
 ```
 
 Warnings in unrelated legacy page code should not be mistaken for route or host-configuration errors; builds must still complete with zero errors.
+
+## SemanticCatalogue 0.8.0
+
+The host consumes regenerated clients from the SemanticCatalogue 0.8.0 contracts. Existing routes, configuration and persistence are unchanged.

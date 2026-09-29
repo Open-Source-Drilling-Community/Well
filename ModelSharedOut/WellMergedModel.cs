@@ -25235,6 +25235,9 @@ namespace OSDC.Drilling.Well.ModelShared
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.4.0.0 (NJsonSchema v11.3.2.0 (Newtonsoft.Json v13.0.0.0))")]
     public partial class MetaInfo
     {
+        /// <summary>
+        /// A UUID identifying a resource, nested object, catalogue definition, option or assignment in a declared ownership and type scope.
+        /// </summary>
 
         [System.Text.Json.Serialization.JsonPropertyName("ID")]
         public System.Guid ID { get; set; }
@@ -38214,22 +38217,45 @@ namespace OSDC.Drilling.Well.ModelShared
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.4.0.0 (NJsonSchema v11.3.2.0 (Newtonsoft.Json v13.0.0.0))")]
     public partial class RigJob
     {
+        /// <summary>
+        /// Stable UUID of this job within the containing WellBore history.
+        /// </summary>
 
         [System.Text.Json.Serialization.JsonPropertyName("RigJobID")]
         public System.Guid RigJobID { get; set; }
 
+        /// <summary>
+        /// UUID of the associated resource owned by the Rig service.
+        /// </summary>
+
         [System.Text.Json.Serialization.JsonPropertyName("RigID")]
         public System.Guid RigID { get; set; }
+
+        /// <summary>
+        /// A position on a time axis identified using a declared time scale and representation. Neither elapsed duration nor a calendar date alone. Reference: Coordinated Universal Time.
+        /// </summary>
 
         [System.Text.Json.Serialization.JsonPropertyName("StartDate")]
         public System.DateTimeOffset StartDate { get; set; }
 
+        /// <summary>
+        /// A position on a time axis identified using a declared time scale and representation. Neither elapsed duration nor a calendar date alone. Reference: Coordinated Universal Time.
+        /// </summary>
+
         [System.Text.Json.Serialization.JsonPropertyName("EndDate")]
         public System.DateTimeOffset? EndDate { get; set; }
+
+        /// <summary>
+        /// Discriminator identifying whether the authoritative drill-floor depth belongs to the referenced rig or to the rig-job entry.
+        /// </summary>
 
         [System.Text.Json.Serialization.JsonPropertyName("DrillFloorDepthSource")]
         [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
         public DrillFloorDepthSource DrillFloorDepthSource { get; set; }
+
+        /// <summary>
+        /// Vertical depth coordinate locating the drill floor relative to the declared vertical reference. GaussianValue.Mean is the expected value in SI metres (m), Relative to the WGS84 ellipsoid, positive downward. StandardDeviation is a non-negative standard uncertainty in SI metres (m); it has no coordinate origin. MinValue and MaxValue are provider domain-limit metadata in the mean's unit and reference, not confidence limits or instructions to truncate the Gaussian distribution.
+        /// </summary>
 
         [System.Text.Json.Serialization.JsonPropertyName("DrillFloorDepth")]
         public GaussianDrillingProperty DrillFloorDepth { get; set; }
@@ -38323,24 +38349,51 @@ namespace OSDC.Drilling.Well.ModelShared
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.4.0.0 (NJsonSchema v11.3.2.0 (Newtonsoft.Json v13.0.0.0))")]
     public partial class WellBore
     {
+        /// <summary>
+        /// Identity and service-location metadata accompanying a managed resource; a locator is not the semantic identity.
+        /// </summary>
 
         [System.Text.Json.Serialization.JsonPropertyName("MetaInfo")]
         public MetaInfo MetaInfo { get; set; }
 
+        /// <summary>
+        /// Human-readable name of a resource, definition or option; not necessarily unique or stable.
+        /// </summary>
+
         [System.Text.Json.Serialization.JsonPropertyName("Name")]
         public string Name { get; set; }
+
+        /// <summary>
+        /// Human-readable descriptive text about a resource.
+        /// </summary>
 
         [System.Text.Json.Serialization.JsonPropertyName("Description")]
         public string Description { get; set; }
 
+        /// <summary>
+        /// A position on a time axis identified using a declared time scale and representation. Neither elapsed duration nor a calendar date alone. Reference: Coordinated Universal Time.
+        /// </summary>
+
         [System.Text.Json.Serialization.JsonPropertyName("CreationDate")]
         public System.DateTimeOffset? CreationDate { get; set; }
+
+        /// <summary>
+        /// A position on a time axis identified using a declared time scale and representation. Neither elapsed duration nor a calendar date alone. Reference: Coordinated Universal Time.
+        /// </summary>
 
         [System.Text.Json.Serialization.JsonPropertyName("LastModificationDate")]
         public System.DateTimeOffset? LastModificationDate { get; set; }
 
+        /// <summary>
+        /// UUID of the referenced Well resource owned by the Well service.
+        /// </summary>
+
         [System.Text.Json.Serialization.JsonPropertyName("WellID")]
         public System.Guid? WellID { get; set; }
+
+        /// <summary>
+        /// UUID of the associated resource owned by the Rig service.
+        /// </summary>
 
         [System.Text.Json.Serialization.JsonPropertyName("RigID")]
         [System.Obsolete]
@@ -38349,11 +38402,23 @@ namespace OSDC.Drilling.Well.ModelShared
         [System.Text.Json.Serialization.JsonPropertyName("RigJobs")]
         public System.Collections.Generic.ICollection<RigJob> RigJobs { get; set; }
 
+        /// <summary>
+        /// Boolean declaration that a wellbore is a branch of a parent wellbore.
+        /// </summary>
+
         [System.Text.Json.Serialization.JsonPropertyName("IsSidetrack")]
         public bool IsSidetrack { get; set; }
 
+        /// <summary>
+        /// UUID of the referenced WellBore resource; ParentWellBoreID identifies the parent path for tie-in MD.
+        /// </summary>
+
         [System.Text.Json.Serialization.JsonPropertyName("ParentWellBoreID")]
         public System.Guid? ParentWellBoreID { get; set; }
+
+        /// <summary>
+        /// Measured-depth coordinate of a sidetrack tie-in on the parent wellbore path, expressed using that parent path's MD origin. GaussianValue.Mean is the expected value in SI metres (m), Along the parent wellbore identified by ParentWellBoreID, using the OSDC WGS84-referenced measured-depth convention; this is not a vertical depth. StandardDeviation is a non-negative standard uncertainty in SI metres (m); it has no coordinate origin. MinValue and MaxValue are provider domain-limit metadata in the mean's unit and reference, not confidence limits or instructions to truncate the Gaussian distribution.
+        /// </summary>
 
         [System.Text.Json.Serialization.JsonPropertyName("TieInPointAlongHoleDepth")]
         public GaussianDrillingProperty TieInPointAlongHoleDepth { get; set; }
@@ -38407,11 +38472,23 @@ namespace OSDC.Drilling.Well.ModelShared
         [System.Text.Json.Serialization.JsonPropertyName("Catalog")]
         public string Catalog { get; set; }
 
+        /// <summary>
+        /// Human-readable name of a resource, definition or option; not necessarily unique or stable.
+        /// </summary>
+
         [System.Text.Json.Serialization.JsonPropertyName("Name")]
         public string Name { get; set; }
 
+        /// <summary>
+        /// A UUID identifying a resource, nested object, catalogue definition, option or assignment in a declared ownership and type scope.
+        /// </summary>
+
         [System.Text.Json.Serialization.JsonPropertyName("SourceID")]
         public System.Guid SourceID { get; set; }
+
+        /// <summary>
+        /// A UUID identifying a resource, nested object, catalogue definition, option or assignment in a declared ownership and type scope.
+        /// </summary>
 
         [System.Text.Json.Serialization.JsonPropertyName("LocalID")]
         public System.Guid LocalID { get; set; }
@@ -38643,9 +38720,16 @@ namespace OSDC.Drilling.Well.ModelShared
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.4.0.0 (NJsonSchema v11.3.2.0 (Newtonsoft.Json v13.0.0.0))")]
     public partial class WellBoreDetailsUpdate
     {
+        /// <summary>
+        /// Human-readable name of a resource, definition or option; not necessarily unique or stable.
+        /// </summary>
 
         [System.Text.Json.Serialization.JsonPropertyName("Name")]
         public string Name { get; set; }
+
+        /// <summary>
+        /// Human-readable descriptive text about a resource.
+        /// </summary>
 
         [System.Text.Json.Serialization.JsonPropertyName("Description")]
         public string Description { get; set; }
@@ -38768,12 +38852,23 @@ namespace OSDC.Drilling.Well.ModelShared
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.4.0.0 (NJsonSchema v11.3.2.0 (Newtonsoft.Json v13.0.0.0))")]
     public partial class WellBoreExternalReferenceValidation
     {
+        /// <summary>
+        /// UUID of the referenced WellBore resource; ParentWellBoreID identifies the parent path for tie-in MD.
+        /// </summary>
 
         [System.Text.Json.Serialization.JsonPropertyName("WellBoreID")]
         public System.Guid WellBoreID { get; set; }
 
+        /// <summary>
+        /// UUID of the referenced Well resource owned by the Well service.
+        /// </summary>
+
         [System.Text.Json.Serialization.JsonPropertyName("WellID")]
         public System.Guid? WellID { get; set; }
+
+        /// <summary>
+        /// UUID of the associated resource owned by the Rig service.
+        /// </summary>
 
         [System.Text.Json.Serialization.JsonPropertyName("RigID")]
         public System.Guid? RigID { get; set; }
@@ -38823,18 +38918,37 @@ namespace OSDC.Drilling.Well.ModelShared
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.4.0.0 (NJsonSchema v11.3.2.0 (Newtonsoft.Json v13.0.0.0))")]
     public partial class WellBoreFeatureAssignment
     {
+        /// <summary>
+        /// A UUID identifying a resource, nested object, catalogue definition, option or assignment in a declared ownership and type scope.
+        /// </summary>
 
         [System.Text.Json.Serialization.JsonPropertyName("ID")]
         public System.Guid ID { get; set; }
 
+        /// <summary>
+        /// UUID of the selected category in the owning service catalogue.
+        /// </summary>
+
         [System.Text.Json.Serialization.JsonPropertyName("FeatureCategoryID")]
         public System.Guid? FeatureCategoryID { get; set; }
+
+        /// <summary>
+        /// UUID of an option belonging to the selected category.
+        /// </summary>
 
         [System.Text.Json.Serialization.JsonPropertyName("FeatureOptionID")]
         public System.Guid? FeatureOptionID { get; set; }
 
+        /// <summary>
+        /// A position on a time axis identified using a declared time scale and representation. Neither elapsed duration nor a calendar date alone. Reference: Coordinated Universal Time.
+        /// </summary>
+
         [System.Text.Json.Serialization.JsonPropertyName("FromDate")]
         public System.DateTimeOffset? FromDate { get; set; }
+
+        /// <summary>
+        /// A position on a time axis identified using a declared time scale and representation. Neither elapsed duration nor a calendar date alone. Reference: Coordinated Universal Time.
+        /// </summary>
 
         [System.Text.Json.Serialization.JsonPropertyName("ToDate")]
         public System.DateTimeOffset? ToDate { get; set; }
@@ -38853,15 +38967,30 @@ namespace OSDC.Drilling.Well.ModelShared
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.4.0.0 (NJsonSchema v11.3.2.0 (Newtonsoft.Json v13.0.0.0))")]
     public partial class WellBoreFeatureCategory
     {
+        /// <summary>
+        /// Identity and service-location metadata accompanying a managed resource; a locator is not the semantic identity.
+        /// </summary>
 
         [System.Text.Json.Serialization.JsonPropertyName("MetaInfo")]
         public MetaInfo MetaInfo { get; set; }
 
+        /// <summary>
+        /// Human-readable name of a resource, definition or option; not necessarily unique or stable.
+        /// </summary>
+
         [System.Text.Json.Serialization.JsonPropertyName("Name")]
         public string Name { get; set; }
 
+        /// <summary>
+        /// Boolean rule declaring that at most one category assignment may be active on a resource at the same instant.
+        /// </summary>
+
         [System.Text.Json.Serialization.JsonPropertyName("IsExclusive")]
         public bool IsExclusive { get; set; }
+
+        /// <summary>
+        /// Boolean rule indicating whether assignments in a category may carry validity bounds.
+        /// </summary>
 
         [System.Text.Json.Serialization.JsonPropertyName("HasValidityPeriod")]
         public bool HasValidityPeriod { get; set; }
@@ -38869,8 +38998,16 @@ namespace OSDC.Drilling.Well.ModelShared
         [System.Text.Json.Serialization.JsonPropertyName("Options")]
         public System.Collections.Generic.ICollection<WellBoreFeatureOption> Options { get; set; }
 
+        /// <summary>
+        /// A position on a time axis identified using a declared time scale and representation. Neither elapsed duration nor a calendar date alone. Reference: Coordinated Universal Time.
+        /// </summary>
+
         [System.Text.Json.Serialization.JsonPropertyName("CreationDate")]
         public System.DateTimeOffset? CreationDate { get; set; }
+
+        /// <summary>
+        /// A position on a time axis identified using a declared time scale and representation. Neither elapsed duration nor a calendar date alone. Reference: Coordinated Universal Time.
+        /// </summary>
 
         [System.Text.Json.Serialization.JsonPropertyName("LastModificationDate")]
         public System.DateTimeOffset? LastModificationDate { get; set; }
@@ -38889,9 +39026,16 @@ namespace OSDC.Drilling.Well.ModelShared
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.4.0.0 (NJsonSchema v11.3.2.0 (Newtonsoft.Json v13.0.0.0))")]
     public partial class WellBoreFeatureOption
     {
+        /// <summary>
+        /// A UUID identifying a resource, nested object, catalogue definition, option or assignment in a declared ownership and type scope.
+        /// </summary>
 
         [System.Text.Json.Serialization.JsonPropertyName("ID")]
         public System.Guid ID { get; set; }
+
+        /// <summary>
+        /// Human-readable name of a resource, definition or option; not necessarily unique or stable.
+        /// </summary>
 
         [System.Text.Json.Serialization.JsonPropertyName("Name")]
         public string Name { get; set; }
@@ -38910,15 +39054,30 @@ namespace OSDC.Drilling.Well.ModelShared
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.4.0.0 (NJsonSchema v11.3.2.0 (Newtonsoft.Json v13.0.0.0))")]
     public partial class WellBoreIdentity
     {
+        /// <summary>
+        /// Identity and service-location metadata accompanying a managed resource; a locator is not the semantic identity.
+        /// </summary>
 
         [System.Text.Json.Serialization.JsonPropertyName("MetaInfo")]
         public MetaInfo MetaInfo { get; set; }
 
+        /// <summary>
+        /// Human-readable name of a resource, definition or option; not necessarily unique or stable.
+        /// </summary>
+
         [System.Text.Json.Serialization.JsonPropertyName("Name")]
         public string Name { get; set; }
 
+        /// <summary>
+        /// A position on a time axis identified using a declared time scale and representation. Neither elapsed duration nor a calendar date alone. Reference: Coordinated Universal Time.
+        /// </summary>
+
         [System.Text.Json.Serialization.JsonPropertyName("CreationDate")]
         public System.DateTimeOffset? CreationDate { get; set; }
+
+        /// <summary>
+        /// A position on a time axis identified using a declared time scale and representation. Neither elapsed duration nor a calendar date alone. Reference: Coordinated Universal Time.
+        /// </summary>
 
         [System.Text.Json.Serialization.JsonPropertyName("LastModificationDate")]
         public System.DateTimeOffset? LastModificationDate { get; set; }
@@ -38937,12 +39096,23 @@ namespace OSDC.Drilling.Well.ModelShared
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.4.0.0 (NJsonSchema v11.3.2.0 (Newtonsoft.Json v13.0.0.0))")]
     public partial class WellBoreIdentityAssignment
     {
+        /// <summary>
+        /// A UUID identifying a resource, nested object, catalogue definition, option or assignment in a declared ownership and type scope.
+        /// </summary>
 
         [System.Text.Json.Serialization.JsonPropertyName("ID")]
         public System.Guid ID { get; set; }
 
+        /// <summary>
+        /// UUID of the selected identity definition in the owning service catalogue.
+        /// </summary>
+
         [System.Text.Json.Serialization.JsonPropertyName("IdentityID")]
         public System.Guid? IdentityID { get; set; }
+
+        /// <summary>
+        /// Value identifying a resource within a selected identification scheme; its interpretation and uniqueness depend on that scheme.
+        /// </summary>
 
         [System.Text.Json.Serialization.JsonPropertyName("Value")]
         public string Value { get; set; }
@@ -39039,9 +39209,16 @@ namespace OSDC.Drilling.Well.ModelShared
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.4.0.0 (NJsonSchema v11.3.2.0 (Newtonsoft.Json v13.0.0.0))")]
     public partial class WellBoreTopologyUpdate
     {
+        /// <summary>
+        /// UUID of the referenced Well resource owned by the Well service.
+        /// </summary>
 
         [System.Text.Json.Serialization.JsonPropertyName("WellID")]
         public System.Guid? WellID { get; set; }
+
+        /// <summary>
+        /// UUID of the associated resource owned by the Rig service.
+        /// </summary>
 
         [System.Text.Json.Serialization.JsonPropertyName("RigID")]
         [System.Obsolete]
@@ -39050,11 +39227,23 @@ namespace OSDC.Drilling.Well.ModelShared
         [System.Text.Json.Serialization.JsonPropertyName("RigJobs")]
         public System.Collections.Generic.ICollection<RigJob> RigJobs { get; set; }
 
+        /// <summary>
+        /// Boolean declaration that a wellbore is a branch of a parent wellbore.
+        /// </summary>
+
         [System.Text.Json.Serialization.JsonPropertyName("IsSidetrack")]
         public bool IsSidetrack { get; set; }
 
+        /// <summary>
+        /// UUID of the referenced WellBore resource; ParentWellBoreID identifies the parent path for tie-in MD.
+        /// </summary>
+
         [System.Text.Json.Serialization.JsonPropertyName("ParentWellBoreID")]
         public System.Guid? ParentWellBoreID { get; set; }
+
+        /// <summary>
+        /// Measured-depth coordinate of a sidetrack tie-in on the parent wellbore path, expressed using that parent path's MD origin. GaussianValue.Mean is the expected value in SI metres (m), Along the parent wellbore identified by ParentWellBoreID, using the OSDC WGS84-referenced measured-depth convention; this is not a vertical depth. StandardDeviation is a non-negative standard uncertainty in SI metres (m); it has no coordinate origin. MinValue and MaxValue are provider domain-limit metadata in the mean's unit and reference, not confidence limits or instructions to truncate the Gaussian distribution.
+        /// </summary>
 
         [System.Text.Json.Serialization.JsonPropertyName("TieInPointAlongHoleDepth")]
         [System.ComponentModel.DataAnnotations.Required]
@@ -39127,27 +39316,58 @@ namespace OSDC.Drilling.Well.ModelShared
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.4.0.0 (NJsonSchema v11.3.2.0 (Newtonsoft.Json v13.0.0.0))")]
     public partial class Well
     {
+        /// <summary>
+        /// Identity and service-location metadata accompanying a managed resource; a locator is not the semantic identity.
+        /// </summary>
 
         [System.Text.Json.Serialization.JsonPropertyName("MetaInfo")]
         public MetaInfo MetaInfo { get; set; }
 
+        /// <summary>
+        /// Human-readable name of a resource, definition or option; not necessarily unique or stable.
+        /// </summary>
+
         [System.Text.Json.Serialization.JsonPropertyName("Name")]
         public string Name { get; set; }
+
+        /// <summary>
+        /// Human-readable descriptive text about a resource.
+        /// </summary>
 
         [System.Text.Json.Serialization.JsonPropertyName("Description")]
         public string Description { get; set; }
 
+        /// <summary>
+        /// A position on a time axis identified using a declared time scale and representation. Neither elapsed duration nor a calendar date alone. Reference: Coordinated Universal Time.
+        /// </summary>
+
         [System.Text.Json.Serialization.JsonPropertyName("CreationDate")]
         public System.DateTimeOffset? CreationDate { get; set; }
+
+        /// <summary>
+        /// A position on a time axis identified using a declared time scale and representation. Neither elapsed duration nor a calendar date alone. Reference: Coordinated Universal Time.
+        /// </summary>
 
         [System.Text.Json.Serialization.JsonPropertyName("LastModificationDate")]
         public System.DateTimeOffset? LastModificationDate { get; set; }
 
+        /// <summary>
+        /// UUID of a Slot owned by the associated Cluster.
+        /// </summary>
+
         [System.Text.Json.Serialization.JsonPropertyName("SlotID")]
         public System.Guid? SlotID { get; set; }
 
+        /// <summary>
+        /// UUID of the associated Cluster service resource.
+        /// </summary>
+
         [System.Text.Json.Serialization.JsonPropertyName("ClusterID")]
         public System.Guid? ClusterID { get; set; }
+
+        /// <summary>
+        /// Boolean declaration that a cluster represents a single-well site rather than a multi-well grouping.
+        /// </summary>
 
         [System.Text.Json.Serialization.JsonPropertyName("IsSingleWell")]
         public bool IsSingleWell { get; set; }
@@ -39197,11 +39417,23 @@ namespace OSDC.Drilling.Well.ModelShared
         [System.Text.Json.Serialization.JsonPropertyName("Catalog")]
         public string Catalog { get; set; }
 
+        /// <summary>
+        /// Human-readable name of a resource, definition or option; not necessarily unique or stable.
+        /// </summary>
+
         [System.Text.Json.Serialization.JsonPropertyName("Name")]
         public string Name { get; set; }
 
+        /// <summary>
+        /// A UUID identifying a resource, nested object, catalogue definition, option or assignment in a declared ownership and type scope.
+        /// </summary>
+
         [System.Text.Json.Serialization.JsonPropertyName("SourceID")]
         public System.Guid SourceID { get; set; }
+
+        /// <summary>
+        /// A UUID identifying a resource, nested object, catalogue definition, option or assignment in a declared ownership and type scope.
+        /// </summary>
 
         [System.Text.Json.Serialization.JsonPropertyName("LocalID")]
         public System.Guid LocalID { get; set; }
@@ -39433,9 +39665,16 @@ namespace OSDC.Drilling.Well.ModelShared
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.4.0.0 (NJsonSchema v11.3.2.0 (Newtonsoft.Json v13.0.0.0))")]
     public partial class WellDetailsUpdate
     {
+        /// <summary>
+        /// Human-readable name of a resource, definition or option; not necessarily unique or stable.
+        /// </summary>
 
         [System.Text.Json.Serialization.JsonPropertyName("Name")]
         public string Name { get; set; }
+
+        /// <summary>
+        /// Human-readable descriptive text about a resource.
+        /// </summary>
 
         [System.Text.Json.Serialization.JsonPropertyName("Description")]
         public string Description { get; set; }
@@ -39558,12 +39797,23 @@ namespace OSDC.Drilling.Well.ModelShared
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.4.0.0 (NJsonSchema v11.3.2.0 (Newtonsoft.Json v13.0.0.0))")]
     public partial class WellExternalReferenceValidation
     {
+        /// <summary>
+        /// UUID of the referenced Well resource owned by the Well service.
+        /// </summary>
 
         [System.Text.Json.Serialization.JsonPropertyName("WellID")]
         public System.Guid WellID { get; set; }
 
+        /// <summary>
+        /// UUID of the associated Cluster service resource.
+        /// </summary>
+
         [System.Text.Json.Serialization.JsonPropertyName("ClusterID")]
         public System.Guid? ClusterID { get; set; }
+
+        /// <summary>
+        /// UUID of a Slot owned by the associated Cluster.
+        /// </summary>
 
         [System.Text.Json.Serialization.JsonPropertyName("SlotID")]
         public System.Guid? SlotID { get; set; }
@@ -39613,18 +39863,37 @@ namespace OSDC.Drilling.Well.ModelShared
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.4.0.0 (NJsonSchema v11.3.2.0 (Newtonsoft.Json v13.0.0.0))")]
     public partial class WellFeatureAssignment
     {
+        /// <summary>
+        /// A UUID identifying a resource, nested object, catalogue definition, option or assignment in a declared ownership and type scope.
+        /// </summary>
 
         [System.Text.Json.Serialization.JsonPropertyName("ID")]
         public System.Guid ID { get; set; }
 
+        /// <summary>
+        /// UUID of the selected category in the owning service catalogue.
+        /// </summary>
+
         [System.Text.Json.Serialization.JsonPropertyName("FeatureCategoryID")]
         public System.Guid? FeatureCategoryID { get; set; }
+
+        /// <summary>
+        /// UUID of an option belonging to the selected category.
+        /// </summary>
 
         [System.Text.Json.Serialization.JsonPropertyName("FeatureOptionID")]
         public System.Guid? FeatureOptionID { get; set; }
 
+        /// <summary>
+        /// A position on a time axis identified using a declared time scale and representation. Neither elapsed duration nor a calendar date alone. Reference: Coordinated Universal Time.
+        /// </summary>
+
         [System.Text.Json.Serialization.JsonPropertyName("FromDate")]
         public System.DateTimeOffset? FromDate { get; set; }
+
+        /// <summary>
+        /// A position on a time axis identified using a declared time scale and representation. Neither elapsed duration nor a calendar date alone. Reference: Coordinated Universal Time.
+        /// </summary>
 
         [System.Text.Json.Serialization.JsonPropertyName("ToDate")]
         public System.DateTimeOffset? ToDate { get; set; }
@@ -39643,15 +39912,30 @@ namespace OSDC.Drilling.Well.ModelShared
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.4.0.0 (NJsonSchema v11.3.2.0 (Newtonsoft.Json v13.0.0.0))")]
     public partial class WellFeatureCategory
     {
+        /// <summary>
+        /// Identity and service-location metadata accompanying a managed resource; a locator is not the semantic identity.
+        /// </summary>
 
         [System.Text.Json.Serialization.JsonPropertyName("MetaInfo")]
         public MetaInfo MetaInfo { get; set; }
 
+        /// <summary>
+        /// Human-readable name of a resource, definition or option; not necessarily unique or stable.
+        /// </summary>
+
         [System.Text.Json.Serialization.JsonPropertyName("Name")]
         public string Name { get; set; }
 
+        /// <summary>
+        /// Boolean rule declaring that at most one category assignment may be active on a resource at the same instant.
+        /// </summary>
+
         [System.Text.Json.Serialization.JsonPropertyName("IsExclusive")]
         public bool IsExclusive { get; set; }
+
+        /// <summary>
+        /// Boolean rule indicating whether assignments in a category may carry validity bounds.
+        /// </summary>
 
         [System.Text.Json.Serialization.JsonPropertyName("HasValidityPeriod")]
         public bool HasValidityPeriod { get; set; }
@@ -39659,8 +39943,16 @@ namespace OSDC.Drilling.Well.ModelShared
         [System.Text.Json.Serialization.JsonPropertyName("Options")]
         public System.Collections.Generic.ICollection<WellFeatureOption> Options { get; set; }
 
+        /// <summary>
+        /// A position on a time axis identified using a declared time scale and representation. Neither elapsed duration nor a calendar date alone. Reference: Coordinated Universal Time.
+        /// </summary>
+
         [System.Text.Json.Serialization.JsonPropertyName("CreationDate")]
         public System.DateTimeOffset? CreationDate { get; set; }
+
+        /// <summary>
+        /// A position on a time axis identified using a declared time scale and representation. Neither elapsed duration nor a calendar date alone. Reference: Coordinated Universal Time.
+        /// </summary>
 
         [System.Text.Json.Serialization.JsonPropertyName("LastModificationDate")]
         public System.DateTimeOffset? LastModificationDate { get; set; }
@@ -39679,9 +39971,16 @@ namespace OSDC.Drilling.Well.ModelShared
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.4.0.0 (NJsonSchema v11.3.2.0 (Newtonsoft.Json v13.0.0.0))")]
     public partial class WellFeatureOption
     {
+        /// <summary>
+        /// A UUID identifying a resource, nested object, catalogue definition, option or assignment in a declared ownership and type scope.
+        /// </summary>
 
         [System.Text.Json.Serialization.JsonPropertyName("ID")]
         public System.Guid ID { get; set; }
+
+        /// <summary>
+        /// Human-readable name of a resource, definition or option; not necessarily unique or stable.
+        /// </summary>
 
         [System.Text.Json.Serialization.JsonPropertyName("Name")]
         public string Name { get; set; }
@@ -39700,15 +39999,30 @@ namespace OSDC.Drilling.Well.ModelShared
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.4.0.0 (NJsonSchema v11.3.2.0 (Newtonsoft.Json v13.0.0.0))")]
     public partial class WellIdentity
     {
+        /// <summary>
+        /// Identity and service-location metadata accompanying a managed resource; a locator is not the semantic identity.
+        /// </summary>
 
         [System.Text.Json.Serialization.JsonPropertyName("MetaInfo")]
         public MetaInfo MetaInfo { get; set; }
 
+        /// <summary>
+        /// Human-readable name of a resource, definition or option; not necessarily unique or stable.
+        /// </summary>
+
         [System.Text.Json.Serialization.JsonPropertyName("Name")]
         public string Name { get; set; }
 
+        /// <summary>
+        /// A position on a time axis identified using a declared time scale and representation. Neither elapsed duration nor a calendar date alone. Reference: Coordinated Universal Time.
+        /// </summary>
+
         [System.Text.Json.Serialization.JsonPropertyName("CreationDate")]
         public System.DateTimeOffset? CreationDate { get; set; }
+
+        /// <summary>
+        /// A position on a time axis identified using a declared time scale and representation. Neither elapsed duration nor a calendar date alone. Reference: Coordinated Universal Time.
+        /// </summary>
 
         [System.Text.Json.Serialization.JsonPropertyName("LastModificationDate")]
         public System.DateTimeOffset? LastModificationDate { get; set; }
@@ -39727,12 +40041,23 @@ namespace OSDC.Drilling.Well.ModelShared
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.4.0.0 (NJsonSchema v11.3.2.0 (Newtonsoft.Json v13.0.0.0))")]
     public partial class WellIdentityAssignment
     {
+        /// <summary>
+        /// A UUID identifying a resource, nested object, catalogue definition, option or assignment in a declared ownership and type scope.
+        /// </summary>
 
         [System.Text.Json.Serialization.JsonPropertyName("ID")]
         public System.Guid ID { get; set; }
 
+        /// <summary>
+        /// UUID of the selected identity definition in the owning service catalogue.
+        /// </summary>
+
         [System.Text.Json.Serialization.JsonPropertyName("IdentityID")]
         public System.Guid? IdentityID { get; set; }
+
+        /// <summary>
+        /// Value identifying a resource within a selected identification scheme; its interpretation and uniqueness depend on that scheme.
+        /// </summary>
 
         [System.Text.Json.Serialization.JsonPropertyName("Value")]
         public string Value { get; set; }
@@ -39751,12 +40076,23 @@ namespace OSDC.Drilling.Well.ModelShared
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.4.0.0 (NJsonSchema v11.3.2.0 (Newtonsoft.Json v13.0.0.0))")]
     public partial class WellLocationUpdate
     {
+        /// <summary>
+        /// UUID of the associated Cluster service resource.
+        /// </summary>
 
         [System.Text.Json.Serialization.JsonPropertyName("ClusterID")]
         public System.Guid? ClusterID { get; set; }
 
+        /// <summary>
+        /// UUID of a Slot owned by the associated Cluster.
+        /// </summary>
+
         [System.Text.Json.Serialization.JsonPropertyName("SlotID")]
         public System.Guid? SlotID { get; set; }
+
+        /// <summary>
+        /// Boolean declaration that a cluster represents a single-well site rather than a multi-well grouping.
+        /// </summary>
 
         [System.Text.Json.Serialization.JsonPropertyName("IsSingleWell")]
         public bool IsSingleWell { get; set; }

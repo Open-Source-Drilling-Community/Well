@@ -159,3 +159,7 @@ CORS is permissive and the service has no built-in authentication or authorizati
 ResourceClassification 0.1.0 supplies identity and feature models through Model. Exclusive assignment validation reuses `ClassificationValidation.IntervalsOverlap`: endpoints are inclusive, null bounds are unbounded, and equal instants with different offsets overlap. Existing required-reference, validity, unique-ID, concurrency and catalogue-deletion rules and error envelopes remain service-owned and unchanged.
 
 The complete exported OpenAPI document was verified equal before and after this migration, and equal to the checked-in schema. REST/MCP payloads and database schemas therefore remain unchanged. Rebuild the Service image to include the published package; no database conversion or reseeding is required.
+
+## SemanticCatalogue 0.8.0
+
+`SemanticSchemaFilter` and the MCP schema builders use the same model/provider registry with SemanticCatalogue 0.8.0. `x-osdc-semantic` contains the concept, catalogue version, curation status, and applicable role, reference and physical quantity. Annotations apply to resource, catalogue, assignment, batch and granular-update contracts. Existing routes, tool names, validation and persistence remain unchanged.

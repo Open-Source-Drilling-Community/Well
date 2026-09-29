@@ -92,3 +92,7 @@ DocFX configuration is available in `Model/docfx.json`; `Model/api` and `Model/a
 `WellIdentity`, `WellIdentityAssignment`, `WellFeatureCategory`, `WellFeatureOption` and `WellFeatureAssignment` inherit their implementations from the published `OSDC.DotnetLibraries.General.ResourceClassification` 0.1.0 NuGet. The package reference is unconditional. `WellFeatureCategory` uses `FeatureCategory<WellFeatureOption>`, retaining concrete mutable options and the existing `IFeatureCategory` adapter. DataManagement 2.2.0 remains the owner of `MetaInfo` and the classification interfaces.
 
 Property names, nullability, timestamps and caller-assigned IDs retain their serialized shape. Constructors do not generate IDs or timestamps. Model contract tests round-trip existing JSON and exercise the interface adapter. The service continues to own catalogue contents, persistence and validation.
+
+## SemanticCatalogue 0.8.0
+
+`OSDC.DotnetLibraries.Drilling.SemanticCatalogue` 0.8.0 supplies the reviewed vocabulary. Local model attributes bind service-owned types and properties; `ProviderSemantics` binds inherited ResourceClassification 0.1.0 members and shared metadata without redefining those package-owned types. Resource identifiers remain UUIDs. Creation/modification timestamps and classification validity endpoints use UTC instant semantics; classification validity retains its inclusive endpoints.

@@ -83,3 +83,7 @@ dotnet build WebPages\WebPages.csproj
 ```
 
 `GeneratePackageOnBuild` is enabled, so the NuGet package is written under `WebPages/bin/<configuration>`. The package includes this README and static web assets.
+
+## SemanticCatalogue 0.8.0
+
+The generated client now comes from contracts annotated with SemanticCatalogue 0.8.0. These annotations do not add payload fields or change classification editing workflows.

@@ -1,3 +1,4 @@
+using OSDC.DotnetLibraries.Drilling.SemanticCatalogue;
 using System.Text.Json.Serialization;
 
 namespace OSDC.Drilling.Well.Model;
@@ -6,8 +7,10 @@ namespace OSDC.Drilling.Well.Model;
 public sealed class WellDetailsUpdate
 {
     [JsonRequired]
+    [Semantic(Concepts.ResourceName)]
     public string? Name { get; set; }
 
     [JsonRequired]
+    [Semantic(Concepts.ResourceDescription)]
     public string? Description { get; set; }
 }

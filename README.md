@@ -110,3 +110,7 @@ Authentication and authorization are not enabled by default. SQLite data is not 
 ## Shared resource classification
 
 Identity definitions/assignments and feature categories/options/assignments use `OSDC.DotnetLibraries.General.ResourceClassification` **0.1.0**, with DataManagement **2.2.0** retaining the interfaces and `MetaInfo`. The service-specific `Well*` type names remain thin derived classes. Existing JSON, catalogue UUIDs, database tables, REST/MCP routes and validation responses are preserved; no data migration is needed for this package adoption.
+
+## SemanticCatalogue 0.8.0
+
+The Well model uses `OSDC.DotnetLibraries.Drilling.SemanticCatalogue` 0.8.0. REST/OpenAPI and MCP expose reviewed concept bindings, identifiers, roles and references through `x-osdc-semantic`. This adds contract metadata without changing stored JSON or requiring a database migration.

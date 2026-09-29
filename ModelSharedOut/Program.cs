@@ -155,7 +155,8 @@ class Program
 
                         // Reading locally stored dependencies
                         IEnumerable<string> files = Directory.EnumerateFiles(jsonInputsDirectory, "*.json")
-                            .OrderBy(path => Path.GetFileName(path), StringComparer.OrdinalIgnoreCase);
+                            .OrderBy(path => string.Equals(Path.GetFileName(path), "WellFullName.json", StringComparison.OrdinalIgnoreCase) ? 1 : 0)
+                            .ThenBy(path => Path.GetFileName(path), StringComparer.OrdinalIgnoreCase);
                         foreach (string file in files)
                         {
                             PrettyPrint(file, "Processing Open Api doc into API client...");

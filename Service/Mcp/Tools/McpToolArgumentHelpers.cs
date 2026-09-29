@@ -1,3 +1,4 @@
+using Model = OSDC.Drilling.Well.Model;
 using System;
 using System.Text.Json.Nodes;
 
@@ -105,7 +106,7 @@ internal static class McpToolArgumentHelpers
     {
         JsonObject schema = CreateTimestampedIdSchema("id", "Identifier of the Well to mutate.");
         JsonObject properties = (JsonObject)schema["properties"]!;
-        properties[bodyName] = body;
+        properties[bodyName] = Model.ProviderSemantics.Annotate(body, bodyName == "details" ? typeof(Model.WellDetailsUpdate) : typeof(Model.WellLocationUpdate));
         ((JsonArray)schema["required"]!).Add(bodyName);
         return schema;
     }
@@ -235,7 +236,9 @@ internal static class McpToolArgumentHelpers
         ["additionalProperties"] = false
     });
 
-    private static JsonObject CreateWellExternalReferenceValidationSchema() => new()
+    private static JsonObject CreateWellExternalReferenceValidationSchema() => Model.ProviderSemantics.Annotate(CreateWellExternalReferenceValidationSchemaRaw(), typeof(Model.WellExternalReferenceValidation));
+
+    private static JsonObject CreateWellExternalReferenceValidationSchemaRaw() => new()
     {
         ["type"] = "object",
         ["properties"] = new JsonObject
@@ -313,7 +316,9 @@ internal static class McpToolArgumentHelpers
         BatchDocument
     }
 
-    private static JsonObject CreateWellObjectSchema(WellSchemaKind kind)
+    private static JsonObject CreateWellObjectSchema(WellSchemaKind kind) => Model.ProviderSemantics.Annotate(CreateWellObjectSchemaRaw(kind), typeof(Model.Well));
+
+    private static JsonObject CreateWellObjectSchemaRaw(WellSchemaKind kind)
     {
         bool response = kind == WellSchemaKind.Response;
         bool mutationInput = kind is WellSchemaKind.CreateInput or WellSchemaKind.UpdateInput;
@@ -357,7 +362,9 @@ internal static class McpToolArgumentHelpers
         };
     }
 
-    private static JsonObject CreateMetaInfoSchema() => new()
+    private static JsonObject CreateMetaInfoSchema() => Model.ProviderSemantics.Annotate(CreateMetaInfoSchemaRaw(), typeof(OSDC.DotnetLibraries.General.DataManagement.MetaInfo));
+
+    private static JsonObject CreateMetaInfoSchemaRaw() => new()
     {
         ["type"] = "object",
         ["description"] = "Identity and optional HTTP location metadata for the well.",
@@ -435,7 +442,9 @@ internal static class McpToolArgumentHelpers
         ["additionalProperties"] = false
     });
 
-    private static JsonObject CreateBatchDocumentSchema(int minimumWells) => new()
+    private static JsonObject CreateBatchDocumentSchema(int minimumWells) => Model.ProviderSemantics.Annotate(CreateBatchDocumentSchemaRaw(minimumWells), typeof(Model.WellBatchExportDocument));
+
+    private static JsonObject CreateBatchDocumentSchemaRaw(int minimumWells) => new()
     {
         ["type"] = "object",
         ["properties"] = new JsonObject
@@ -465,7 +474,9 @@ internal static class McpToolArgumentHelpers
         ["required"] = new JsonArray("request"), ["additionalProperties"] = false
     };
 
-    private static JsonObject CreateIdentityDefinitionSchema() => new()
+    private static JsonObject CreateIdentityDefinitionSchema() => Model.ProviderSemantics.Annotate(CreateIdentityDefinitionSchemaRaw(), typeof(Model.WellIdentity));
+
+    private static JsonObject CreateIdentityDefinitionSchemaRaw() => new()
     {
         ["type"] = "object", ["properties"] = new JsonObject
         {
@@ -475,7 +486,9 @@ internal static class McpToolArgumentHelpers
         ["required"] = new JsonArray("MetaInfo", "Name"), ["additionalProperties"] = false
     };
 
-    private static JsonObject CreateFeatureCategorySchema() => new()
+    private static JsonObject CreateFeatureCategorySchema() => Model.ProviderSemantics.Annotate(CreateFeatureCategorySchemaRaw(), typeof(Model.WellFeatureCategory));
+
+    private static JsonObject CreateFeatureCategorySchemaRaw() => new()
     {
         ["type"] = "object", ["properties"] = new JsonObject
         {
@@ -513,7 +526,9 @@ internal static class McpToolArgumentHelpers
         };
     }
 
-    private static JsonObject CreateIdentityAssignmentSchema() => new()
+    private static JsonObject CreateIdentityAssignmentSchema() => Model.ProviderSemantics.Annotate(CreateIdentityAssignmentSchemaRaw(), typeof(Model.WellIdentityAssignment));
+
+    private static JsonObject CreateIdentityAssignmentSchemaRaw() => new()
     {
         ["type"] = "object", ["properties"] = new JsonObject
         {
@@ -523,7 +538,9 @@ internal static class McpToolArgumentHelpers
         }, ["required"] = new JsonArray("ID", "IdentityID", "Value"), ["additionalProperties"] = false
     };
 
-    private static JsonObject CreateFeatureAssignmentSchema() => new()
+    private static JsonObject CreateFeatureAssignmentSchema() => Model.ProviderSemantics.Annotate(CreateFeatureAssignmentSchemaRaw(), typeof(Model.WellFeatureAssignment));
+
+    private static JsonObject CreateFeatureAssignmentSchemaRaw() => new()
     {
         ["type"] = "object", ["properties"] = new JsonObject
         {
