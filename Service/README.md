@@ -153,3 +153,9 @@ A Debug build runs the `CreateSwaggerJson` target and writes `ModelSharedOut/jso
 ## Security
 
 CORS is permissive and the service has no built-in authentication or authorization. Protect REST, Swagger, MCP, SQLite storage, and backups through deployment-level controls.
+
+## Shared classification implementation
+
+ResourceClassification 0.1.0 supplies identity and feature models through Model. Exclusive assignment validation reuses `ClassificationValidation.IntervalsOverlap`: endpoints are inclusive, null bounds are unbounded, and equal instants with different offsets overlap. Existing required-reference, validity, unique-ID, concurrency and catalogue-deletion rules and error envelopes remain service-owned and unchanged.
+
+The complete exported OpenAPI document was verified equal before and after this migration, and equal to the checked-in schema. REST/MCP payloads and database schemas therefore remain unchanged. Rebuild the Service image to include the published package; no database conversion or reseeding is required.

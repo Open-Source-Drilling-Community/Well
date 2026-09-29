@@ -106,3 +106,7 @@ The two MCP HTTP tests require a running service at `http://localhost:8080/well/
 ## Security
 
 Authentication and authorization are not enabled by default. SQLite data is not encrypted by the service. Protect the API, WebApp, MCP endpoints, backups, and persistent volume through ingress, identity, network, and storage controls appropriate to the deployment.
+
+## Shared resource classification
+
+Identity definitions/assignments and feature categories/options/assignments use `OSDC.DotnetLibraries.General.ResourceClassification` **0.1.0**, with DataManagement **2.2.0** retaining the interfaces and `MetaInfo`. The service-specific `Well*` type names remain thin derived classes. Existing JSON, catalogue UUIDs, database tables, REST/MCP routes and validation responses are preserved; no data migration is needed for this package adoption.

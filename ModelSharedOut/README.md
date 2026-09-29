@@ -50,3 +50,7 @@ git diff --check
 ```
 
 Regenerate whenever REST routes or request/response models change. Pure MCP schema changes do not alter the OpenAPI-generated client because MCP tools are registered outside the REST controller surface.
+
+## ResourceClassification 0.1.0 migration verification
+
+The service-specific classification types now inherit shared implementations. A fresh Service OpenAPI export was compared with the pre-migration export and this generator's checked-in service input: all paths and schemas are identical. Existing merged contracts and generated clients remain valid, so no generated source changes are required for this implementation-only migration.

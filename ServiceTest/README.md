@@ -32,3 +32,7 @@ dotnet test ServiceTest\ServiceTest.csproj
 ```
 
 Stop the service after the tests. Test databases are created under the test working directory; production data is not modified.
+
+## Shared classification regression checks
+
+The ResourceClassification 0.1.0 adoption is covered by ModelTest/ClassificationContractTests (stored JSON compatibility, nullable references, concrete options and interface conversion), plus the existing isolated catalogue, backup/restore, database safety and MCP registration tests. Live HTTP tests require a separately started test service. Well's optional Kubernetes-backup test skips when no local backup snapshots are available.

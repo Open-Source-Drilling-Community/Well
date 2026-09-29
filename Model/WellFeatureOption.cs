@@ -1,25 +1,8 @@
-using OSDC.DotnetLibraries.General.DataManagement;
-using System;
+using OSDC.DotnetLibraries.General.ResourceClassification;
 
-namespace OSDC.Drilling.Well.Model
+namespace OSDC.Drilling.Well.Model;
+
+/// <summary>Well FeatureOption contract backed by the shared resource classification implementation.</summary>
+public class WellFeatureOption : FeatureOption
 {
-    public class WellFeatureOption : IFeatureOption
-    {
-        /// <summary>
-        /// stable identifier for the option inside its category
-        /// </summary>
-        public Guid ID { get; set; }
-
-        /// <summary>
-        /// user-defined name of the option
-        /// </summary>
-        public string? Name { get; set; }
-
-        /// <summary>
-        /// default constructor required for JSON serialization
-        /// </summary>
-        public WellFeatureOption() : base()
-        {
-        }
-    }
 }
