@@ -50,3 +50,5 @@ git diff --check
 ```
 
 Regenerate whenever REST routes or request/response models change. Pure MCP schema changes do not alter the OpenAPI-generated client because MCP tools are registered outside the REST controller surface.
+
+`ClientJsonSerializerSettings.cs` is a maintained partial-client extension, not generated output. It registers `JsonStringEnumConverter` because NSwag does not attach an item converter to arrays of string enums such as `StationKeepingSystem.Modes`. Keep it linked into WebPages when regenerating `WellMergedModel.cs`.

@@ -76,6 +76,8 @@ Well edit, survey-run, and trajectory workflows use current Field, Cluster, Rig,
 
 The project compiles `../ModelSharedOut/WellMergedModel.cs` as a linked source file. After REST contract changes, regenerate it using [../ModelSharedOut/README.md](../ModelSharedOut/README.md) before building or packaging WebPages.
 
+The generated client is accompanied by `../ModelSharedOut/ClientJsonSerializerSettings.cs`, which preserves OpenAPI string-enum semantics for enum collections in dependency responses, including Rig station-keeping modes.
+
 ## Build and package
 
 ```powershell
