@@ -113,3 +113,15 @@ dotnet build WebApp\WebApp.csproj
 ```
 
 Warnings in unrelated legacy page code should not be mistaken for route or host-configuration errors; builds must still complete with zero errors.
+
+## SemanticCatalogue 0.9.0
+
+The host consumes regenerated clients from the SemanticCatalogue 0.9.0 contracts. Existing routes, configuration and persistence are unchanged.
+
+
+## Canonical reference adoption (0.9.0)
+
+The provider registry uses the shared SemanticMetadata.Create factory and OSDC canonical drilling profile. A contradictory explicit reference fails. Along-hole and vertical coordinates have distinct references; uncertainties remain origin-free. Publish SemanticCatalogue 0.9.0 before CI or Docker restore. Local verification uses a packed 0.9.0 package without a permanent local-feed configuration.
+
+
+Canonical reference metadata describes storage and REST/MCP payloads (`referenceScope: canonical-storage-and-api`), not a restriction on display choices (`presentationReferencesAllowed: true`). Web editors convert between the canonical reference and the supported reference selected by the user. Reference changes apply to coordinate values, not their standard uncertainties.

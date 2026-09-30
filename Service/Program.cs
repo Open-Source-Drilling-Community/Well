@@ -29,6 +29,7 @@ builder.Services.AddControllers()
 builder.Services.AddSwaggerGen(config =>
 {
     config.CustomSchemaIds(type => type.FullName);
+    config.SchemaFilter<SemanticSchemaFilter>();
 });
 
 builder.Services.Configure<McpHubOptions>(builder.Configuration.GetSection(McpHubOptions.SectionName));

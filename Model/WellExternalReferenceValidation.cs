@@ -1,3 +1,4 @@
+using OSDC.DotnetLibraries.Drilling.SemanticCatalogue;
 using System;
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
@@ -20,8 +21,11 @@ public sealed class WellExternalReferenceIssue
 
 public sealed class WellExternalReferenceValidation
 {
+    [Semantic(Concepts.ResourceIdentifier)]
     public Guid WellID { get; set; }
+    [Semantic(Concepts.ResourceIdentifier)]
     public Guid? ClusterID { get; set; }
+    [Semantic(Concepts.ResourceIdentifier)]
     public Guid? SlotID { get; set; }
     public bool? ClusterExists { get; set; }
     public bool? SlotBelongsToCluster { get; set; }

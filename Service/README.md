@@ -153,3 +153,21 @@ A Debug build runs the `CreateSwaggerJson` target and writes `ModelSharedOut/jso
 ## Security
 
 CORS is permissive and the service has no built-in authentication or authorization. Protect REST, Swagger, MCP, SQLite storage, and backups through deployment-level controls.
+
+## Shared classification implementation
+
+ResourceClassification 0.1.0 supplies identity and feature models through Model. Exclusive assignment validation reuses `ClassificationValidation.IntervalsOverlap`: endpoints are inclusive, null bounds are unbounded, and equal instants with different offsets overlap. Existing required-reference, validity, unique-ID, concurrency and catalogue-deletion rules and error envelopes remain service-owned and unchanged.
+
+The complete exported OpenAPI document was verified equal before and after this migration, and equal to the checked-in schema. REST/MCP payloads and database schemas therefore remain unchanged. Rebuild the Service image to include the published package; no database conversion or reseeding is required.
+
+## SemanticCatalogue 0.9.0
+
+`SemanticSchemaFilter` and the MCP schema builders use the same model/provider registry with SemanticCatalogue 0.9.0. `x-osdc-semantic` contains the concept, catalogue version, curation status, and applicable role, reference and physical quantity. Annotations apply to resource, catalogue, assignment, batch and granular-update contracts. Existing routes, tool names, validation and persistence remain unchanged.
+
+
+## Canonical reference adoption (0.9.0)
+
+The provider registry uses the shared SemanticMetadata.Create factory and OSDC canonical drilling profile. A contradictory explicit reference fails. Along-hole and vertical coordinates have distinct references; uncertainties remain origin-free. Publish SemanticCatalogue 0.9.0 before CI or Docker restore. Local verification uses a packed 0.9.0 package without a permanent local-feed configuration.
+
+
+Canonical reference metadata describes storage and REST/MCP payloads (`referenceScope: canonical-storage-and-api`), not a restriction on display choices (`presentationReferencesAllowed: true`). Web editors convert between the canonical reference and the supported reference selected by the user. Reference changes apply to coordinate values, not their standard uncertainties.
