@@ -21,6 +21,7 @@ The package also contains `ScatterPlot`, `Scatter3DPlot`, `MslDepthReferenceUtil
 
 The Field, Cluster, and Well selectors on both trajectory and survey-run pages show every applicable item when empty and support case-insensitive substring filtering while typing.
 Their shared unit/reference control also converts plotted North/East coordinates between WGS84, the selected Field reference point, the selected Cluster reference point, the selected Well-head slot, and the owning Field's cartographic projection. WGS84 metres remain the canonical wire values.
+Uncertainty overlays use the Trajectory service's resource-specific ellipse routes so tied and sidetrack Wolff-de Wardt ancestry is reconstructed before display.
 
 ## Host requirements
 
@@ -86,14 +87,14 @@ dotnet build WebPages\WebPages.csproj
 
 `GeneratePackageOnBuild` is enabled, so the NuGet package is written under `WebPages/bin/<configuration>`. The package includes this README and static web assets.
 
-## SemanticCatalogue 0.9.0
+## SemanticCatalogue 0.15.0
 
-The generated client now comes from contracts annotated with SemanticCatalogue 0.9.0. These annotations do not add payload fields or change classification editing workflows.
+The owning Model now consumes SemanticCatalogue 0.15.0. Semantic annotations do not add payload fields or change classification editing workflows in the generated client.
 
 
 ## Canonical reference adoption (0.9.0)
 
-The provider registry uses the shared SemanticMetadata.Create factory and OSDC canonical drilling profile. A contradictory explicit reference fails. Along-hole and vertical coordinates have distinct references; uncertainties remain origin-free. Publish SemanticCatalogue 0.9.0 before CI or Docker restore. Local verification uses a packed 0.9.0 package without a permanent local-feed configuration.
+The provider registry uses the shared SemanticMetadata.Create factory and OSDC canonical drilling profile. A contradictory explicit reference fails. Along-hole and vertical coordinates have distinct references; uncertainties remain origin-free. SemanticCatalogue 0.15.0 is consumed from NuGet; no local-project or local-feed fallback is required.
 
 
 Canonical reference metadata describes storage and REST/MCP payloads (`referenceScope: canonical-storage-and-api`), not a restriction on display choices (`presentationReferencesAllowed: true`). Web editors convert between the canonical reference and the supported reference selected by the user. Reference changes apply to coordinate values, not their standard uncertainties.

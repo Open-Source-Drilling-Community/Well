@@ -111,14 +111,14 @@ Authentication and authorization are not enabled by default. SQLite data is not 
 
 Identity definitions/assignments and feature categories/options/assignments use `OSDC.DotnetLibraries.General.ResourceClassification` **0.1.0**, with DataManagement **2.2.0** retaining the interfaces and `MetaInfo`. The service-specific `Well*` type names remain thin derived classes. Existing JSON, catalogue UUIDs, database tables, REST/MCP routes and validation responses are preserved; no data migration is needed for this package adoption.
 
-## SemanticCatalogue 0.9.0
+## SemanticCatalogue 0.15.0
 
-The Well model uses `OSDC.DotnetLibraries.Drilling.SemanticCatalogue` 0.9.0. REST/OpenAPI and MCP expose reviewed concept bindings, identifiers, roles and references through `x-osdc-semantic`. This adds contract metadata without changing stored JSON or requiring a database migration.
+The Well model uses `OSDC.DotnetLibraries.Drilling.SemanticCatalogue` 0.15.0. REST/OpenAPI and MCP expose reviewed concept bindings, identifiers, roles and references through `x-osdc-semantic`. This adds contract metadata without changing stored JSON or requiring a database migration.
 
 
 ## Canonical reference adoption (0.9.0)
 
-The provider registry uses the shared SemanticMetadata.Create factory and OSDC canonical drilling profile. A contradictory explicit reference fails. Along-hole and vertical coordinates have distinct references; uncertainties remain origin-free. Publish SemanticCatalogue 0.9.0 before CI or Docker restore. Local verification uses a packed 0.9.0 package without a permanent local-feed configuration.
+The provider registry uses the shared SemanticMetadata.Create factory and OSDC canonical drilling profile. A contradictory explicit reference fails. Along-hole and vertical coordinates have distinct references; uncertainties remain origin-free. SemanticCatalogue 0.15.0 is consumed from NuGet; no local-project or local-feed fallback is required.
 
 
 Canonical reference metadata describes storage and REST/MCP payloads (`referenceScope: canonical-storage-and-api`), not a restriction on display choices (`presentationReferencesAllowed: true`). Web editors convert between the canonical reference and the supported reference selected by the user. Reference changes apply to coordinate values, not their standard uncertainties.
