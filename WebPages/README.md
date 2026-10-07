@@ -87,14 +87,14 @@ dotnet build WebPages\WebPages.csproj
 
 `GeneratePackageOnBuild` is enabled, so the NuGet package is written under `WebPages/bin/<configuration>`. The package includes this README and static web assets.
 
-## SemanticCatalogue 0.15.0
+## SemanticCatalogue 0.16.0
 
-The owning Model now consumes SemanticCatalogue 0.15.0. Semantic annotations do not add payload fields or change classification editing workflows in the generated client.
+The owning Model now consumes SemanticCatalogue 0.16.0. Semantic annotations do not add payload fields or change classification editing workflows in the generated client.
 
 
 ## Canonical reference adoption (0.9.0)
 
-The provider registry uses the shared SemanticMetadata.Create factory and OSDC canonical drilling profile. A contradictory explicit reference fails. Along-hole and vertical coordinates have distinct references; uncertainties remain origin-free. SemanticCatalogue 0.15.0 is consumed from NuGet; no local-project or local-feed fallback is required.
+The provider registry uses the shared SemanticMetadata.Create factory and OSDC canonical drilling profile. A contradictory explicit reference fails. Along-hole and vertical coordinates have distinct references; uncertainties remain origin-free. SemanticCatalogue 0.16.0 is consumed from NuGet; no local-project or local-feed fallback is required.
 
 
 Canonical reference metadata describes storage and REST/MCP payloads (`referenceScope: canonical-storage-and-api`), not a restriction on display choices (`presentationReferencesAllowed: true`). Web editors convert between the canonical reference and the supported reference selected by the user. Reference changes apply to coordinate values, not their standard uncertainties.
