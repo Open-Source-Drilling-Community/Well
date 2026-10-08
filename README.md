@@ -122,3 +122,5 @@ The provider registry uses the shared SemanticMetadata.Create factory and OSDC c
 
 
 Canonical reference metadata describes storage and REST/MCP payloads (`referenceScope: canonical-storage-and-api`), not a restriction on display choices (`presentationReferencesAllowed: true`). Web editors convert between the canonical reference and the supported reference selected by the user. Reference changes apply to coordinate values, not their standard uncertainties.
+
+Well resource UUID links to cluster/slot and the read-by-ID parameter are explicitly typed in the REST and MCP semantic contracts, allowing generic reference and ownership traversal.
