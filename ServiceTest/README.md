@@ -9,37 +9,23 @@
 - `WellBatchBackupRestoreTests`: ordered export, dependency closure, catalog remapping/creation, collision rollback, corrupt-document rejection, and legacy-upgrade data preservation.
 - `WellExternalReferenceValidatorTests`: Cluster/Slot membership checks, tri-state dependency failures, and per-batch Cluster-read caching.
 - `McpToolRegistrationTests`: parity between all 35 non-statistics REST actions and MCP tools, operation-specific write/response schemas, strict inputs, bounded search/audit, detailed descriptions, and behavior annotations.
-- `McpServerHttpTests`: live streamable-HTTP initialization, tool discovery, and `ping` invocation.
-
-## Run without the live MCP tests
-
-```powershell
-dotnet test ServiceTest\ServiceTest.csproj --filter "FullyQualifiedName!~McpServerHttpTests"
-```
+- `McpServerHttpTests`: in-process Streamable HTTP initialization, tool discovery, and `ping` invocation.
 
 ## Run the complete suite
 
-The HTTP tests connect to `http://localhost:8080/well/api/mcp`. Start the service in one terminal:
-
-```powershell
-dotnet run --project Service\Service.csproj --urls http://localhost:8080
-```
-
-Then run in another terminal:
+The HTTP tests host the service in process; no external service or listening port is required:
 
 ```powershell
 dotnet test ServiceTest\ServiceTest.csproj
 ```
 
-Stop the service after the tests. Test databases are created under the test working directory; production data is not modified.
-
 ## Shared classification regression checks
 
-The ResourceClassification 0.1.0 adoption is covered by ModelTest/ClassificationContractTests (stored JSON compatibility, nullable references, concrete options and interface conversion), plus the existing isolated catalogue, backup/restore, database safety and MCP registration tests. Live HTTP tests require a separately started test service. Well's optional Kubernetes-backup test skips when no local backup snapshots are available.
+The ResourceClassification 0.1.0 adoption is covered by ModelTest/ClassificationContractTests (stored JSON compatibility, nullable references, concrete options and interface conversion), plus the existing isolated catalogue, backup/restore, database safety and MCP registration tests. Well's optional Kubernetes-backup test skips when no local backup snapshots are available.
 
-## SemanticCatalogue 0.16.0
+## SemanticCatalogue 0.18.0
 
-`SemanticContractTests` verifies REST/MCP binding parity, inherited classification semantics and that published MCP bindings resolve to reviewed SemanticCatalogue 0.16.0 concepts.
+`SemanticContractTests` verifies REST/MCP binding parity, inherited classification semantics and that published MCP bindings resolve to reviewed SemanticCatalogue 0.18.0 concepts.
 
 
 ## Canonical reference adoption (0.9.0)
