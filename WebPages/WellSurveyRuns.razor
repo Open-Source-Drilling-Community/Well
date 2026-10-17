@@ -230,10 +230,10 @@
         try
         {
             logger.LogInformation("Trying to load list of Fields, Clusters and Wells");
-            Task<ICollection<WellModelShared.Field>> fieldTask = Api.ClientField.GetAllFieldAsync();
-            Task<ICollection<WellModelShared.Cluster>> clusterTask = Api.ClientCluster.GetAllClusterAsync();
-            Task<ICollection<WellModelShared.RigReadResponse>> rigTask = Api.ClientRig.GetAllRigAsync();
-            Task<ICollection<WellModelShared.Well>> wellTask = Api.ClientWell.GetAllWellAsync();
+            var fieldTask = Api.ClientField.ListFieldReferencesAsync();
+            var clusterTask = Api.ClientCluster.ListClusterReferencesAsync();
+            var rigTask = Api.ClientRig.ListRigReferencesAsync();
+            var wellTask = Api.ClientWell.ListWellReferencesAsync();
 
             await Task.WhenAll(fieldTask, clusterTask, rigTask, wellTask);
 
@@ -426,7 +426,7 @@
             await InvokeAsync(StateHasChanged);
 
             logger.LogInformation("Loading survey run light data for field {FieldId}, cluster {ClusterId} and well {WellId}", fieldId, clusterId, wellId);
-            surveyRunLightList = (await Api.ClientTrajectory.GetAllSurveyRunLightAsync(fieldId: fieldId, clusterId: clusterId, wellId: wellId))
+            surveyRunLightList = (await Api.ClientTrajectory.ListSurveyRunLightAsync(fieldId: fieldId, clusterId: clusterId, wellId: wellId))
                 .Where(surveyRun => surveyRun?.MetaInfo != null && surveyRun.MetaInfo.ID != Guid.Empty)
                 .Where(MatchesSurveyRunFilters)
                 .OrderBy(surveyRun => surveyRun.Name)

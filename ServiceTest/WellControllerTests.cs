@@ -66,6 +66,31 @@ namespace OSDC.Drilling.Well.ServiceTest
         }
 
         [Test]
+        public void Discovery_pages_are_bounded_sorted_filtered_and_preserve_selected_reads()
+        {
+            Guid cluster = Guid.NewGuid();
+            var ids = new[] { Guid.Parse("00000000-0000-0000-0000-000000000003"), Guid.Parse("00000000-0000-0000-0000-000000000001"), Guid.Parse("00000000-0000-0000-0000-000000000002") };
+            foreach (Guid id in ids) Assert.That(_controller.PostWell(NewWell(id, cluster)), Is.InstanceOf<Microsoft.AspNetCore.Mvc.OkResult>());
+            var result = _controller.DiscoverWell(offset: 0, limit: 2, clusterId: cluster);
+            var page = (WellDiscoveryPage)((Microsoft.AspNetCore.Mvc.OkObjectResult)result.Result!).Value!;
+            Assert.Multiple(() =>
+            {
+                Assert.That(page.TotalCount, Is.EqualTo(3));
+                Assert.That(page.Items.Select(item => item.MetaInfo!.ID), Is.EqualTo(ids.OrderBy(id => id.ToString()).Take(2)));
+                Assert.That(page.NextOffset, Is.EqualTo(2));
+                Assert.That(JsonSerializer.Serialize(page), Does.Not.Contain("WellIdentityAssignments").And.Not.Contain("WellFeatureAssignments"));
+            });
+            var last = (WellDiscoveryPage)((Microsoft.AspNetCore.Mvc.OkObjectResult)_controller.DiscoverWell(offset: 2, limit: 2).Result!).Value!;
+            Assert.That(last.Items, Has.Count.EqualTo(1));
+            Assert.That(last.NextOffset, Is.Null);
+            var absent = (WellDiscoveryPage)((Microsoft.AspNetCore.Mvc.OkObjectResult)_controller.DiscoverWell(clusterId: Guid.NewGuid()).Result!).Value!;
+            Assert.That(absent.Items, Is.Empty); Assert.That(absent.TotalCount, Is.Zero); Assert.That(absent.NextOffset, Is.Null);
+            Assert.That(_controller.GetWellById(ids[0]).Result, Is.InstanceOf<Microsoft.AspNetCore.Mvc.OkObjectResult>());
+            Assert.That(_controller.DiscoverWell(limit: 201).Result, Is.InstanceOf<Microsoft.AspNetCore.Mvc.BadRequestObjectResult>());
+            Assert.That(_controller.DiscoverWell(offset: -1).Result, Is.InstanceOf<Microsoft.AspNetCore.Mvc.BadRequestObjectResult>());
+        }
+
+        [Test]
         public void GetAllWellId_Empty_ReturnsOkEmptyList()
         {
             var result = _controller.GetAllWellId();

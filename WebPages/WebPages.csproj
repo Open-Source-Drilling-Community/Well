@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
+<Project Sdk="Microsoft.NET.Sdk.Razor">
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
@@ -34,7 +34,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<Compile Include="..\ModelSharedOut\WellMergedModel.cs;..\ModelSharedOut\ClientJsonSerializerSettings.cs" Link="GeneratedDtos\%(RecursiveDir)%(Filename)%(Extension)" />
+		<Compile Include="..\ModelSharedOut\WellMergedModel.cs;..\ModelSharedOut\ClientJsonSerializerSettings.cs;..\ModelSharedOut\DiscoveryClientExtensions.cs;..\ModelSharedOut\SlotDiscoveryClientExtensions.cs" Link="GeneratedDtos\%(RecursiveDir)%(Filename)%(Extension)" />
 	</ItemGroup>
 
 </Project>

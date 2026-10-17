@@ -107,7 +107,7 @@ See [../deployment/identity-cutover.md](../deployment/identity-cutover.md) for t
 
 ## MCP contract
 
-The service advertises 36 MCP tools: 35 non-statistics REST operations plus `ping`. Usage statistics are intentionally not exposed through MCP.
+The service advertises the current MCP tools: 35 non-statistics REST operations plus `ping`. Usage statistics are intentionally not exposed through MCP.
 
 - Streamable HTTP: `/well/api/mcp`
 - WebSocket: `/well/api/mcp/ws`
@@ -124,7 +124,7 @@ Tool families:
 - `well_identity_*`: complete Identity definition CRUD and discovery.
 - `well_feature_category_*`: complete Feature Category CRUD and discovery.
 
-Well discovery consists of `well_get_all_ids`, `well_get_all_meta_info`, `well_get_by_id`, the complete unbounded `well_get_all`, and bounded `well_search`. There is no separate `well_get_all_light`; use metadata for a lightweight listing or `well_search` for filtered, paginated complete records. Search supports name, Cluster, Slot, identity definition/value, feature category/option, and modification-time filters. Field-level navigation remains a cross-service workflow because Well stores Cluster and Slot UUIDs, not a Field UUID.
+Well discovery consists of `well_get_all_ids`, `well_get_all_meta_info`, `well_get_by_id`, the complete unbounded `well_discover`, and bounded `well_search`. There is no separate `well_discover`; use metadata for a lightweight listing or `well_search` for filtered, paginated complete records. Search supports name, Cluster, Slot, identity definition/value, feature category/option, and modification-time filters. Field-level navigation remains a cross-service workflow because Well stores Cluster and Slot UUIDs, not a Field UUID.
 
 Every tool publishes a title, detailed description, closed input/output JSON schemas, and read-only/destructive/idempotent/open-world annotations. Success envelopes use lowercase `status` and `data`, while model properties inside `data` preserve their declared PascalCase names such as `MetaInfo` and `ID`, exactly matching the output schema. Closed schemas are enforced at runtime: unknown top-level and nested properties are rejected instead of ignored. Well write schemas mark timestamps as optional server-owned fields, while Well response schemas require non-null creation and modification timestamps. UUID arguments must be non-empty. Well updates, Well deletion, assignment mutations, and catalog updates require `expectedModifiedUtc`. Well mutations additionally validate assignment IDs, required identity values, catalog references, validity periods, exclusive-category overlap, and Slot/Cluster consistency. Tests compare all non-statistics controller actions with registered MCP tools to prevent REST/MCP drift.
 
@@ -171,3 +171,19 @@ The provider registry uses the shared SemanticMetadata.Create factory and OSDC c
 
 
 Canonical reference metadata describes storage and REST/MCP payloads (`referenceScope: canonical-storage-and-api`), not a restriction on display choices (`presentationReferencesAllowed: true`). Web editors convert between the canonical reference and the supported reference selected by the user. Reference changes apply to coordinate values, not their standard uncertainties.
+
+## Bounded light discovery
+
+Resource and catalog discovery returns light pages, with `offset` defaulting to 0 and `limit` defaulting to 50 (allowed range 1–200). Names and relevant resource-reference filters are evaluated on the server. Unbounded full-object `HeavyData` routes and tools, including filtered full-object lists, have been removed. Existing UUID and HTTP-metadata listings remain available; use named light pages for routine discovery.
+
+REST routes and MCP tool names (relative to the service's existing API path base):
+
+- `/Well/LightData` / `well_discover`
+- `/WellFeatureCategory/LightData` / `well_feature_category_discover`
+- `/WellIdentity/LightData` / `well_identity_discover`
+
+Pages contain `Items`, `Offset`, `Limit`, `TotalCount`, and `NextOffset`; `NextOffset` is null on the final page. Offset pages are individually consistent reads, not a snapshot spanning requests: concurrent inserts/deletes can change later pages. Refresh discovery when the underlying collection changes. EarthGeodesy's existing search pages instead expose `Items[].Value`, `Offset`, `Limit`, and `TotalCount`.
+
+Single-record reads, result/chunk reads, and deliberate backup/export/restore operations are preserved. Backups can still contain complete resources and should be treated as explicit bulk operations.
+
+This is a breaking REST/MCP contract change: update generated clients, UIs, and external integrations together with the service release. Removed heavy-list names are not compatibility aliases. No persisted engineering shapes, database names, or storage volumes are changed. Historical usage counters are retained; bounded discovery has a separate additive `DiscoveryRequestsPerDay` history in resource services.

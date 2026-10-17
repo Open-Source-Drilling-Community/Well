@@ -233,10 +233,10 @@
         try
         {
             logger.LogInformation("Trying to load list of Fields, Clusters and Wells");
-            Task<ICollection<WellModelShared.Field>> fieldTask = Api.ClientField.GetAllFieldAsync();
-            Task<ICollection<WellModelShared.Cluster>> clusterTask = Api.ClientCluster.GetAllClusterAsync();
-            Task<ICollection<WellModelShared.RigReadResponse>> rigTask = Api.ClientRig.GetAllRigAsync();
-            Task<ICollection<WellModelShared.Well>> wellTask = Api.ClientWell.GetAllWellAsync();
+            var fieldTask = Api.ClientField.ListFieldReferencesAsync();
+            var clusterTask = Api.ClientCluster.ListClusterReferencesAsync();
+            var rigTask = Api.ClientRig.ListRigReferencesAsync();
+            var wellTask = Api.ClientWell.ListWellReferencesAsync();
 
             await Task.WhenAll(fieldTask, clusterTask, rigTask, wellTask);
 
@@ -436,7 +436,7 @@
             await InvokeAsync(StateHasChanged);
 
             logger.LogInformation("Loading trajectory light data for field {FieldId}, cluster {ClusterId} and well {WellId}", fieldId, clusterId, wellId);
-            trajectoryLightList = (await Api.ClientTrajectory.GetAllTrajectoryLightAsync(fieldId: fieldId, clusterId: clusterId, wellId: wellId))
+            trajectoryLightList = (await Api.ClientTrajectory.ListTrajectoryLightAsync(fieldId: fieldId, clusterId: clusterId, wellId: wellId))
                 .Where(trajectory => trajectory?.MetaInfo != null && trajectory.MetaInfo.ID != Guid.Empty)
                 .Where(MatchesTrajectoryFilters)
                 .OrderBy(trajectory => trajectory.Name)

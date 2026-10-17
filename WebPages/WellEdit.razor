@@ -176,7 +176,7 @@
                 if (Clusters != null)
                 {
                     <MudItem xs="12" sm="6" md="6" lg="6" xl="6">
-                        <MudSelect Label="Cluster" @bind-Value="@_selectedCluster" Dense="true" ToStringFunc="@(s => s?.Name)">
+                        <MudSelect T="Cluster" Label="Cluster" Value="@_selectedCluster" ValueChanged="SelectClusterAsync" Dense="true" ToStringFunc="@(s => s?.Name)">
                             @foreach (var cluster in Clusters.Where(x =>
                                                 (x != null && x.FieldID != null && _selectedField != null && _selectedField.MetaInfo != null && _selectedField.MetaInfo.ID == x.FieldID && !x.IsSingleWell) &&
                                                 (string.IsNullOrEmpty(_clusterSearchText) || (x != null && !string.IsNullOrEmpty(x.Name) && x.Name.Contains(_clusterSearchText, StringComparison.OrdinalIgnoreCase)))))
@@ -288,6 +288,12 @@
     private bool _isSingleWell = false;
     private Field? _selectedField = null;
     private Cluster? _selectedCluster = null;
+    private async Task SelectClusterAsync(Cluster? summary)
+    {
+        _selectedCluster = summary?.MetaInfo?.ID is Guid id
+            ? await Api.ClientCluster.GetClusterByIdAsync(id) : null;
+        _selectedSlot = null;
+    }
     private Slot? _selectedSlot = null;
     private Cluster? _singleWellCluster = null;
     private Slot? _singleWellSlot = null;
@@ -350,6 +356,8 @@
                 _wellIdentityAssignments = CloneIdentityAssignments(CurrentWell.WellIdentityAssignments);
                 _wellFeatureCategories = await LoadWellFeatureCategoriesAsync();
                 _wellFeatureAssignments = CloneFeatureAssignments(CurrentWell.WellFeatureAssignments);
+                foreach (Guid assignedCategoryId in _wellFeatureAssignments.Where(value => value.FeatureCategoryID.HasValue).Select(value => value.FeatureCategoryID!.Value).Distinct())
+                    await Api.ClientWell.LoadWellFeatureCategoryDetailsAsync(_wellFeatureCategories, assignedCategoryId);
                 _selectedCluster = null;
                 _selectedSlot = null;
                 _selectedField = null;
@@ -359,12 +367,12 @@
                     {
                         if (cluster != null && cluster.MetaInfo != null && cluster.MetaInfo.ID == CurrentWell.ClusterID)
                         {
-                            _selectedCluster = cluster;
-                            if (cluster != null && cluster.Slots != null && CurrentWell.SlotID != null && CurrentWell.SlotID != Guid.Empty)
+                            _selectedCluster = await Api.ClientCluster.GetClusterByIdAsync(cluster.MetaInfo.ID);
+                            if (_selectedCluster.Slots != null && CurrentWell.SlotID != null && CurrentWell.SlotID != Guid.Empty)
                             {
-                                if (cluster.Slots.ContainsKey(CurrentWell.SlotID.ToString()))
+                                if (_selectedCluster.Slots.ContainsKey(CurrentWell.SlotID.ToString()))
                                 {
-                                    _selectedSlot = cluster.Slots[CurrentWell.SlotID.ToString()];
+                                    _selectedSlot = _selectedCluster.Slots[CurrentWell.SlotID.ToString()];
                                 }
                             }
                             break;
@@ -597,7 +605,7 @@
     {
         try
         {
-            return ((IEnumerable<WellIdentity>)await Api.ClientWell.GetAllWellIdentityAsync())
+            return ((IEnumerable<WellIdentity>)await Api.ClientWell.ListWellIdentityReferencesAsync())
                 .OrderBy(item => item.Name, StringComparer.OrdinalIgnoreCase)
                 .ToList();
         }
@@ -613,7 +621,7 @@
     {
         try
         {
-            return ((IEnumerable<WellFeatureCategory>)await Api.ClientWell.GetAllWellFeatureCategoryAsync())
+            return ((IEnumerable<WellFeatureCategory>)await Api.ClientWell.ListWellFeatureCategoryReferencesAsync())
                 .OrderBy(item => item.Name, StringComparer.OrdinalIgnoreCase)
                 .ToList();
         }
@@ -628,8 +636,10 @@
     private string GetIdentityName(WellIdentityAssignment assignment) =>
         _wellIdentities.FirstOrDefault(item => item.MetaInfo?.ID == assignment.IdentityID)?.Name ?? "Unknown identity";
 
-    private void SelectFeatureCategory(Guid? categoryId)
+    private async Task SelectFeatureCategory(Guid? categoryId)
     {
+        if (categoryId is Guid id)
+            await Api.ClientWell.LoadWellFeatureCategoryDetailsAsync(_wellFeatureCategories, id);
         _selectedFeatureCategoryId = categoryId;
         _selectedFeatureOptionId = null;
     }

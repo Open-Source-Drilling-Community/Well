@@ -1,3 +1,4 @@
+using OSDC.Drilling.Well.Service;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -19,6 +20,28 @@ namespace OSDC.Drilling.Well.Service.Controllers
     [ApiController]
     public class WellController : ControllerBase
     {
+        private readonly SqlConnectionManager _discoveryConnections;
+
+        /// <summary>Discover Well resources as bounded light records; retrieve selected full records by ID.</summary>
+        [HttpGet("LightData", Name = "DiscoverWell")]
+        public ActionResult<OSDC.Drilling.Well.Model.WellDiscoveryPage> DiscoverWell([FromQuery] int offset = 0, [FromQuery] int limit = 50, [FromQuery] string? name = null, [FromQuery] System.Guid? slotId = null, [FromQuery] System.Guid? clusterId = null, [FromQuery] bool? isSingleWell = null)
+        {
+            UsageStatisticsWell.Instance.IncrementDiscoveryRequestsPerDay();
+            if (offset < 0 || limit < 1 || limit > 200 || name?.Length > 200 || slotId == System.Guid.Empty || clusterId == System.Guid.Empty)
+                return BadRequest(new { error = "invalid_discovery_query", message = "Offset must be non-negative, limit 1–200, name at most 200 characters, and UUID filters non-empty." });
+            try
+            {
+                var records = DiscoveryRecords.ReadPage<OSDC.Drilling.Well.Model.WellLight>(_discoveryConnections.GetConnection(), "WellTable", "Well", offset, limit, name,
+                    new System.Collections.Generic.Dictionary<string, object?> { ["SlotID"] = slotId, ["ClusterID"] = clusterId, ["IsSingleWell"] = isSingleWell }, out int total);
+                return Ok(new OSDC.Drilling.Well.Model.WellDiscoveryPage { Items = records, Offset = offset, Limit = limit, TotalCount = total,
+                    NextOffset = offset < total && records.Count < total - offset ? offset + records.Count : null });
+            }
+            catch (System.Exception ex) when (ex is Microsoft.Data.Sqlite.SqliteException or System.Text.Json.JsonException or System.InvalidOperationException)
+            {
+                return StatusCode(500, new { error = "discovery_failed" });
+            }
+        }
+
         private readonly ILogger<WellManager> _logger;
         private readonly WellManager _wellManager;
         private readonly IWellExternalReferenceValidator _externalReferenceValidator;
@@ -26,6 +49,7 @@ namespace OSDC.Drilling.Well.Service.Controllers
         public WellController(ILogger<WellManager> logger, SqlConnectionManager connectionManager,
             IWellExternalReferenceValidator? externalReferenceValidator = null)
         {
+            _discoveryConnections = connectionManager;
             _logger = logger;
             _wellManager = WellManager.GetInstance(_logger, connectionManager);
             _externalReferenceValidator = externalReferenceValidator ?? new UnavailableWellExternalReferenceValidator();
@@ -100,7 +124,7 @@ namespace OSDC.Drilling.Well.Service.Controllers
         /// Returns the list of all Well present in the microservice database, at endpoint Well/api/Well/HeavyData
         /// </summary>
         /// <returns>the list of all Well present in the microservice database, at endpoint Well/api/Well/HeavyData</returns>
-        [HttpGet("HeavyData", Name = "GetAllWell")]
+        [NonAction]
         public ActionResult<IEnumerable<Model.Well?>> GetAllWell()
         {
             UsageStatisticsWell.Instance.IncrementGetAllWellPerDay();

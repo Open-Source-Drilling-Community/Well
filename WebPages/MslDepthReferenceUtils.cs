@@ -4,10 +4,12 @@ namespace OSDC.Drilling.Well.WebPages;
 
 public static class MslDepthReferenceUtils
 {
-    public static Task<double?> ResolveMeanSeaLevelDepthReferenceAsync(IWellAPIUtils api, ModelShared.Well? well, IEnumerable<ModelShared.Cluster>? clusters)
+    public static async Task<double?> ResolveMeanSeaLevelDepthReferenceAsync(IWellAPIUtils api, ModelShared.Well? well, IEnumerable<ModelShared.Cluster>? clusters)
     {
+        var cluster = clusters?.FirstOrDefault(value => value.MetaInfo?.ID == well?.ClusterID);
+        if (cluster != null) await ModelShared.SlotDiscoveryClientExtensions.LoadClusterSlotReferencesAsync(api.ClientCluster, cluster);
         ModelShared.Slot? slot = ResolveSlot(well, clusters);
-        return CalculateMeanSeaLevelDepthReferenceAsync(
+        return await CalculateMeanSeaLevelDepthReferenceAsync(
             api,
             slot?.Latitude?.GaussianValue?.Mean,
             slot?.Longitude?.GaussianValue?.Mean);

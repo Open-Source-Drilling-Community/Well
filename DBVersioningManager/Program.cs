@@ -18,7 +18,10 @@ Client wellClient = ClientSetup(devHostName, wellHostBase);
 // Create clients to access databases from local/ environment
 Client wellLocalClient = ClientSetup(localHostName, wellHostBase);
 // Get all wells and cartographic projection sets from the APIs
-List<Well> wells = (List<Well>) (await wellClient.GetAllWellAsync()).ToList();
+// This explicit administrative copy reads full records individually after light discovery.
+List<Well> wells = [];
+foreach (var summary in await wellClient.ListWellLightAsync())
+    wells.Add(await wellClient.GetWellByIdAsync(summary.MetaInfo!.ID));
 
 // Update local database with data from dev/ database
 foreach (var well in wells)

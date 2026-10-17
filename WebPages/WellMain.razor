@@ -81,10 +81,10 @@
 
             // Starting all loading tasks asynchronously
             logger.LogInformation("Trying to load list of Well from client: " + Api.HostNameWell);
-            var wellTask = Api.ClientWell.GetAllWellAsync();
-            var clusterTask = Api.ClientCluster.GetAllClusterAsync();
-            var fieldTask = Api.ClientField.GetAllFieldAsync();
-            var rigTask = Api.ClientRig.GetAllRigAsync();
+            var wellTask = Api.ClientWell.ListWellReferencesAsync();
+            var clusterTask = Api.ClientCluster.ListClusterReferencesAsync();
+            var fieldTask = Api.ClientField.ListFieldReferencesAsync();
+            var rigTask = Api.ClientRig.ListRigReferencesAsync();
 
             List<Task> loadingTaskList = new List<Task> { wellTask, clusterTask, fieldTask, rigTask };
 
@@ -329,6 +329,8 @@
 
     private async Task UpdateSelectedClusterDepthReferenceSourceAsync()
     {
+        var cluster = clusterList?.FirstOrDefault(value => value.MetaInfo?.ID == currentWell?.ClusterID);
+        if (cluster != null) await Api.ClientCluster.LoadClusterSlotReferencesAsync(cluster);
         DataUtils.ApplyWellReferenceValues(currentWell, clusterList, rigList, fieldList);
         DataUtils.UnitAndReferenceParameters.MeanSeaLevelDepthReferenceSource.MeanSeaLevelDepthReference =
             await MslDepthReferenceUtils.ResolveMeanSeaLevelDepthReferenceAsync(Api, currentWell, clusterList);

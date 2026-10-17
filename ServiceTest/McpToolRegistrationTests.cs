@@ -17,7 +17,7 @@ public sealed class McpToolRegistrationTests
         ["GetAllWellId"] = "well_get_all_ids",
         ["GetAllWellMetaInfo"] = "well_get_all_meta_info",
         ["GetWellById"] = "well_get_by_id",
-        ["GetAllWell"] = "well_get_all",
+        ["DiscoverWell"] = "well_discover",
         ["SearchWells"] = "well_search",
         ["ValidateWellExternalReferences"] = "well_validate_external_references",
         ["AuditWellExternalReferences"] = "well_audit_external_references",
@@ -38,17 +38,17 @@ public sealed class McpToolRegistrationTests
         ["GetAllWellIdentityId"] = "well_identity_get_all_ids",
         ["GetAllWellIdentityMetaInfo"] = "well_identity_get_all_meta_info",
         ["GetWellIdentityById"] = "well_identity_get_by_id",
-        ["GetAllWellIdentity"] = "well_identity_get_all",
+        ["DiscoverWellIdentity"] = "well_identity_discover",
         ["PostWellIdentity"] = "well_identity_create",
         ["PutWellIdentityById"] = "well_identity_update_by_id",
         ["DeleteWellIdentityById"] = "well_identity_delete_by_id",
         ["GetAllWellFeatureCategoryId"] = "well_feature_category_get_all_ids",
         ["GetAllWellFeatureCategoryMetaInfo"] = "well_feature_category_get_all_meta_info",
         ["GetWellFeatureCategoryById"] = "well_feature_category_get_by_id",
-        ["GetAllWellFeatureCategory"] = "well_feature_category_get_all",
+        ["DiscoverWellFeatureCategory"] = "well_feature_category_discover",
         ["PostWellFeatureCategory"] = "well_feature_category_create",
         ["PutWellFeatureCategoryById"] = "well_feature_category_update_by_id",
-        ["DeleteWellFeatureCategoryById"] = "well_feature_category_delete_by_id"
+        ["DeleteWellFeatureCategoryById"] = "well_feature_category_delete_by_id",
     };
 
     private ServiceProvider _provider = null!;
@@ -129,7 +129,7 @@ public sealed class McpToolRegistrationTests
         foreach ((string name, IMcpTool tool) in _tools.Where(pair => pair.Key != "ping"))
         {
             Assert.That(tool.Behavior.OpenWorldHint, Is.False, name);
-            if (name.Contains("_get_", StringComparison.Ordinal) || name is "well_batch_export" or "well_search" or
+            if (name.EndsWith("_discover", StringComparison.Ordinal) || name.Contains("_get_", StringComparison.Ordinal) || name is "well_batch_export" or "well_search" or
                 "well_validate_external_references" or "well_audit_external_references")
             {
                 Assert.Multiple(() =>
@@ -166,13 +166,13 @@ public sealed class McpToolRegistrationTests
 
     [TestCase("well_get_all_ids")]
     [TestCase("well_get_all_meta_info")]
-    [TestCase("well_get_all")]
+    [TestCase("well_discover")]
     [TestCase("well_identity_get_all_ids")]
     [TestCase("well_identity_get_all_meta_info")]
-    [TestCase("well_identity_get_all")]
+    [TestCase("well_identity_discover")]
     [TestCase("well_feature_category_get_all_ids")]
     [TestCase("well_feature_category_get_all_meta_info")]
-    [TestCase("well_feature_category_get_all")]
+    [TestCase("well_feature_category_discover")]
     public void Parameterless_tools_publish_an_explicit_empty_object_schema(string toolName)
     {
         JsonObject schema = RequireObject(_tools[toolName].InputSchema);

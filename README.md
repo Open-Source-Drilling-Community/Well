@@ -66,7 +66,7 @@ dotnet run --project WebApp
 
 Well mutations and catalog replacement operations use optimistic concurrency: callers send the `LastModificationDate` from their latest read as `expectedModifiedUtc`. Stale updates and deletes return `409` without changing the record. MCP closed-object schemas are also enforced at runtime, including rejection of unknown nested fields.
 
-Lightweight Well discovery is available through ID and metadata listings. `well_search` is the bounded query operation and filters by name, Cluster, Slot, identity definition/value, feature category/option, and modification interval; there is no separate `well_get_all_light` operation.
+Lightweight Well discovery is available through ID and metadata listings. `well_search` is the bounded query operation and filters by name, Cluster, Slot, identity definition/value, feature category/option, and modification interval; there is no separate `well_discover` operation.
 
 Cluster and Slot UUIDs are external references owned by the Cluster service. Their UUID shape and Slot-requires-Cluster relationship are validated locally; external existence is never checked inside a Well database transaction. Separate read-only validation endpoints use `ClusterHostURL` and report `Unavailable` when the Cluster service cannot be reached.
 
@@ -124,3 +124,19 @@ The provider registry uses the shared SemanticMetadata.Create factory and OSDC c
 Canonical reference metadata describes storage and REST/MCP payloads (`referenceScope: canonical-storage-and-api`), not a restriction on display choices (`presentationReferencesAllowed: true`). Web editors convert between the canonical reference and the supported reference selected by the user. Reference changes apply to coordinate values, not their standard uncertainties.
 
 Well resource UUID links to cluster/slot and the read-by-ID parameter are explicitly typed in the REST and MCP semantic contracts, allowing generic reference and ownership traversal.
+
+## Bounded light discovery
+
+Resource and catalog discovery returns light pages, with `offset` defaulting to 0 and `limit` defaulting to 50 (allowed range 1–200). Names and relevant resource-reference filters are evaluated on the server. Unbounded full-object `HeavyData` routes and tools, including filtered full-object lists, have been removed. Existing UUID and HTTP-metadata listings remain available; use named light pages for routine discovery.
+
+REST routes and MCP tool names (relative to the service's existing API path base):
+
+- `/Well/LightData` / `well_discover`
+- `/WellFeatureCategory/LightData` / `well_feature_category_discover`
+- `/WellIdentity/LightData` / `well_identity_discover`
+
+Pages contain `Items`, `Offset`, `Limit`, `TotalCount`, and `NextOffset`; `NextOffset` is null on the final page. Offset pages are individually consistent reads, not a snapshot spanning requests: concurrent inserts/deletes can change later pages. Refresh discovery when the underlying collection changes. EarthGeodesy's existing search pages instead expose `Items[].Value`, `Offset`, `Limit`, and `TotalCount`.
+
+Single-record reads, result/chunk reads, and deliberate backup/export/restore operations are preserved. Backups can still contain complete resources and should be treated as explicit bulk operations.
+
+This is a breaking REST/MCP contract change: update generated clients, UIs, and external integrations together with the service release. Removed heavy-list names are not compatibility aliases. No persisted engineering shapes, database names, or storage volumes are changed. Historical usage counters are retained; bounded discovery has a separate additive `DiscoveryRequestsPerDay` history in resource services.
