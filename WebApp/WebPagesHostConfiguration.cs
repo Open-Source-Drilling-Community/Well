@@ -35,9 +35,4 @@ public class WebPagesHostConfiguration :
         get => EarthVerticalDatumHostURL ?? string.Empty;
         set => EarthVerticalDatumHostURL = value;
     }
-    string? OSDC.Drilling.Field.WebPages.IFieldWebPagesConfiguration.VerticalDatumHostURL
-    {
-        get => EarthVerticalDatumHostURL;
-        set => EarthVerticalDatumHostURL = value;
-    }
 }
